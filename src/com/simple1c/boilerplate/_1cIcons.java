@@ -1,4 +1,4 @@
-package com.simple1c;
+package com.simple1c.boilerplate;
 
 import com.intellij.openapi.util.IconLoader;
 

@@ -1,6 +1,9 @@
-package com.simple1c;
+package com.simple1c.boilerplate;
 
+import com.intellij.extapi.psi.PsiFileBase;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.LanguageFileType;
+import com.intellij.psi.FileViewProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,4 +41,6 @@ public class _1cFileType extends LanguageFileType {
         return _1cIcons.FILE;
     }
 }
+
+
 

@@ -39,24 +39,23 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <fileTypeFactory implementation="com.simple1c._1cFileTypeFactory"/>
+        <fileTypeFactory implementation="com.simple1c.boilerplate._1cFileTypeFactory"/>
         <lang.parserDefinition language="1c" implementationClass="com.simple1c._1cParserDefinition"/>
-        <!--<lang.syntaxHighlighterFactory key="_1c"-->
-        <!--language="_1c"-->
-        <!--implementationClass="com.simple-1c._1cSyntaxHighlighterFactory"/>-->
+        <lang.syntaxHighlighterFactory key="1c" language="1c"
+                                       implementationClass="com.simple1c.impl.SyntaxHighlighterFactory"/>
         <!--<colorSettingsPage implementation="com.simpleplugin.SimpleColorSettingsPage"/>-->
         <!--<annotator language="JAVA" implementationClass="com.simpleplugin.SimpleAnnotator"/>-->
         <!--<codeInsight.lineMarkerProvider language="JAVA"-->
-                                        <!--implementationClass="com.simpleplugin.SimpleLineMarkerProvider"/>-->
+        <!--implementationClass="com.simpleplugin.SimpleLineMarkerProvider"/>-->
         <!--<completion.contributor language="Simple" implementationClass="com.simpleplugin.SimpleCompletionContributor"/>-->
         <!--<psi.referenceContributor implementation="com.simpleplugin.SimpleReferenceContributor"/>-->
         <!--<lang.findUsagesProvider language="Simple" implementationClass="com.simpleplugin.SimpleFindUsagesProvider"/>-->
         <!--<lang.refactoringSupport language="Simple"-->
-                                 <!--implementationClass="com.simpleplugin.SimpleRefactoringSupportProvider"/>-->
+        <!--implementationClass="com.simpleplugin.SimpleRefactoringSupportProvider"/>-->
         <!--<lang.foldingBuilder language="JAVA" implementationClass="com.simpleplugin.SimpleFoldingBuilder"/>-->
         <!--<gotoSymbolContributor implementation="com.simpleplugin.SimpleChooseByNameContributor"/>-->
         <!--<lang.psiStructureViewFactory language="Simple"-->
-                                      <!--implementationClass="com.simpleplugin.SimpleStructureViewFactory"/>-->
+        <!--implementationClass="com.simpleplugin.SimpleStructureViewFactory"/>-->
         <!--<lang.formatter language="Simple" implementationClass="com.simpleplugin.SimpleFormattingModelBuilder"/>-->
         <!--<codeStyleSettingsProvider implementation="com.simpleplugin.SimpleCodeStyleSettingsProvider"/>-->
         <!--<langCodeStyleSettingsProvider implementation="com.simpleplugin.SimpleLanguageCodeStyleSettingsProvider"/>-->
