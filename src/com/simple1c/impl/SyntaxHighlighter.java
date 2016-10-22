@@ -1,13 +1,14 @@
 package com.simple1c.impl;
 
+import com.intellij.lexer.FlexAdapter;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import com.simple1c._1cTokenType;
-import com.simple1c.impl._1cLexer;
+import generated.GeneratedTypes;
+import generated._QueryGrammarLexer;
 import org.jetbrains.annotations.NotNull;
 
 class SyntaxHighlighter implements com.intellij.openapi.fileTypes.SyntaxHighlighter {
@@ -28,7 +29,7 @@ class SyntaxHighlighter implements com.intellij.openapi.fileTypes.SyntaxHighligh
     @NotNull
     @Override
     public Lexer getHighlightingLexer() {
-        return new _1cLexer();
+        return new FlexAdapter(new _QueryGrammarLexer());
     }
 
     @NotNull
@@ -36,11 +37,9 @@ class SyntaxHighlighter implements com.intellij.openapi.fileTypes.SyntaxHighligh
     public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
         if (tokenType.equals(TokenType.BAD_CHARACTER))
             return Error;
-        if (tokenType.equals(_1cTokenType.Comment))
+        if (tokenType.equals(GeneratedTypes.LINE_COMMENT))
             return Comment;
-        if (tokenType.equals(_1cTokenType.Keyword))
-            return Keyword;
-        if (tokenType.equals(_1cTokenType.Identifier))
+        if (tokenType.equals(GeneratedTypes.IDENTIFIER))
             return Identifier;
         return Default;
     }

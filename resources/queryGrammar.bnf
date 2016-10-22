@@ -1,0 +1,116 @@
+{
+  generate = [names = "long" visitor-value = "R"]
+  psiPackage = "generated"
+  psiImplPackage = "generated"
+  psiClassPrefix = ""
+  psiImplClassSuffix = "Impl"
+  elementTypeClass="com.simple1c.boilerplate._1cElementType"
+  extends(".*Literal") = expression
+  extends("identifier") = expression
+
+  tokens = [
+    space='regexp:\s+'
+    number='regexp:\d+'
+    idSimple="regexp:[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*"
+    string="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
+    line_comment="regexp://.*"
+    WILDCARD = '*'
+    DOT = '.'
+    COMMA = ','
+    LPAREN = '('
+    RPAREN = ')'
+  ]
+}
+
+//external grammar ::= parseGrammar select_statement
+grammar ::= sqlQuery// live preview root
+
+select_statement ::= !<<eof>> select topOpt distinctOpt selectList
+fromKeyword tableDeclaration
+joinItem*
+[whereKeyword expression]
+[groupByKeyword expressionList [havingKeyword expression]]{
+    methods = [
+        topCount = "topOpt/numberLiteral"
+        topOpt = ""
+        whereExpression = "expression[0]"
+        havingExpression ="expression[1]"
+        grouping = "expressionList"
+        expressionList =""
+        //todo. isDistinct
+    ]
+}
+
+private fromKeyword ::= (from | из)
+topOpt ::= [top numberLiteral] //TODO. trash.make private
+private distinctOpt ::= distinct?
+alias ::= as? identifier //TODO. trash.make private
+
+//selection
+selectionItem ::= expression alias? {
+    methods = [
+        identifier = ""
+        alias = "alias/identifier"
+    ]
+}
+selectionList ::= selectionItem (COMMA selectionItem)*{
+    //TODO. isSelectAll
+}
+
+private selectList ::= (WILDCARD | selectionList ) {recoverWhile=notFromKeyword pin=1}
+private notFromKeyword ::= !fromKeyword
+
+//source
+tableDeclaration ::= identifier alias?{
+    methods = [
+        alias = "alias/identifier"
+        identifier = ""
+        tableName = "identifier"
+    ]
+}
+subquery ::= LPAREN sqlQuery RPAREN
+subqueryTable::= subquery alias{
+    methods = [
+        subquery = "/subquery"
+        alias = "alias/identifier"
+    ]
+}
+columnSource::= tableDeclaration | subqueryTable
+
+//optional clauses
+private whereKeyword::= where | где
+private groupByKeyword ::= (group by) | (сгруппировать по)
+private havingKeyword ::= having | имеющие
+
+//order by
+private orderByKeyword::= (order by) | (упорядочить по)
+private ascKeyword ::= asc | возр
+private descKeyword::= desc | убыв
+private orderDirectionOpt ::= [ascKeyword | descKeyword]
+orderItem ::= expression orderDirectionOpt
+private orderByExpressionList ::= orderItem (COMMA orderItem) *
+
+//union
+private unionKeyword ::= union| объединить
+private allModifierOpt ::= [all | все]
+private unionList ::= select_statement (unionKeyword allModifierOpt select_statement)*
+sqlQuery::= unionList [orderByKeyword orderByExpressionList]
+
+//join
+private joinKeyword ::= join | соединение
+private outerKeywordOpt ::= (outer | внешнее)?
+private outerJoinKind::= full | left | right | полное | левое | правое
+joinKind::= (inner | внутреннее) | (outerJoinKind outerKeywordOpt)
+
+joinItem ::= joinKind? joinKeyword columnSource (on | по) expression
+
+//identifiers
+identifier ::= idSimple (DOT idSimple)*
+
+stringLiteral ::= string
+numberLiteral ::= number
+boolLiteral ::= (true | false | истина | ложь)
+
+expression::= identifier | stringLiteral | numberLiteral | boolLiteral
+expressionList ::=  expression (COMMA expression)*
+

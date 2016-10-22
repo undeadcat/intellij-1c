@@ -1,2 +1,2 @@
 select * from Справочник.Контрагенты c
-left join huj t on t.id = c.id
+left join Документы.ПоступлениеНаРасчетныйСчет d on d.Контрагент = c.Ссылка

@@ -1,5 +1,6 @@
 import com.intellij.testFramework.ParsingTestCase;
 import com.simple1c._1cParserDefinition;
+import com.simple1c.boilerplate._1cLanguage;
 
 public class ParserTest extends ParsingTestCase {
 
@@ -8,6 +9,22 @@ public class ParserTest extends ParsingTestCase {
     }
 
     public void testSimple() {
+        doTest(true);
+    }
+
+    public void testMultipleQueries() {
+        doTest(true);
+    }
+
+    public void testInvalidSymbolsBetweenQueries() {
+        doTest(true);
+    }
+
+    public void testErrorsInQuery() {
+        doTest(true);
+    }
+
+    public void testPartialQuery() {
         doTest(true);
     }
 
