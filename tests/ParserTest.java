@@ -5,6 +5,7 @@ import com.simple1c.boilerplate._1cLanguage;
 /*
 TODO:
 Parenthesis
+not equals operators
 QueryFunction
 UnaryNotOperator
 InOperator

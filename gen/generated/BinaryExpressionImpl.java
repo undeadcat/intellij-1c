@@ -8,16 +8,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static generated.GeneratedTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 
-public class MulGroupImpl extends ASTWrapperPsiElement implements MulGroup {
+public class BinaryExpressionImpl extends ExpressionImpl implements BinaryExpression {
 
-  public MulGroupImpl(ASTNode node) {
+  public BinaryExpressionImpl(ASTNode node) {
     super(node);
   }
 
   public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitMulGroup(this);
+    return visitor.visitBinaryExpression(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -29,6 +28,20 @@ public class MulGroupImpl extends ASTWrapperPsiElement implements MulGroup {
   @NotNull
   public List<Expression> getExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, Expression.class);
+  }
+
+  @Override
+  @NotNull
+  public Expression getLeft() {
+    List<Expression> p1 = getExpressionList();
+    return p1.get(0);
+  }
+
+  @Override
+  @Nullable
+  public Expression getRight() {
+    List<Expression> p1 = getExpressionList();
+    return p1.size() < 2 ? null : p1.get(1);
   }
 
 }

@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface MulGroup extends PsiElement {
+public interface UnaryExpression extends Expression {
 
   @NotNull
-  List<Expression> getExpressionList();
+  Expression getOperand();
 
 }

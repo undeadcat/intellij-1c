@@ -1,4 +1,4 @@
-package generated;
+package ;
 
 import com.intellij.lexer.*;
 import com.intellij.psi.tree.IElementType;
@@ -22,6 +22,7 @@ import static generated.GeneratedTypes.*;
 EOL=\R
 WHITE_SPACE=\s
 
+OP_NEQ=((<>)|(\!\=))
 SPACE=[ \t\n\x0B\f\r]+
 NUMBER=[0-9]+
 IDSIMPLE=[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*
@@ -32,11 +33,25 @@ LINE_COMMENT="//".*
 <YYINITIAL> {
   {WHITE_SPACE}       { return com.intellij.psi.TokenType.WHITE_SPACE; }
 
-  "*"                 { return WILDCARD; }
+  "*"                 { return ASTERISK; }
   "."                 { return DOT; }
   ","                 { return COMMA; }
   "("                 { return LPAREN; }
   ")"                 { return RPAREN; }
+  ";"                 { return SEMICOLON; }
+  "="                 { return OP_EQ; }
+  "/"                 { return OP_DIV; }
+  "%"                 { return OP_REM; }
+  "+"                 { return OP_PLUS; }
+  "-"                 { return OP_MINUS; }
+  "<"                 { return OP_LT; }
+  "<="                { return OP_LTE; }
+  ">"                 { return OP_GT; }
+  ">="                { return OP_GTE; }
+  "like"              { return OP_LIKE; }
+  "not"               { return OP_NOT; }
+  "and"               { return OP_AND; }
+  "or"                { return OP_OR; }
   "select"            { return SELECT; }
   "from"              { return FROM; }
   "из"                { return ИЗ; }
@@ -79,7 +94,8 @@ LINE_COMMENT="//".*
   "истина"            { return ИСТИНА; }
   "ложь"              { return ЛОЖЬ; }
 
-  {SPACE}             { return com.intellij.psi.TokenType.WHITE_SPACE; }
+  {OP_NEQ}            { return OP_NEQ; }
+  {SPACE}             { return SPACE; }
   {NUMBER}            { return NUMBER; }
   {IDSIMPLE}          { return IDSIMPLE; }
   {STRING}            { return STRING; }

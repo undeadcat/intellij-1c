@@ -8,21 +8,26 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static generated.GeneratedTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 
-public class ExpressionImpl extends ASTWrapperPsiElement implements Expression {
+public class UnaryExpressionImpl extends ExpressionImpl implements UnaryExpression {
 
-  public ExpressionImpl(ASTNode node) {
+  public UnaryExpressionImpl(ASTNode node) {
     super(node);
   }
 
   public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitExpression(this);
+    return visitor.visitUnaryExpression(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof Visitor) accept((Visitor)visitor);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public Expression getOperand() {
+    return findNotNullChildByClass(Expression.class);
   }
 
 }

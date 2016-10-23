@@ -9,6 +9,7 @@ import com.simple1c.boilerplate._1cElementType;
 public interface GeneratedTypes {
 
   IElementType ALIAS = new _1cElementType("ALIAS");
+  IElementType BINARY_EXPRESSION = new _1cElementType("BINARY_EXPRESSION");
   IElementType BOOL_LITERAL = new _1cElementType("BOOL_LITERAL");
   IElementType COLUMN_SOURCE = new _1cElementType("COLUMN_SOURCE");
   IElementType EXPRESSION = new _1cElementType("EXPRESSION");
@@ -16,7 +17,6 @@ public interface GeneratedTypes {
   IElementType IDENTIFIER = new _1cElementType("IDENTIFIER");
   IElementType JOIN_ITEM = new _1cElementType("JOIN_ITEM");
   IElementType JOIN_KIND = new _1cElementType("JOIN_KIND");
-  IElementType MUL_GROUP = new _1cElementType("MUL_GROUP");
   IElementType NUMBER_LITERAL = new _1cElementType("NUMBER_LITERAL");
   IElementType ORDER_ITEM = new _1cElementType("ORDER_ITEM");
   IElementType SELECTION_ITEM = new _1cElementType("SELECTION_ITEM");
@@ -28,16 +28,17 @@ public interface GeneratedTypes {
   IElementType SUBQUERY_TABLE = new _1cElementType("SUBQUERY_TABLE");
   IElementType TABLE_DECLARATION = new _1cElementType("TABLE_DECLARATION");
   IElementType TOP_OPT = new _1cElementType("TOP_OPT");
+  IElementType UNARY_EXPRESSION = new _1cElementType("UNARY_EXPRESSION");
 
   IElementType ALL = new IElementType("all", null);
   IElementType AS = new IElementType("as", null);
   IElementType ASC = new IElementType("asc", null);
+  IElementType ASTERISK = new IElementType("*", null);
   IElementType BY = new IElementType("by", null);
   IElementType COMMA = new IElementType(",", null);
   IElementType DESC = new IElementType("desc", null);
   IElementType DISTINCT = new IElementType("distinct", null);
   IElementType DOT = new IElementType(".", null);
-  IElementType EQ = new IElementType("=", null);
   IElementType FALSE = new IElementType("false", null);
   IElementType FROM = new IElementType("from", null);
   IElementType FULL = new IElementType("full", null);
@@ -51,6 +52,20 @@ public interface GeneratedTypes {
   IElementType LPAREN = new IElementType("(", null);
   IElementType NUMBER = new IElementType("number", null);
   IElementType ON = new IElementType("on", null);
+  IElementType OP_AND = new IElementType("and", null);
+  IElementType OP_DIV = new IElementType("/", null);
+  IElementType OP_EQ = new IElementType("=", null);
+  IElementType OP_GT = new IElementType(">", null);
+  IElementType OP_GTE = new IElementType(">=", null);
+  IElementType OP_LIKE = new IElementType("like", null);
+  IElementType OP_LT = new IElementType("<", null);
+  IElementType OP_LTE = new IElementType("<=", null);
+  IElementType OP_MINUS = new IElementType("-", null);
+  IElementType OP_NEQ = new IElementType("OP_NEQ", null);
+  IElementType OP_NOT = new IElementType("not", null);
+  IElementType OP_OR = new IElementType("or", null);
+  IElementType OP_PLUS = new IElementType("+", null);
+  IElementType OP_REM = new IElementType("%", null);
   IElementType ORDER = new IElementType("order", null);
   IElementType OUTER = new IElementType("outer", null);
   IElementType RIGHT = new IElementType("right", null);
@@ -62,7 +77,6 @@ public interface GeneratedTypes {
   IElementType TRUE = new IElementType("true", null);
   IElementType UNION = new IElementType("union", null);
   IElementType WHERE = new IElementType("where", null);
-  IElementType WILDCARD = new IElementType("*", null);
   IElementType ВНЕШНЕЕ = new IElementType("внешнее", null);
   IElementType ВНУТРЕННЕЕ = new IElementType("внутреннее", null);
   IElementType ВОЗР = new IElementType("возр", null);
@@ -88,6 +102,9 @@ public interface GeneratedTypes {
        if (type == ALIAS) {
         return new AliasImpl(node);
       }
+      else if (type == BINARY_EXPRESSION) {
+        return new BinaryExpressionImpl(node);
+      }
       else if (type == BOOL_LITERAL) {
         return new BoolLiteralImpl(node);
       }
@@ -108,9 +125,6 @@ public interface GeneratedTypes {
       }
       else if (type == JOIN_KIND) {
         return new JoinKindImpl(node);
-      }
-      else if (type == MUL_GROUP) {
-        return new MulGroupImpl(node);
       }
       else if (type == NUMBER_LITERAL) {
         return new NumberLiteralImpl(node);
@@ -144,6 +158,9 @@ public interface GeneratedTypes {
       }
       else if (type == TOP_OPT) {
         return new TopOptImpl(node);
+      }
+      else if (type == UNARY_EXPRESSION) {
+        return new UnaryExpressionImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

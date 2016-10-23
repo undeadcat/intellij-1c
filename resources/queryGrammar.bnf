@@ -1,4 +1,5 @@
 {
+//todo. ignore case.
   generate = [names = "long" visitor-value = "R"]
   psiPackage = "generated"
   psiImplPackage = "generated"
@@ -7,25 +8,39 @@
   elementTypeClass="com.simple1c.boilerplate._1cElementType"
   extends(".*Literal") = expression
   extends("identifier") = expression
-  extends(".*expr") = expression
+  extends(".*Expr") = expression
+  extends(".*Expression") = expression
 
   tokens = [
-    space='regexp:\s+'
-    number='regexp:\d+'
-    idSimple="regexp:[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*"
-    string="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
-    line_comment="regexp://.*"
-    WILDCARD = '*'
+    ASTERISK = '*'
     DOT = '.'
     COMMA = ','
     LPAREN = '('
     RPAREN = ')'
     SEMICOLON = ';'
-    EQ = '='
+    OP_EQ = '='
+    OP_DIV = '/'
+    OP_REM = '%'
+    OP_PLUS = '+'
+    OP_MINUS = '-'
+    OP_NEQ = 'regexp:((<>)|(\!\=))'
+    OP_LT = '<'
+    OP_LTE = '<='
+    OP_GT = '>'
+    OP_GTE = '>='
+    OP_LIKE = 'like'
+    OP_NOT = 'not'
+    OP_AND = 'and'
+    OP_OR = 'or'
+    space='regexp:\s+'
+    number='regexp:\d+'
+    idSimple="regexp:[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*"
+    string="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
+    line_comment="regexp://.*"
   ]
 }
 
-grammar ::= sqlQuery ((SEMICOLON) sqlQuery) ?
+grammar ::= sqlQuery
 
 select_statement ::= !<<eof>> select topOpt distinctOpt selectList
 fromKeyword tableDeclaration
@@ -59,7 +74,7 @@ selectionList ::= selectionItem (COMMA selectionItem)*{
     //TODO. isSelectAll
 }
 
-private selectList ::= (WILDCARD | selectionList ) {recoverWhile=notFromKeyword pin=1}
+private selectList ::= (ASTERISK | selectionList ) {recoverWhile=notFromKeyword pin=1}
 private notFromKeyword ::= !fromKeyword
 
 //source
@@ -117,26 +132,65 @@ expressionList ::=  expression (COMMA expression)*
 
 expression ::=
 //Priority increases from top to bottom
-//  expression 'or' expression
-//  | expression 'and' expression
-//  | 'not' expression
-  comparison_group
+  boolean_group
+  | unary_group
+  | comparison_group
   | add_group
   | mul_group
   | primary_group
 
-private mul_group ::= expression '*' expression | expression '/' expression | expression '%' expression
-private add_group ::= expression '+' expression | expression '-' expression
-private comparison_group ::= expression EQ expression
-    | expression ('<>' | '!=') expression
-    | expression ('<') expression
-    | expression ('<=') expression
-    | expression ('>') expression
-    | expression ('>=') expression
-    | expression ('like' | 'подобно') expression
+fake binaryExpression::= expression expression {
+    methods = [
+        left = "expression[0]"
+        right = "expression[1]"
+        expressionList = ""
+    ]
+}
+fake unaryExpression ::= expression {
+    methods = [
+        operand = "expression"
+        expressionList = ""
+    ]
+}
+
+private add_group ::=  addExpr| subtractExpr
+addExpr ::= expression '+' expression {elementType = binaryExpression}
+subtractExpr ::= expression '-' expression {elementType = binaryExpression}
+
+private mul_group ::= multExpr | divExpr | remExpr
+multExpr ::= expression ASTERISK expression {elementType = binaryExpression}
+divExpr ::= expression OP_DIV expression {elementType = binaryExpression}
+remExpr ::= expression OP_REM expression {elementType = binaryExpression}
+
+private unary_group ::= unaryNotExpr
+unaryNotExpr ::= OP_NOT expression {elementType = unaryExpression}
+
+private comparison_group ::= eqExpr
+    | neqExpr
+    | ltExpr
+    | lteExpr
+    | gtExpr
+    | gteExpr
+    | likeExpr
+
+eqExpr ::= expression OP_EQ expression {elementType = binaryExpression}
+neqExpr ::= expression OP_NEQ expression {elementType = binaryExpression}
+ltExpr ::= expression OP_LT expression {elementType = binaryExpression}
+lteExpr ::= expression OP_LTE expression {elementType = binaryExpression}
+gtExpr ::= expression OP_GT expression {elementType = binaryExpression}
+gteExpr ::= expression OP_GTE expression {elementType = binaryExpression}
+likeExpr ::= expression OP_LIKE expression {elementType = binaryExpression}
+
+private boolean_group ::= andExpr | orExpr
+andExpr ::= expression OP_AND expression {elementType = binaryExpression}
+orExpr ::= expression OP_OR expression {elementType = binaryExpression}
+
 private primary_group ::=
     identifier
     | numberLiteral
     | boolLiteral
     | stringLiteral
-    | '(' expression ')'
+    | parExpr
+parExpr::= '(' expression ')' {elementType = expression}
+
+

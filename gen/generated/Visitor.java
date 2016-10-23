@@ -11,6 +11,10 @@ public class Visitor<R> extends PsiElementVisitor {
     return visitPsiElement(o);
   }
 
+  public R visitBinaryExpression(@NotNull BinaryExpression o) {
+    return visitExpression(o);
+  }
+
   public R visitBoolLiteral(@NotNull BoolLiteral o) {
     return visitExpression(o);
   }
@@ -36,10 +40,6 @@ public class Visitor<R> extends PsiElementVisitor {
   }
 
   public R visitJoinKind(@NotNull JoinKind o) {
-    return visitPsiElement(o);
-  }
-
-  public R visitMulGroup(@NotNull MulGroup o) {
     return visitPsiElement(o);
   }
 
@@ -85,6 +85,10 @@ public class Visitor<R> extends PsiElementVisitor {
 
   public R visitTopOpt(@NotNull TopOpt o) {
     return visitPsiElement(o);
+  }
+
+  public R visitUnaryExpression(@NotNull UnaryExpression o) {
+    return visitExpression(o);
   }
 
   public R visitPsiElement(@NotNull PsiElement o) {
