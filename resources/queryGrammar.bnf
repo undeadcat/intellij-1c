@@ -10,6 +10,8 @@
   extends("identifier") = expression
   extends(".*Expr") = expression
   extends(".*Expression") = expression
+  extends("tableDeclaration") = columnSource
+  extends("subqueryTable") = columnSource
 
   tokens = [
     ASTERISK = '*'
@@ -32,7 +34,7 @@
     OP_NOT = 'not'
     OP_AND = 'and'
     OP_OR = 'or'
-    space='regexp:\s+'
+    WHITE_SPACE='regexp:[\s]+'
     number='regexp:\d+'
     idSimple="regexp:[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*"
     string="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
@@ -40,13 +42,17 @@
   ]
 }
 
-grammar ::= sqlQuery
+grammar ::= sqlQuery (querySeparator sqlQuery)* querySeparator*
 
-select_statement ::= !<<eof>> select topOpt distinctOpt selectList
-fromKeyword tableDeclaration
+private querySeparator ::= SEMICOLON
+
+select_statement ::= !<<eof>> selectKeyword topOpt distinctOpt selectList
+fromKeyword columnSource
 joinItem*
 [whereKeyword expression]
 [groupByKeyword expressionList [havingKeyword expression]]{
+    pin = 1
+    recoverWhile = notSeparator
     methods = [
         topCount = "topOpt/numberLiteral"
         topOpt = ""
@@ -57,7 +63,9 @@ joinItem*
         //todo. isDistinct
     ]
 }
+private notSeparator ::= !(querySeparator)
 
+private selectKeyword ::= (select | выбрать)
 private fromKeyword ::= (from | из)
 topOpt ::= [top numberLiteral] //TODO. trash.make private
 private distinctOpt ::= distinct?

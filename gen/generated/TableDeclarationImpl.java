@@ -8,9 +8,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static generated.GeneratedTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 
-public class TableDeclarationImpl extends ASTWrapperPsiElement implements TableDeclaration {
+public class TableDeclarationImpl extends ColumnSourceImpl implements TableDeclaration {
 
   public TableDeclarationImpl(ASTNode node) {
     super(node);

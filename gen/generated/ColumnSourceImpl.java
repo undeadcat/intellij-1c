@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static generated.GeneratedTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 
-public class ColumnSourceImpl extends ASTWrapperPsiElement implements ColumnSource {
+public abstract class ColumnSourceImpl extends ASTWrapperPsiElement implements ColumnSource {
 
   public ColumnSourceImpl(ASTNode node) {
     super(node);
@@ -23,18 +23,6 @@ public class ColumnSourceImpl extends ASTWrapperPsiElement implements ColumnSour
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof Visitor) accept((Visitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public SubqueryTable getSubqueryTable() {
-    return findChildByClass(SubqueryTable.class);
-  }
-
-  @Override
-  @Nullable
-  public TableDeclaration getTableDeclaration() {
-    return findChildByClass(TableDeclaration.class);
   }
 
 }

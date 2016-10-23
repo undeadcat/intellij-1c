@@ -79,6 +79,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   }
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
+    create_token_set_(COLUMN_SOURCE, SUBQUERY_TABLE, TABLE_DECLARATION),
     create_token_set_(BINARY_EXPRESSION, BOOL_LITERAL, EXPRESSION, IDENTIFIER,
       NUMBER_LITERAL, STRING_LITERAL, UNARY_EXPRESSION),
   };
@@ -141,7 +142,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(builder, level, "columnSource")) return false;
     if (!nextTokenIs(builder, "<column source>", LPAREN, IDSIMPLE)) return false;
     boolean result;
-    Marker marker = enter_section_(builder, level, _NONE_, COLUMN_SOURCE, "<column source>");
+    Marker marker = enter_section_(builder, level, _COLLAPSE_, COLUMN_SOURCE, "<column source>");
     result = tableDeclaration(builder, level + 1);
     if (!result) result = subqueryTable(builder, level + 1);
     exit_section_(builder, level, marker, result, false, null);
@@ -218,9 +219,52 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // sqlQuery
+  // sqlQuery (querySeparator sqlQuery)* querySeparator*
   static boolean grammar(PsiBuilder builder, int level) {
-    return sqlQuery(builder, level + 1);
+    if (!recursion_guard_(builder, level, "grammar")) return false;
+    if (!nextTokenIs(builder, "", SELECT, ВЫБРАТЬ)) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = sqlQuery(builder, level + 1);
+    result = result && grammar_1(builder, level + 1);
+    result = result && grammar_2(builder, level + 1);
+    exit_section_(builder, marker, null, result);
+    return result;
+  }
+
+  // (querySeparator sqlQuery)*
+  private static boolean grammar_1(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "grammar_1")) return false;
+    int pos = current_position_(builder);
+    while (true) {
+      if (!grammar_1_0(builder, level + 1)) break;
+      if (!empty_element_parsed_guard_(builder, "grammar_1", pos)) break;
+      pos = current_position_(builder);
+    }
+    return true;
+  }
+
+  // querySeparator sqlQuery
+  private static boolean grammar_1_0(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "grammar_1_0")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = querySeparator(builder, level + 1);
+    result = result && sqlQuery(builder, level + 1);
+    exit_section_(builder, marker, null, result);
+    return result;
+  }
+
+  // querySeparator*
+  private static boolean grammar_2(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "grammar_2")) return false;
+    int pos = current_position_(builder);
+    while (true) {
+      if (!querySeparator(builder, level + 1)) break;
+      if (!empty_element_parsed_guard_(builder, "grammar_2", pos)) break;
+      pos = current_position_(builder);
+    }
+    return true;
   }
 
   /* ********************************************************** */
@@ -361,6 +405,27 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // !(querySeparator)
+  static boolean notSeparator(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "notSeparator")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder, level, _NOT_);
+    result = !notSeparator_0(builder, level + 1);
+    exit_section_(builder, level, marker, result, false, null);
+    return result;
+  }
+
+  // (querySeparator)
+  private static boolean notSeparator_0(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "notSeparator_0")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = querySeparator(builder, level + 1);
+    exit_section_(builder, marker, null, result);
+    return result;
+  }
+
+  /* ********************************************************** */
   // orderItem (COMMA orderItem) *
   static boolean orderByExpressionList(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "orderByExpressionList")) return false;
@@ -495,6 +560,25 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // SEMICOLON
+  static boolean querySeparator(PsiBuilder builder, int level) {
+    return consumeToken(builder, SEMICOLON);
+  }
+
+  /* ********************************************************** */
+  // select | выбрать
+  static boolean selectKeyword(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "selectKeyword")) return false;
+    if (!nextTokenIs(builder, "", SELECT, ВЫБРАТЬ)) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = consumeToken(builder, SELECT);
+    if (!result) result = consumeToken(builder, ВЫБРАТЬ);
+    exit_section_(builder, marker, null, result);
+    return result;
+  }
+
+  /* ********************************************************** */
   // ASTERISK | selectionList
   static boolean selectList(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "selectList")) return false;
@@ -507,28 +591,28 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !<<eof>> select topOpt distinctOpt selectList
-  // fromKeyword tableDeclaration
+  // !<<eof>> selectKeyword topOpt distinctOpt selectList
+  // fromKeyword columnSource
   // joinItem*
   // [whereKeyword expression]
   // [groupByKeyword expressionList [havingKeyword expression]]
   public static boolean select_statement(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "select_statement")) return false;
-    if (!nextTokenIs(builder, SELECT)) return false;
-    boolean result;
-    Marker marker = enter_section_(builder);
+    boolean result, pinned;
+    Marker marker = enter_section_(builder, level, _NONE_, SELECT_STATEMENT, "<select statement>");
     result = select_statement_0(builder, level + 1);
-    result = result && consumeToken(builder, SELECT);
-    result = result && topOpt(builder, level + 1);
-    result = result && distinctOpt(builder, level + 1);
-    result = result && selectList(builder, level + 1);
-    result = result && fromKeyword(builder, level + 1);
-    result = result && tableDeclaration(builder, level + 1);
-    result = result && select_statement_7(builder, level + 1);
-    result = result && select_statement_8(builder, level + 1);
-    result = result && select_statement_9(builder, level + 1);
-    exit_section_(builder, marker, SELECT_STATEMENT, result);
-    return result;
+    pinned = result; // pin = 1
+    result = result && report_error_(builder, selectKeyword(builder, level + 1));
+    result = pinned && report_error_(builder, topOpt(builder, level + 1)) && result;
+    result = pinned && report_error_(builder, distinctOpt(builder, level + 1)) && result;
+    result = pinned && report_error_(builder, selectList(builder, level + 1)) && result;
+    result = pinned && report_error_(builder, fromKeyword(builder, level + 1)) && result;
+    result = pinned && report_error_(builder, columnSource(builder, level + 1)) && result;
+    result = pinned && report_error_(builder, select_statement_7(builder, level + 1)) && result;
+    result = pinned && report_error_(builder, select_statement_8(builder, level + 1)) && result;
+    result = pinned && select_statement_9(builder, level + 1) && result;
+    exit_section_(builder, level, marker, result, pinned, notSeparator_parser_);
+    return result || pinned;
   }
 
   // !<<eof>>
@@ -676,12 +760,12 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   // unionList [orderByKeyword orderByExpressionList]
   public static boolean sqlQuery(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "sqlQuery")) return false;
-    if (!nextTokenIs(builder, SELECT)) return false;
+    if (!nextTokenIs(builder, "<sql query>", SELECT, ВЫБРАТЬ)) return false;
     boolean result;
-    Marker marker = enter_section_(builder);
+    Marker marker = enter_section_(builder, level, _NONE_, SQL_QUERY, "<sql query>");
     result = unionList(builder, level + 1);
     result = result && sqlQuery_1(builder, level + 1);
-    exit_section_(builder, marker, SQL_QUERY, result);
+    exit_section_(builder, level, marker, result, false, null);
     return result;
   }
 
@@ -801,7 +885,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   // select_statement (unionKeyword allModifierOpt select_statement)*
   static boolean unionList(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "unionList")) return false;
-    if (!nextTokenIs(builder, SELECT)) return false;
+    if (!nextTokenIs(builder, "", SELECT, ВЫБРАТЬ)) return false;
     boolean result;
     Marker marker = enter_section_(builder);
     result = select_statement(builder, level + 1);
@@ -1028,6 +1112,11 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   final static Parser notFromKeyword_parser_ = new Parser() {
     public boolean parse(PsiBuilder builder, int level) {
       return notFromKeyword(builder, level + 1);
+    }
+  };
+  final static Parser notSeparator_parser_ = new Parser() {
+    public boolean parse(PsiBuilder builder, int level) {
+      return notSeparator(builder, level + 1);
     }
   };
 }

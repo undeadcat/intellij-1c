@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface TableDeclaration extends PsiElement {
+public interface TableDeclaration extends ColumnSource {
 
   @Nullable
   Identifier getAlias();

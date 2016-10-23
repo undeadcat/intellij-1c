@@ -7,10 +7,4 @@ import com.intellij.psi.PsiElement;
 
 public interface ColumnSource extends PsiElement {
 
-  @Nullable
-  SubqueryTable getSubqueryTable();
-
-  @Nullable
-  TableDeclaration getTableDeclaration();
-
 }

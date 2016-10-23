@@ -8,9 +8,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static generated.GeneratedTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 
-public class SubqueryTableImpl extends ASTWrapperPsiElement implements SubqueryTable {
+public class SubqueryTableImpl extends ColumnSourceImpl implements SubqueryTable {
 
   public SubqueryTableImpl(ASTNode node) {
     super(node);

@@ -1,0 +1,43 @@
+1c query File
+  PsiElement(line_comment)('//query with error')
+  SqlQueryImpl(SQL_QUERY)
+    SelectStatementImpl(SELECT_STATEMENT)
+      PsiElement(select)('select')
+      TopOptImpl(TOP_OPT)
+        <empty list>
+      PsiElement(*)('*')
+      PsiElement(from)('from')
+      TableDeclarationImpl(TABLE_DECLARATION)
+        IdentifierImpl(IDENTIFIER)
+          PsiElement(idSimple)('Table2')
+      PsiElement(where)('where')
+      BinaryExpressionImpl(BINARY_EXPRESSION)
+        NumberLiteralImpl(NUMBER_LITERAL)
+          PsiElement(number)('1')
+        PsiElement(=)('=')
+        PsiErrorElement:<expression> expected, got ';'
+          <empty list>
+  PsiElement(;)(';')
+  PsiElement(line_comment)('//query with error')
+  SqlQueryImpl(SQL_QUERY)
+    SelectStatementImpl(SELECT_STATEMENT)
+      PsiElement(select)('select')
+      TopOptImpl(TOP_OPT)
+        <empty list>
+      PsiElement(*)('*')
+      PsiElement(from)('from')
+      PsiErrorElement:<column source> expected, got ';'
+        <empty list>
+  PsiElement(;)(';')
+  PsiElement(line_comment)('//successfully parsed')
+  SqlQueryImpl(SQL_QUERY)
+    SelectStatementImpl(SELECT_STATEMENT)
+      PsiElement(select)('select')
+      TopOptImpl(TOP_OPT)
+        <empty list>
+      PsiElement(*)('*')
+      PsiElement(from)('from')
+      TableDeclarationImpl(TABLE_DECLARATION)
+        IdentifierImpl(IDENTIFIER)
+          PsiElement(idSimple)('ValidTable')
+  PsiElement(;)(';')

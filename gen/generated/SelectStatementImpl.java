@@ -26,6 +26,12 @@ public class SelectStatementImpl extends ASTWrapperPsiElement implements SelectS
   }
 
   @Override
+  @Nullable
+  public ColumnSource getColumnSource() {
+    return findChildByClass(ColumnSource.class);
+  }
+
+  @Override
   @NotNull
   public List<Expression> getExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, Expression.class);
@@ -44,15 +50,10 @@ public class SelectStatementImpl extends ASTWrapperPsiElement implements SelectS
   }
 
   @Override
-  @NotNull
-  public TableDeclaration getTableDeclaration() {
-    return findNotNullChildByClass(TableDeclaration.class);
-  }
-
-  @Override
   @Nullable
   public NumberLiteral getTopCount() {
-    TopOpt p1 = findNotNullChildByClass(TopOpt.class);
+    TopOpt p1 = findChildByClass(TopOpt.class);
+    if (p1 == null) return null;
     return p1.getNumberLiteral();
   }
 

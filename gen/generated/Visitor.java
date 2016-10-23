@@ -76,11 +76,11 @@ public class Visitor<R> extends PsiElementVisitor {
   }
 
   public R visitSubqueryTable(@NotNull SubqueryTable o) {
-    return visitPsiElement(o);
+    return visitColumnSource(o);
   }
 
   public R visitTableDeclaration(@NotNull TableDeclaration o) {
-    return visitPsiElement(o);
+    return visitColumnSource(o);
   }
 
   public R visitTopOpt(@NotNull TopOpt o) {

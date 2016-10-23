@@ -7,6 +7,9 @@ import com.intellij.psi.PsiElement;
 
 public interface SelectStatement extends PsiElement {
 
+  @Nullable
+  ColumnSource getColumnSource();
+
   @NotNull
   List<Expression> getExpressionList();
 
@@ -15,9 +18,6 @@ public interface SelectStatement extends PsiElement {
 
   @Nullable
   SelectionList getSelectionList();
-
-  @NotNull
-  TableDeclaration getTableDeclaration();
 
   @Nullable
   NumberLiteral getTopCount();

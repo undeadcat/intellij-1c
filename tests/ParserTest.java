@@ -4,8 +4,10 @@ import com.simple1c.boilerplate._1cLanguage;
 
 /*
 TODO:
+Casing/mixed languages
 Parenthesis
 not equals operators
+subqueries don't work
 QueryFunction
 UnaryNotOperator
 InOperator
@@ -18,7 +20,9 @@ FilterByNullCondition (is null)
 SelectFromSubquery
 EmbeddedQueryInFilterExpression
 
-EmbeddedQueryCanReferToOuterTables -- need to rewrite references*/
+EmbeddedQueryCanReferToOuterTables -- need to rewrite references
+Сумма - название колонки vs функция
+*/
 public class ParserTest extends ParsingTestCase {
 
     public ParserTest() {
@@ -29,15 +33,11 @@ public class ParserTest extends ParsingTestCase {
         doTest(true);
     }
 
-    public void testMultipleQueries() {
+    public void testQueriesSeparatedBySemicolons() {
         doTest(true);
     }
 
-    public void testInvalidSymbolsBetweenQueries() {
-        doTest(true);
-    }
-
-    public void testErrorsInQuery() {
+    public void testCanRecoverToSeparator() {
         doTest(true);
     }
 

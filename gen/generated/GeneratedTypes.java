@@ -81,6 +81,7 @@ public interface GeneratedTypes {
   IElementType ВНУТРЕННЕЕ = new IElementType("внутреннее", null);
   IElementType ВОЗР = new IElementType("возр", null);
   IElementType ВСЕ = new IElementType("все", null);
+  IElementType ВЫБРАТЬ = new IElementType("выбрать", null);
   IElementType ГДЕ = new IElementType("где", null);
   IElementType ИЗ = new IElementType("из", null);
   IElementType ИМЕЮЩИЕ = new IElementType("имеющие", null);
@@ -107,9 +108,6 @@ public interface GeneratedTypes {
       }
       else if (type == BOOL_LITERAL) {
         return new BoolLiteralImpl(node);
-      }
-      else if (type == COLUMN_SOURCE) {
-        return new ColumnSourceImpl(node);
       }
       else if (type == EXPRESSION) {
         return new ExpressionImpl(node);

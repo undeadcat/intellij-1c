@@ -1,4 +1,0 @@
-select * from Справочник.Контрагенты where ИНН == ''
-
-select * from Справочник.Контрагенты where ИНН <> "" and trash trash trash
-order by ИНН desc

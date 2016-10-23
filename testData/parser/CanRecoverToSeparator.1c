@@ -1,0 +1,7 @@
+//query with error
+select * from Table2 where 1 = ;
+//query with error
+select * from ;
+//successfully parsed
+select * from ValidTable;
+

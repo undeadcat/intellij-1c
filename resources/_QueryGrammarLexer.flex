@@ -1,4 +1,4 @@
-package ;
+package generated;
 
 import com.intellij.lexer.*;
 import com.intellij.psi.tree.IElementType;
@@ -19,11 +19,9 @@ import static generated.GeneratedTypes.*;
 %type IElementType
 %unicode
 
-EOL=\R
-WHITE_SPACE=\s
 
 OP_NEQ=((<>)|(\!\=))
-SPACE=[ \t\n\x0B\f\r]+
+WHITE_SPACE=[\s]+
 NUMBER=[0-9]+
 IDSIMPLE=[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*
 STRING=('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\'|\\)*\")
@@ -95,7 +93,6 @@ LINE_COMMENT="//".*
   "ложь"              { return ЛОЖЬ; }
 
   {OP_NEQ}            { return OP_NEQ; }
-  {SPACE}             { return SPACE; }
   {NUMBER}            { return NUMBER; }
   {IDSIMPLE}          { return IDSIMPLE; }
   {STRING}            { return STRING; }
