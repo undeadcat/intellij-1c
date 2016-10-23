@@ -1,5 +1,4 @@
 {
-//todo. ignore case.
   generate = [names = "long" visitor-value = "R"]
   psiPackage = "generated"
   psiImplPackage = "generated"
@@ -25,24 +24,49 @@
     OP_REM = '%'
     OP_PLUS = '+'
     OP_MINUS = '-'
-    OP_NEQ = 'regexp:((<>)|(\!\=))'
+    OP_NEQ = 'regexp:<>|\!\='
     OP_LT = '<'
     OP_LTE = '<='
     OP_GT = '>'
     OP_GTE = '>='
-    OP_LIKE = 'like'
-    OP_NOT = 'not'
-    OP_AND = 'and'
-    OP_OR = 'or'
-    WHITE_SPACE='regexp:[\s]+'
-    number='regexp:\d+'
-    idSimple="regexp:[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*"
-    string="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
-    line_comment="regexp://.*"
+    OP_LIKE = 'regexp:like|подобно'
+    OP_NOT = 'regexp:not|не'
+    OP_AND = 'regexp:and|и'
+    OP_OR = 'regexp:or|или'
+    //pretending these words are reserved (they're not)
+    //if anyone calls a column 'различные', we're screwed
+    selectKeyword = 'regexp:select|выбрать'
+    whereKeyword = 'regexp:where|где'
+    fromKeyword = 'regexp:from|из'
+    topKeyword = 'regexp:top|первые'
+    distinctKeyword = 'regexp:distinct|различные'
+    asKeyword = 'regexp:as|как'
+    groupKeyword = 'regexp:group|сгруппировать'
+    orderKeyword = 'regexp:order|упорядочить'
+    ascKeyword = 'regexp:asc|возр'
+    descKeyword = 'regexp:desc|убыв'
+    havingKeyword = 'regexp:having|имеющие'
+    unionKeyword = 'regexp:union|объединить'
+    allKeyword = 'regexp:all|все'
+    joinKeyword = 'regexp:join|соединение'
+    outerKeyword = 'regexp:outer|внешнее'
+    fullKeyword = 'regexp:full|полное'
+    leftKeyword = 'regexp:left|левое'
+    rightKeyword = 'regexp:right|правое'
+    innerKeyword = 'regexp:inner|внутреннее'
+    byKeyword = 'by'
+    onKeyword = 'on'
+    поKeyword = 'по'
+    WHITE_SPACE = 'regexp:[\s]+'
+    number = 'regexp:\d+'
+    bool = 'regexp:true|false|истина|ложь'
+    idSimple = 'regexp:[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*'
+    string = "regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
+    line_comment = 'regexp://.*'
   ]
 }
 
-grammar ::= sqlQuery (querySeparator sqlQuery)* querySeparator*
+grammar ::= (querySeparator? sqlQuery)*
 
 private querySeparator ::= SEMICOLON
 
@@ -50,7 +74,7 @@ select_statement ::= !<<eof>> selectKeyword topOpt distinctOpt selectList
 fromKeyword columnSource
 joinItem*
 [whereKeyword expression]
-[groupByKeyword expressionList [havingKeyword expression]]{
+[groupKeyword (byKeyword| поKeyword) expressionList [havingKeyword expression]]{
     pin = 1
     recoverWhile = notSeparator
     methods = [
@@ -65,12 +89,13 @@ joinItem*
 }
 private notSeparator ::= !(querySeparator)
 
-private selectKeyword ::= (select | выбрать)
-private fromKeyword ::= (from | из)
-topOpt ::= [top numberLiteral] //TODO. trash.make private
-private distinctOpt ::= distinct?
-alias ::= as? identifier //TODO. trash.make private
-
+topOpt ::= [topKeyword numberLiteral] //TODO. trash.make private
+private distinctOpt ::= distinctKeyword?
+alias ::= asKeyword? identifier{ //TODO. trash.make private
+    methods = [
+        asKeyword=""
+    ]
+}
 //selection
 selectionItem ::= expression alias? {
     methods = [
@@ -102,39 +127,26 @@ subqueryTable::= subquery alias{
 }
 columnSource::= tableDeclaration | subqueryTable
 
-//optional clauses
-private whereKeyword::= where | где
-private groupByKeyword ::= (group by) | (сгруппировать по)
-private havingKeyword ::= having | имеющие
-
 //order by
-private orderByKeyword::= (order by) | (упорядочить по)
-private ascKeyword ::= asc | возр
-private descKeyword::= desc | убыв
-private orderDirectionOpt ::= [ascKeyword | descKeyword]
-orderItem ::= expression orderDirectionOpt
+orderItem ::= expression [ascKeyword | descKeyword]
 private orderByExpressionList ::= orderItem (COMMA orderItem) *
 
 //union
-private unionKeyword ::= union| объединить
-private allModifierOpt ::= [all | все]
-private unionList ::= select_statement (unionKeyword allModifierOpt select_statement)*
-sqlQuery::= unionList [orderByKeyword orderByExpressionList]
+private unionList ::= select_statement (unionKeyword allKeyword? select_statement)*
+sqlQuery::= unionList [orderKeyword (byKeyword| поKeyword) orderByExpressionList]
 
 //join
-private joinKeyword ::= join | соединение
-private outerKeywordOpt ::= (outer | внешнее)?
-private outerJoinKind::= full | left | right | полное | левое | правое
-joinKind::= (inner | внутреннее) | (outerJoinKind outerKeywordOpt)
+joinItem ::= joinKind? joinKeyword columnSource (onKeyword | поKeyword) expression
+joinKind::= innerKeyword | ((fullKeyword | leftKeyword| rightKeyword) (outerKeyword)?)
 
-joinItem ::= joinKind? joinKeyword columnSource (on | по) expression
 
 //identifiers
+//TODO. make this one lexer rule. this allows spaces.
 identifier ::= idSimple (DOT idSimple)*
 
 stringLiteral ::= string
 numberLiteral ::= number
-boolLiteral ::= (true | false | истина | ложь)
+boolLiteral ::= bool
 
 expressionList ::=  expression (COMMA expression)*
 

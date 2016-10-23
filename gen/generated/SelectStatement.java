@@ -20,6 +20,24 @@ public interface SelectStatement extends PsiElement {
   SelectionList getSelectionList();
 
   @Nullable
+  PsiElement getDistinctKeyword();
+
+  @Nullable
+  PsiElement getFromKeyword();
+
+  @Nullable
+  PsiElement getGroupKeyword();
+
+  @Nullable
+  PsiElement getHavingKeyword();
+
+  @Nullable
+  PsiElement getSelectKeyword();
+
+  @Nullable
+  PsiElement getWhereKeyword();
+
+  @Nullable
   NumberLiteral getTopCount();
 
   @Nullable

@@ -24,4 +24,10 @@ public class BoolLiteralImpl extends ExpressionImpl implements BoolLiteral {
     else super.accept(visitor);
   }
 
+  @Override
+  @NotNull
+  public PsiElement getBool() {
+    return findNotNullChildByType(BOOL);
+  }
+
 }

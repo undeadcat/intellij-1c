@@ -25,4 +25,34 @@ public class JoinKindImpl extends ASTWrapperPsiElement implements JoinKind {
     else super.accept(visitor);
   }
 
+  @Override
+  @Nullable
+  public PsiElement getFullKeyword() {
+    return findChildByType(FULLKEYWORD);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getInnerKeyword() {
+    return findChildByType(INNERKEYWORD);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getLeftKeyword() {
+    return findChildByType(LEFTKEYWORD);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getOuterKeyword() {
+    return findChildByType(OUTERKEYWORD);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getRightKeyword() {
+    return findChildByType(RIGHTKEYWORD);
+  }
+
 }

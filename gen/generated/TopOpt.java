@@ -10,4 +10,7 @@ public interface TopOpt extends PsiElement {
   @Nullable
   NumberLiteral getNumberLiteral();
 
+  @Nullable
+  PsiElement getTopKeyword();
+
 }

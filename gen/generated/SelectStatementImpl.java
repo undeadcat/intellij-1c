@@ -51,6 +51,42 @@ public class SelectStatementImpl extends ASTWrapperPsiElement implements SelectS
 
   @Override
   @Nullable
+  public PsiElement getDistinctKeyword() {
+    return findChildByType(DISTINCTKEYWORD);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getFromKeyword() {
+    return findChildByType(FROMKEYWORD);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getGroupKeyword() {
+    return findChildByType(GROUPKEYWORD);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getHavingKeyword() {
+    return findChildByType(HAVINGKEYWORD);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getSelectKeyword() {
+    return findChildByType(SELECTKEYWORD);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getWhereKeyword() {
+    return findChildByType(WHEREKEYWORD);
+  }
+
+  @Override
+  @Nullable
   public NumberLiteral getTopCount() {
     TopOpt p1 = findChildByClass(TopOpt.class);
     if (p1 == null) return null;

@@ -10,4 +10,10 @@ public interface OrderItem extends PsiElement {
   @NotNull
   Expression getExpression();
 
+  @Nullable
+  PsiElement getAscKeyword();
+
+  @Nullable
+  PsiElement getDescKeyword();
+
 }

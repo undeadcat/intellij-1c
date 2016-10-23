@@ -31,4 +31,10 @@ public class TopOptImpl extends ASTWrapperPsiElement implements TopOpt {
     return findChildByClass(NumberLiteral.class);
   }
 
+  @Override
+  @Nullable
+  public PsiElement getTopKeyword() {
+    return findChildByType(TOPKEYWORD);
+  }
+
 }

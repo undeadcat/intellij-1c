@@ -7,9 +7,12 @@ import com.intellij.util.ProcessingContext
 import generated.GeneratedTypes
 
 class TestCompletionContributor : CompletionContributor() {
+    private var tableSource = TableSource()
+    private var columnSource = ColumnSource()
+
     init {
         extend(CompletionType.BASIC,
-                PlatformPatterns.psiElement().withAncestor(10, PlatformPatterns.psiElement(GeneratedTypes.SELECTION_LIST)),
+                PlatformPatterns.psiElement().inside(PlatformPatterns.psiElement(GeneratedTypes.SELECTION_LIST)),
                 object : CompletionProvider<CompletionParameters>() {
                     public override fun addCompletions(parameters: CompletionParameters,
                                                        context: ProcessingContext,
@@ -19,6 +22,20 @@ class TestCompletionContributor : CompletionContributor() {
                         resultSet.addElement(LookupElementBuilder.create("huj3"))
                     }
                 })
+    }
+
+    override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
+        val tableDeclarationPattern = PlatformPatterns.psiElement()
+                .inside(PlatformPatterns.psiElement(GeneratedTypes.TABLE_DECLARATION))
+        if (tableDeclarationPattern.accepts(parameters.position)) {
+            addStrings(tableSource.getAll(), result)
+            return
+        }
+        addStrings(tableSource.getAll().union(columnSource.getAll(null)), result)
+    }
+
+    private fun addStrings(strings: Iterable<String>, result: CompletionResultSet) {
+        result.addAllElements(strings.map { LookupElementBuilder.create(it) })
     }
 
 }

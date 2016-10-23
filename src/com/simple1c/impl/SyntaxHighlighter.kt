@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
+import com.intellij.psi.tree.TokenSet
 import generated.GeneratedTypes
 import generated._QueryGrammarLexer
 
@@ -17,7 +18,29 @@ internal class SyntaxHighlighter : com.intellij.openapi.fileTypes.SyntaxHighligh
     private val Error = arrayOf(HighlighterColors.BAD_CHARACTER)
     private val Comment = arrayOf(DefaultLanguageHighlighterColors.LINE_COMMENT)
 
-    private val Keyword = arrayOf(DefaultLanguageHighlighterColors.KEYWORD)
+    private val KeywordHighlight = arrayOf(DefaultLanguageHighlighterColors.KEYWORD)
+    private val KeywordsSet = TokenSet.create(GeneratedTypes.ALLKEYWORD,
+            GeneratedTypes.ASCKEYWORD,
+            GeneratedTypes.ASKEYWORD,
+            GeneratedTypes.BYKEYWORD,
+            GeneratedTypes.DESCKEYWORD,
+            GeneratedTypes.DISTINCTKEYWORD,
+            GeneratedTypes.FROMKEYWORD,
+            GeneratedTypes.FULLKEYWORD,
+            GeneratedTypes.GROUPKEYWORD,
+            GeneratedTypes.HAVINGKEYWORD,
+            GeneratedTypes.INNERKEYWORD,
+            GeneratedTypes.JOINKEYWORD,
+            GeneratedTypes.LEFTKEYWORD,
+            GeneratedTypes.ONKEYWORD,
+            GeneratedTypes.ORDERKEYWORD,
+            GeneratedTypes.OUTERKEYWORD,
+            GeneratedTypes.RIGHTKEYWORD,
+            GeneratedTypes.SELECTKEYWORD,
+            GeneratedTypes.TOPKEYWORD,
+            GeneratedTypes.UNIONKEYWORD,
+            GeneratedTypes.WHEREKEYWORD,
+            GeneratedTypes.ПОKEYWORD)
 
     private val Identifier = arrayOf(DefaultLanguageHighlighterColors.IDENTIFIER)
 
@@ -33,15 +56,12 @@ internal class SyntaxHighlighter : com.intellij.openapi.fileTypes.SyntaxHighligh
             return Comment
         if (tokenType == GeneratedTypes.IDENTIFIER)
             return Identifier
+        if (KeywordsSet.contains(tokenType))
+            return KeywordHighlight
         return Default
     }
 
-    class Factory : com.intellij.openapi.fileTypes.SyntaxHighlighterFactory() {
 
-        override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): com.intellij.openapi.fileTypes.SyntaxHighlighter {
-            return SyntaxHighlighter()
-        }
-    }
 
 }
 

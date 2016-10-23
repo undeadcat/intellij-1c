@@ -16,4 +16,7 @@ public interface JoinItem extends PsiElement {
   @Nullable
   JoinKind getJoinKind();
 
+  @NotNull
+  PsiElement getJoinKeyword();
+
 }

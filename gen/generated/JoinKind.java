@@ -7,4 +7,19 @@ import com.intellij.psi.PsiElement;
 
 public interface JoinKind extends PsiElement {
 
+  @Nullable
+  PsiElement getFullKeyword();
+
+  @Nullable
+  PsiElement getInnerKeyword();
+
+  @Nullable
+  PsiElement getLeftKeyword();
+
+  @Nullable
+  PsiElement getOuterKeyword();
+
+  @Nullable
+  PsiElement getRightKeyword();
+
 }

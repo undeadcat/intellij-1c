@@ -43,4 +43,10 @@ public class JoinItemImpl extends ASTWrapperPsiElement implements JoinItem {
     return findChildByClass(JoinKind.class);
   }
 
+  @Override
+  @NotNull
+  public PsiElement getJoinKeyword() {
+    return findNotNullChildByType(JOINKEYWORD);
+  }
+
 }

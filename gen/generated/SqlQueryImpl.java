@@ -37,4 +37,10 @@ public class SqlQueryImpl extends ASTWrapperPsiElement implements SqlQuery {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SelectStatement.class);
   }
 
+  @Override
+  @Nullable
+  public PsiElement getOrderKeyword() {
+    return findChildByType(ORDERKEYWORD);
+  }
+
 }

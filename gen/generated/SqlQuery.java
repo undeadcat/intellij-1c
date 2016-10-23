@@ -13,4 +13,7 @@ public interface SqlQuery extends PsiElement {
   @NotNull
   List<SelectStatement> getSelectStatementList();
 
+  @Nullable
+  PsiElement getOrderKeyword();
+
 }

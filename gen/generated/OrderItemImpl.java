@@ -31,4 +31,16 @@ public class OrderItemImpl extends ASTWrapperPsiElement implements OrderItem {
     return findNotNullChildByClass(Expression.class);
   }
 
+  @Override
+  @Nullable
+  public PsiElement getAscKeyword() {
+    return findChildByType(ASCKEYWORD);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getDescKeyword() {
+    return findChildByType(DESCKEYWORD);
+  }
+
 }

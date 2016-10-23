@@ -1,11 +1,11 @@
 1c query File
   SqlQueryImpl(SQL_QUERY)
     SelectStatementImpl(SELECT_STATEMENT)
-      PsiElement(select)('select')
+      PsiElement(selectKeyword)('select')
       TopOptImpl(TOP_OPT)
         <empty list>
       PsiElement(*)('*')
-      PsiElement(from)('from')
+      PsiElement(fromKeyword)('from')
       TableDeclarationImpl(TABLE_DECLARATION)
         IdentifierImpl(IDENTIFIER)
           PsiElement(idSimple)('Справочник')
@@ -14,11 +14,11 @@
   PsiElement(;)(';')
   SqlQueryImpl(SQL_QUERY)
     SelectStatementImpl(SELECT_STATEMENT)
-      PsiElement(select)('select')
+      PsiElement(selectKeyword)('select')
       TopOptImpl(TOP_OPT)
         <empty list>
       PsiElement(*)('*')
-      PsiElement(from)('from')
+      PsiElement(fromKeyword)('from')
       TableDeclarationImpl(TABLE_DECLARATION)
         IdentifierImpl(IDENTIFIER)
           PsiElement(idSimple)('Документ')
