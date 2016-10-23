@@ -16,6 +16,7 @@ public interface GeneratedTypes {
   IElementType IDENTIFIER = new _1cElementType("IDENTIFIER");
   IElementType JOIN_ITEM = new _1cElementType("JOIN_ITEM");
   IElementType JOIN_KIND = new _1cElementType("JOIN_KIND");
+  IElementType MUL_GROUP = new _1cElementType("MUL_GROUP");
   IElementType NUMBER_LITERAL = new _1cElementType("NUMBER_LITERAL");
   IElementType ORDER_ITEM = new _1cElementType("ORDER_ITEM");
   IElementType SELECTION_ITEM = new _1cElementType("SELECTION_ITEM");
@@ -36,6 +37,7 @@ public interface GeneratedTypes {
   IElementType DESC = new IElementType("desc", null);
   IElementType DISTINCT = new IElementType("distinct", null);
   IElementType DOT = new IElementType(".", null);
+  IElementType EQ = new IElementType("=", null);
   IElementType FALSE = new IElementType("false", null);
   IElementType FROM = new IElementType("from", null);
   IElementType FULL = new IElementType("full", null);
@@ -54,6 +56,7 @@ public interface GeneratedTypes {
   IElementType RIGHT = new IElementType("right", null);
   IElementType RPAREN = new IElementType(")", null);
   IElementType SELECT = new IElementType("select", null);
+  IElementType SEMICOLON = new IElementType(";", null);
   IElementType STRING = new IElementType("string", null);
   IElementType TOP = new IElementType("top", null);
   IElementType TRUE = new IElementType("true", null);
@@ -91,6 +94,9 @@ public interface GeneratedTypes {
       else if (type == COLUMN_SOURCE) {
         return new ColumnSourceImpl(node);
       }
+      else if (type == EXPRESSION) {
+        return new ExpressionImpl(node);
+      }
       else if (type == EXPRESSION_LIST) {
         return new ExpressionListImpl(node);
       }
@@ -102,6 +108,9 @@ public interface GeneratedTypes {
       }
       else if (type == JOIN_KIND) {
         return new JoinKindImpl(node);
+      }
+      else if (type == MUL_GROUP) {
+        return new MulGroupImpl(node);
       }
       else if (type == NUMBER_LITERAL) {
         return new NumberLiteralImpl(node);

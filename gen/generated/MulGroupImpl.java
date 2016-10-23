@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static generated.GeneratedTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 
-public class ExpressionImpl extends ASTWrapperPsiElement implements Expression {
+public class MulGroupImpl extends ASTWrapperPsiElement implements MulGroup {
 
-  public ExpressionImpl(ASTNode node) {
+  public MulGroupImpl(ASTNode node) {
     super(node);
   }
 
   public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitExpression(this);
+    return visitor.visitMulGroup(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -29,12 +29,6 @@ public class ExpressionImpl extends ASTWrapperPsiElement implements Expression {
   @NotNull
   public List<Expression> getExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, Expression.class);
-  }
-
-  @Override
-  @Nullable
-  public MulGroup getMulGroup() {
-    return findChildByClass(MulGroup.class);
   }
 
 }

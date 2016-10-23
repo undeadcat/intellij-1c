@@ -39,6 +39,10 @@ public class Visitor<R> extends PsiElementVisitor {
     return visitPsiElement(o);
   }
 
+  public R visitMulGroup(@NotNull MulGroup o) {
+    return visitPsiElement(o);
+  }
+
   public R visitNumberLiteral(@NotNull NumberLiteral o) {
     return visitExpression(o);
   }

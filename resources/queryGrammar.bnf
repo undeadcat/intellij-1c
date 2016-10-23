@@ -7,6 +7,7 @@
   elementTypeClass="com.simple1c.boilerplate._1cElementType"
   extends(".*Literal") = expression
   extends("identifier") = expression
+  extends(".*expr") = expression
 
   tokens = [
     space='regexp:\s+'
@@ -19,11 +20,12 @@
     COMMA = ','
     LPAREN = '('
     RPAREN = ')'
+    SEMICOLON = ';'
+    EQ = '='
   ]
 }
 
-//external grammar ::= parseGrammar select_statement
-grammar ::= sqlQuery// live preview root
+grammar ::= sqlQuery ((SEMICOLON) sqlQuery) ?
 
 select_statement ::= !<<eof>> select topOpt distinctOpt selectList
 fromKeyword tableDeclaration
@@ -111,6 +113,30 @@ stringLiteral ::= string
 numberLiteral ::= number
 boolLiteral ::= (true | false | истина | ложь)
 
-expression::= identifier | stringLiteral | numberLiteral | boolLiteral
 expressionList ::=  expression (COMMA expression)*
 
+expression ::=
+//Priority increases from top to bottom
+//  expression 'or' expression
+//  | expression 'and' expression
+//  | 'not' expression
+  comparison_group
+  | add_group
+  | mul_group
+  | primary_group
+
+private mul_group ::= expression '*' expression | expression '/' expression | expression '%' expression
+private add_group ::= expression '+' expression | expression '-' expression
+private comparison_group ::= expression EQ expression
+    | expression ('<>' | '!=') expression
+    | expression ('<') expression
+    | expression ('<=') expression
+    | expression ('>') expression
+    | expression ('>=') expression
+    | expression ('like' | 'подобно') expression
+private primary_group ::=
+    identifier
+    | numberLiteral
+    | boolLiteral
+    | stringLiteral
+    | '(' expression ')'
