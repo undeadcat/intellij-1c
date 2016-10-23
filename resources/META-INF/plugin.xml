@@ -42,12 +42,13 @@
         <fileTypeFactory implementation="com.simple1c.boilerplate._1cFileTypeFactory"/>
         <lang.parserDefinition language="1c" implementationClass="com.simple1c._1cParserDefinition"/>
         <lang.syntaxHighlighterFactory key="1c" language="1c"
-                                       implementationClass="com.simple1c.impl.SyntaxHighlighterFactory"/>
+                                       implementationClass="com.simple1c.impl.SyntaxHighlighter.Factory"/>
+        <completion.contributor language="1c" implementationClass="com.simple1c.impl.TestCompletionContributor"/>
+
         <!--<colorSettingsPage implementation="com.simpleplugin.SimpleColorSettingsPage"/>-->
         <!--<annotator language="JAVA" implementationClass="com.simpleplugin.SimpleAnnotator"/>-->
         <!--<codeInsight.lineMarkerProvider language="JAVA"-->
         <!--implementationClass="com.simpleplugin.SimpleLineMarkerProvider"/>-->
-        <!--<completion.contributor language="Simple" implementationClass="com.simpleplugin.SimpleCompletionContributor"/>-->
         <!--<psi.referenceContributor implementation="com.simpleplugin.SimpleReferenceContributor"/>-->
         <!--<lang.findUsagesProvider language="Simple" implementationClass="com.simpleplugin.SimpleFindUsagesProvider"/>-->
         <!--<lang.refactoringSupport language="Simple"-->
