@@ -44,7 +44,7 @@ public interface GeneratedTypes {
   IElementType FULLKEYWORD = new IElementType("fullKeyword", null);
   IElementType GROUPKEYWORD = new IElementType("groupKeyword", null);
   IElementType HAVINGKEYWORD = new IElementType("havingKeyword", null);
-  IElementType IDENTIFIERTOKEN = new IElementType("identifierToken", null);
+  IElementType ID_TOKEN = new IElementType("ID_TOKEN", null);
   IElementType INNERKEYWORD = new IElementType("innerKeyword", null);
   IElementType JOINKEYWORD = new IElementType("joinKeyword", null);
   IElementType LEFTKEYWORD = new IElementType("leftKeyword", null);

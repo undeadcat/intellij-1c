@@ -47,7 +47,7 @@ INNERKEYWORD=inner|внутреннее
 WHITE_SPACE=[\s]+
 NUMBER=[0-9]+
 BOOL=true|false|истина|ложь
-IDENTIFIERTOKEN=([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*)(\.([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*))*
+ID_TOKEN=([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*)(\.([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*))*
 STRING=('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\'|\\)*\")
 LINE_COMMENT="//".*
 
@@ -73,6 +73,7 @@ LINE_COMMENT="//".*
   "by"                   { return BYKEYWORD; }
   "on"                   { return ONKEYWORD; }
   "по"                   { return ПОKEYWORD; }
+  "IDENTIFIER"           { return IDENTIFIER; }
 
   {OP_NEQ}               { return OP_NEQ; }
   {OP_LIKE}              { return OP_LIKE; }
@@ -100,7 +101,7 @@ LINE_COMMENT="//".*
   {INNERKEYWORD}         { return INNERKEYWORD; }
   {NUMBER}               { return NUMBER; }
   {BOOL}                 { return BOOL; }
-  {IDENTIFIERTOKEN}      { return IDENTIFIERTOKEN; }
+  {ID_TOKEN}             { return ID_TOKEN; }
   {STRING}               { return STRING; }
   {LINE_COMMENT}         { return LINE_COMMENT; }
 

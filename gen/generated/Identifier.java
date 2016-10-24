@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface Identifier extends Expression {
 
   @NotNull
-  PsiElement getIdentifierToken();
+  PsiElement getIdToken();
 
 }

@@ -60,7 +60,7 @@
     WHITE_SPACE = 'regexp:[\s]+'
     number = 'regexp:\d+'
     bool = 'regexp:true|false|истина|ложь'
-    identifierToken = 'regexp:([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*)(\.([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*))*'
+    ID_TOKEN = 'regexp:([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*)(\.([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*))*'
     string = "regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
     line_comment = 'regexp://.*'
   ]
@@ -136,7 +136,11 @@ private unionList ::= select_statement (unionKeyword allKeyword? select_statemen
 sqlQuery::= unionList [orderKeyword (byKeyword| поKeyword) orderByExpressionList]
 
 //join
-joinItem ::= joinKind? joinKeyword columnSource (onKeyword | поKeyword) expression
+joinItem ::= joinKind? joinKeyword columnSource (onKeyword | поKeyword) expression {
+//    recoverWhile = notAfterJoinKeyword
+}
+private notAfterJoinKeyword ::= !(groupKeyword | orderKeyword
+| whereKeyword | unionKeyword | havingKeyword | selectKeyword)
 joinKind::= innerKeyword | ((fullKeyword | leftKeyword| rightKeyword) (outerKeyword)?)
 
 stringLiteral ::= string
@@ -206,7 +210,7 @@ private primary_group ::=
     | boolLiteral
     | stringLiteral
     | parExpr
-identifier ::= identifierToken
+identifier ::= ID_TOKEN
 parExpr::= '(' expression ')' {elementType = expression}
 
 

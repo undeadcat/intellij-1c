@@ -88,7 +88,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   // asKeyword? identifier
   public static boolean alias(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "alias")) return false;
-    if (!nextTokenIs(builder, "<alias>", ASKEYWORD, IDENTIFIERTOKEN)) return false;
+    if (!nextTokenIs(builder, "<alias>", ID_TOKEN, ASKEYWORD)) return false;
     boolean result;
     Marker marker = enter_section_(builder, level, _NONE_, ALIAS, "<alias>");
     result = alias_0(builder, level + 1);
@@ -108,7 +108,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   // tableDeclaration | subqueryTable
   public static boolean columnSource(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "columnSource")) return false;
-    if (!nextTokenIs(builder, "<column source>", LPAREN, IDENTIFIERTOKEN)) return false;
+    if (!nextTokenIs(builder, "<column source>", ID_TOKEN, LPAREN)) return false;
     boolean result;
     Marker marker = enter_section_(builder, level, _COLLAPSE_, COLUMN_SOURCE, "<column source>");
     result = tableDeclaration(builder, level + 1);
@@ -192,7 +192,9 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // joinKind? joinKeyword columnSource (onKeyword | поKeyword) expression
+  // joinKind? joinKeyword columnSource (onKeyword | поKeyword) expression {
+  // //    recoverWhile = notAfterJoinKeyword
+  // }
   public static boolean joinItem(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "joinItem")) return false;
     boolean result;
@@ -202,6 +204,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     result = result && columnSource(builder, level + 1);
     result = result && joinItem_3(builder, level + 1);
     result = result && expression(builder, level + 1, -1);
+    result = result && joinItem_5(builder, level + 1);
     exit_section_(builder, level, marker, result, false, null);
     return result;
   }
@@ -222,6 +225,13 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     if (!result) result = consumeToken(builder, ПОKEYWORD);
     exit_section_(builder, marker, null, result);
     return result;
+  }
+
+  // {
+  // //    recoverWhile = notAfterJoinKeyword
+  // }
+  private static boolean joinItem_5(PsiBuilder builder, int level) {
+    return true;
   }
 
   /* ********************************************************** */
@@ -264,6 +274,34 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(builder, level, "joinKind_1_1")) return false;
     consumeToken(builder, OUTERKEYWORD);
     return true;
+  }
+
+  /* ********************************************************** */
+  // !(groupKeyword | orderKeyword
+  // | whereKeyword | unionKeyword | havingKeyword | selectKeyword)
+  static boolean notAfterJoinKeyword(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "notAfterJoinKeyword")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder, level, _NOT_);
+    result = !notAfterJoinKeyword_0(builder, level + 1);
+    exit_section_(builder, level, marker, result, false, null);
+    return result;
+  }
+
+  // groupKeyword | orderKeyword
+  // | whereKeyword | unionKeyword | havingKeyword | selectKeyword
+  private static boolean notAfterJoinKeyword_0(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "notAfterJoinKeyword_0")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = consumeToken(builder, GROUPKEYWORD);
+    if (!result) result = consumeToken(builder, ORDERKEYWORD);
+    if (!result) result = consumeToken(builder, WHEREKEYWORD);
+    if (!result) result = consumeToken(builder, UNIONKEYWORD);
+    if (!result) result = consumeToken(builder, HAVINGKEYWORD);
+    if (!result) result = consumeToken(builder, SELECTKEYWORD);
+    exit_section_(builder, marker, null, result);
+    return result;
   }
 
   /* ********************************************************** */
@@ -633,7 +671,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   // identifier alias?
   public static boolean tableDeclaration(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "tableDeclaration")) return false;
-    if (!nextTokenIs(builder, IDENTIFIERTOKEN)) return false;
+    if (!nextTokenIs(builder, ID_TOKEN)) return false;
     boolean result;
     Marker marker = enter_section_(builder);
     result = identifier(builder, level + 1);
@@ -823,13 +861,13 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     return result;
   }
 
-  // identifierToken
+  // ID_TOKEN
   public static boolean identifier(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "identifier")) return false;
-    if (!nextTokenIsSmart(builder, IDENTIFIERTOKEN)) return false;
+    if (!nextTokenIsSmart(builder, ID_TOKEN)) return false;
     boolean result;
     Marker marker = enter_section_(builder);
-    result = consumeTokenSmart(builder, IDENTIFIERTOKEN);
+    result = consumeTokenSmart(builder, ID_TOKEN);
     exit_section_(builder, marker, IDENTIFIER, result);
     return result;
   }

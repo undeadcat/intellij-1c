@@ -24,8 +24,17 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         schemaStore.addColumns("Table1", "TColumn1")
         schemaStore.addColumns("Table2")
         schemaStore.addColumns("Other")
-        val strings = getCompletionResult("select * from Tab<caret>")
-        Assert.assertThat(strings, Is.`is`(listOf("Table1", "Table2")))
+        val strings = getCompletionResult("select * from <caret>")
+        Assert.assertThat(strings, Is.`is`(listOf("Other", "Table1", "Table2")))
+
+        Assert.assertThat(getCompletionResult("select * from Tab<caret>"), Is.`is`(listOf("Table1", "Table2")))
+    }
+
+    fun testCompleteTableNamesAfterJoinKeyword() {
+        schemaStore.addColumns("Table1", "TColumn1")
+        schemaStore.addColumns("Table2", "TColumn2")
+        Assert.assertThat(getCompletionResult("select * from Table1 join Tab<caret>"), Is.`is`(listOf("Table1", "Table2")))
+        Assert.assertThat(getCompletionResult("select * from Table1 join <caret>"), Is.`is`(listOf("Table1", "Table2")))
     }
 
     fun testAfterSelectKeyword_completeTablesAndColumns() {

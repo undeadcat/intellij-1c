@@ -26,8 +26,8 @@ public class IdentifierImpl extends ExpressionImpl implements Identifier {
 
   @Override
   @NotNull
-  public PsiElement getIdentifierToken() {
-    return findNotNullChildByType(IDENTIFIERTOKEN);
+  public PsiElement getIdToken() {
+    return findNotNullChildByType(ID_TOKEN);
   }
 
 }
