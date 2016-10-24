@@ -66,17 +66,18 @@
   ]
 }
 
-grammar ::= (querySeparator? sqlQuery)*
+grammar ::= (queryItem)*
+private queryItem ::= sqlQuery querySeparator?{
+    pin = 1
+}
 
 private querySeparator ::= SEMICOLON
 
-select_statement ::= !<<eof>> selectKeyword topOpt distinctOpt selectList
+select_statement ::= selectKeyword topOpt distinctOpt selectList
 fromKeyword columnSource
 joinItem*
 [whereKeyword expression]
 [groupKeyword (byKeyword| поKeyword) expressionList [havingKeyword expression]]{
-    pin = 1
-    recoverWhile = notSeparator
     methods = [
         topCount = "topOpt/numberLiteral"
         topOpt = ""
@@ -86,10 +87,11 @@ joinItem*
         expressionList =""
         //todo. isDistinct
     ]
+    pin = 1
 }
-private notSeparator ::= !(querySeparator)
 
-topOpt ::= [topKeyword numberLiteral] //TODO. trash.make private
+top ::= [topKeyword numberLiteral] //TODO. trash.make private
+
 private distinctOpt ::= distinctKeyword?
 alias ::= asKeyword? identifier{ //TODO. trash.make private
     methods = [
@@ -107,8 +109,7 @@ selectionList ::= selectionItem (COMMA selectionItem)*{
     //TODO. isSelectAll
 }
 
-private selectList ::= (ASTERISK | selectionList ) {recoverWhile=notFromKeyword pin=1}
-private notFromKeyword ::= !fromKeyword
+private selectList ::= (ASTERISK | selectionList )
 
 //source
 tableDeclaration ::= identifier alias?{
@@ -132,15 +133,17 @@ orderItem ::= expression [ascKeyword | descKeyword]
 private orderByExpressionList ::= orderItem (COMMA orderItem) *
 
 //union
-private unionList ::= select_statement (unionKeyword allKeyword? select_statement)*
+private unionList ::= select_statement (unionItem)*
+private unionItem ::= unionKeyword allKeyword? select_statement {
+    pin = 1
+}
+
 sqlQuery::= unionList [orderKeyword (byKeyword| поKeyword) orderByExpressionList]
 
 //join
 joinItem ::= joinKind? joinKeyword columnSource (onKeyword | поKeyword) expression {
-//    recoverWhile = notAfterJoinKeyword
+    pin = 2
 }
-private notAfterJoinKeyword ::= !(groupKeyword | orderKeyword
-| whereKeyword | unionKeyword | havingKeyword | selectKeyword)
 joinKind::= innerKeyword | ((fullKeyword | leftKeyword| rightKeyword) (outerKeyword)?)
 
 stringLiteral ::= string

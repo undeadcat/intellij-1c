@@ -26,15 +26,15 @@ public class JoinItemImpl extends ASTWrapperPsiElement implements JoinItem {
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ColumnSource getColumnSource() {
-    return findNotNullChildByClass(ColumnSource.class);
+    return findChildByClass(ColumnSource.class);
   }
 
   @Override
-  @NotNull
+  @Nullable
   public Expression getExpression() {
-    return findNotNullChildByClass(Expression.class);
+    return findChildByClass(Expression.class);
   }
 
   @Override

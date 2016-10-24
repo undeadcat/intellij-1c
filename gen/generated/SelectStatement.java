@@ -31,7 +31,7 @@ public interface SelectStatement extends PsiElement {
   @Nullable
   PsiElement getHavingKeyword();
 
-  @Nullable
+  @NotNull
   PsiElement getSelectKeyword();
 
   @Nullable

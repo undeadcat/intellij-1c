@@ -7,10 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public interface JoinItem extends PsiElement {
 
-  @NotNull
+  @Nullable
   ColumnSource getColumnSource();
 
-  @NotNull
+  @Nullable
   Expression getExpression();
 
   @Nullable

@@ -5,6 +5,7 @@ import com.simple1c.impl.FakeSchemaStore
 import com.simple1c.impl.ISchemaStore
 import org.hamcrest.core.Is
 import org.junit.Assert
+import org.junit.Ignore
 
 class CompletionTest : LightCodeInsightFixtureTestCase() {
 
@@ -43,6 +44,7 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         Assert.assertThat(strings, Is.`is`(listOf("Table", "Column1", "Column2").toSet()))
     }
 
+    @Ignore
     fun testIdentifierStartsWithFullyQualifiedTable_completeColumnsBelongingToTable() {
         //TODO. does 1c support fully-qualified names (Справочник.Контрагенты.ИНН?)
         Assert.fail()

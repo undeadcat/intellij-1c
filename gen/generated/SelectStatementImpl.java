@@ -74,9 +74,9 @@ public class SelectStatementImpl extends ASTWrapperPsiElement implements SelectS
   }
 
   @Override
-  @Nullable
+  @NotNull
   public PsiElement getSelectKeyword() {
-    return findChildByType(SELECTKEYWORD);
+    return findNotNullChildByType(SELECTKEYWORD);
   }
 
   @Override
