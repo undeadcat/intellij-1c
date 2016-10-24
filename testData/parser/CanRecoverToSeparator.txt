@@ -9,7 +9,7 @@
       PsiElement(fromKeyword)('from')
       TableDeclarationImpl(TABLE_DECLARATION)
         IdentifierImpl(IDENTIFIER)
-          PsiElement(idSimple)('Table2')
+          PsiElement(identifierToken)('Table2')
       PsiElement(whereKeyword)('where')
       BinaryExpressionImpl(BINARY_EXPRESSION)
         NumberLiteralImpl(NUMBER_LITERAL)
@@ -39,7 +39,7 @@
       PsiElement(fromKeyword)('from')
       TableDeclarationImpl(TABLE_DECLARATION)
         IdentifierImpl(IDENTIFIER)
-          PsiElement(idSimple)('ValidTable')
+          PsiElement(identifierToken)('ValidTable')
   PsiElement(;)(';')
   PsiErrorElement:selectKeyword expected, unexpected end of file
     <empty list>

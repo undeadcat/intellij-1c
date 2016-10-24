@@ -60,7 +60,7 @@
     WHITE_SPACE = 'regexp:[\s]+'
     number = 'regexp:\d+'
     bool = 'regexp:true|false|истина|ложь'
-    idSimple = 'regexp:[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*'
+    identifierToken = 'regexp:([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*)(\.([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*))*'
     string = "regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
     line_comment = 'regexp://.*'
   ]
@@ -139,11 +139,6 @@ sqlQuery::= unionList [orderKeyword (byKeyword| поKeyword) orderByExpressionLi
 joinItem ::= joinKind? joinKeyword columnSource (onKeyword | поKeyword) expression
 joinKind::= innerKeyword | ((fullKeyword | leftKeyword| rightKeyword) (outerKeyword)?)
 
-
-//identifiers
-//TODO. make this one lexer rule. this allows spaces.
-identifier ::= idSimple (DOT idSimple)*
-
 stringLiteral ::= string
 numberLiteral ::= number
 boolLiteral ::= bool
@@ -211,6 +206,7 @@ private primary_group ::=
     | boolLiteral
     | stringLiteral
     | parExpr
+identifier ::= identifierToken
 parExpr::= '(' expression ')' {elementType = expression}
 
 

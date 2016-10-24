@@ -7,15 +7,11 @@
       SelectionListImpl(SELECTION_LIST)
         SelectionItemImpl(SELECTION_ITEM)
           IdentifierImpl(IDENTIFIER)
-            PsiElement(idSimple)('t')
-            PsiElement(.)('.')
-            PsiElement(idSimple)('Сслыка')
+            PsiElement(identifierToken)('t.Сслыка')
         PsiElement(,)(',')
         SelectionItemImpl(SELECTION_ITEM)
           IdentifierImpl(IDENTIFIER)
-            PsiElement(idSimple)('t')
-            PsiElement(.)('.')
-            PsiElement(idSimple)('Наименование')
+            PsiElement(identifierToken)('t.Наименование')
       PsiElement(fromKeyword)('from')
       PsiErrorElement:<column source> expected, unexpected end of file
         <empty list>

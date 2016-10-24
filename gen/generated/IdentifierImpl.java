@@ -24,4 +24,10 @@ public class IdentifierImpl extends ExpressionImpl implements Identifier {
     else super.accept(visitor);
   }
 
+  @Override
+  @NotNull
+  public PsiElement getIdentifierToken() {
+    return findNotNullChildByType(IDENTIFIERTOKEN);
+  }
+
 }

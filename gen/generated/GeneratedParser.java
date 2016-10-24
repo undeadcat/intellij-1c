@@ -88,7 +88,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   // asKeyword? identifier
   public static boolean alias(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "alias")) return false;
-    if (!nextTokenIs(builder, "<alias>", ASKEYWORD, IDSIMPLE)) return false;
+    if (!nextTokenIs(builder, "<alias>", ASKEYWORD, IDENTIFIERTOKEN)) return false;
     boolean result;
     Marker marker = enter_section_(builder, level, _NONE_, ALIAS, "<alias>");
     result = alias_0(builder, level + 1);
@@ -108,7 +108,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   // tableDeclaration | subqueryTable
   public static boolean columnSource(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "columnSource")) return false;
-    if (!nextTokenIs(builder, "<column source>", LPAREN, IDSIMPLE)) return false;
+    if (!nextTokenIs(builder, "<column source>", LPAREN, IDENTIFIERTOKEN)) return false;
     boolean result;
     Marker marker = enter_section_(builder, level, _COLLAPSE_, COLUMN_SOURCE, "<column source>");
     result = tableDeclaration(builder, level + 1);
@@ -633,7 +633,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   // identifier alias?
   public static boolean tableDeclaration(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "tableDeclaration")) return false;
-    if (!nextTokenIs(builder, IDSIMPLE)) return false;
+    if (!nextTokenIs(builder, IDENTIFIERTOKEN)) return false;
     boolean result;
     Marker marker = enter_section_(builder);
     result = identifier(builder, level + 1);
@@ -823,37 +823,14 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     return result;
   }
 
-  // idSimple (DOT idSimple)*
+  // identifierToken
   public static boolean identifier(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "identifier")) return false;
-    if (!nextTokenIsSmart(builder, IDSIMPLE)) return false;
+    if (!nextTokenIsSmart(builder, IDENTIFIERTOKEN)) return false;
     boolean result;
     Marker marker = enter_section_(builder);
-    result = consumeTokenSmart(builder, IDSIMPLE);
-    result = result && identifier_1(builder, level + 1);
+    result = consumeTokenSmart(builder, IDENTIFIERTOKEN);
     exit_section_(builder, marker, IDENTIFIER, result);
-    return result;
-  }
-
-  // (DOT idSimple)*
-  private static boolean identifier_1(PsiBuilder builder, int level) {
-    if (!recursion_guard_(builder, level, "identifier_1")) return false;
-    int pos = current_position_(builder);
-    while (true) {
-      if (!identifier_1_0(builder, level + 1)) break;
-      if (!empty_element_parsed_guard_(builder, "identifier_1", pos)) break;
-      pos = current_position_(builder);
-    }
-    return true;
-  }
-
-  // DOT idSimple
-  private static boolean identifier_1_0(PsiBuilder builder, int level) {
-    if (!recursion_guard_(builder, level, "identifier_1_0")) return false;
-    boolean result;
-    Marker marker = enter_section_(builder);
-    result = consumeTokens(builder, 0, DOT, IDSIMPLE);
-    exit_section_(builder, marker, null, result);
     return result;
   }
 

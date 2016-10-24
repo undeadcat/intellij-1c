@@ -20,7 +20,6 @@ import static generated.GeneratedTypes.*;
 %type IElementType
 %unicode
 
-
 OP_NEQ=<>|\!\=
 OP_LIKE=like|подобно
 OP_NOT=not|не
@@ -48,7 +47,7 @@ INNERKEYWORD=inner|внутреннее
 WHITE_SPACE=[\s]+
 NUMBER=[0-9]+
 BOOL=true|false|истина|ложь
-IDSIMPLE=[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*
+IDENTIFIERTOKEN=([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*)(\.([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*))*
 STRING=('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\'|\\)*\")
 LINE_COMMENT="//".*
 
@@ -101,7 +100,7 @@ LINE_COMMENT="//".*
   {INNERKEYWORD}         { return INNERKEYWORD; }
   {NUMBER}               { return NUMBER; }
   {BOOL}                 { return BOOL; }
-  {IDSIMPLE}             { return IDSIMPLE; }
+  {IDENTIFIERTOKEN}      { return IDENTIFIERTOKEN; }
   {STRING}               { return STRING; }
   {LINE_COMMENT}         { return LINE_COMMENT; }
 
