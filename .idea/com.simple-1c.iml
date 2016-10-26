@@ -16,7 +16,7 @@
       <excludeFolder url="file://$MODULE_DIR$/testData-bak" />
       <excludeFolder url="file://$MODULE_DIR$/tests-bak" />
     </content>
-    <orderEntry type="jdk" jdkName="IntelliJ IDEA Community Edition IC-162.2032.8" jdkType="IDEA JDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
       <library>
