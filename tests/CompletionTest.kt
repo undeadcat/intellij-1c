@@ -1,20 +1,23 @@
 import com.intellij.codeInsight.completion.CompletionType
-import com.intellij.testFramework.PlatformLiteFixture
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 import com.simple1c.impl.FakeSchemaStore
 import com.simple1c.impl.ISchemaStore
 import org.hamcrest.core.Is
 import org.junit.Assert
 import org.junit.Ignore
+import org.picocontainer.MutablePicoContainer
 
 class CompletionTest : LightCodeInsightFixtureTestCase() {
 
-    private var schemaStore = FakeSchemaStore.instance
+    companion object {
+        private var schemaStore = FakeSchemaStore()
+    }
 
     override fun setUp() {
         super.setUp()
+        registerImplementation(schemaStore, ISchemaStore::class.java)
         schemaStore.clear()
-
     }
 
     override fun getTestDataPath(): String {
@@ -71,9 +74,10 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
     }
 
 
-    private fun <T> registerImplementation(implementation: T, clazz: Class<ISchemaStore>) {
-        PlatformLiteFixture.getApplication()
-                .picoContainer.registerComponentImplementation(implementation, clazz)
+    private fun <T> registerImplementation(implementation: T, clazz: Class<T>) {
+        val container = ApplicationManager.getApplication().picoContainer as MutablePicoContainer
+        container.unregisterComponent(clazz)
+        container.registerComponentInstance(clazz, implementation)
     }
 
 }

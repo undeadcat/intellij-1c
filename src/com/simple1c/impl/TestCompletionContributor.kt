@@ -12,8 +12,7 @@ import generated.SqlQuery
 import generated.TableDeclaration
 import utils.toMap
 
-class TestCompletionContributor : CompletionContributor() {
-    private var schemaStore = FakeSchemaStore.instance
+class TestCompletionContributor(val schemaStore: ISchemaStore) : CompletionContributor() {
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
         val tableDeclarationPattern = PlatformPatterns.psiElement()
