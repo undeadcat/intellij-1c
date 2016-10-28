@@ -1,7 +1,6 @@
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
-import com.simple1c.impl.FakeSchemaStore
 import com.simple1c.impl.ISchemaStore
 import org.hamcrest.core.Is
 import org.junit.Assert
@@ -78,6 +77,28 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         val container = ApplicationManager.getApplication().picoContainer as MutablePicoContainer
         container.unregisterComponent(clazz)
         container.registerComponentInstance(clazz, implementation)
+    }
+
+    class FakeSchemaStore : ISchemaStore {
+        private val tables = hashMapOf<String, List<String>>()
+
+        override fun getColumns(tableName: String?): Iterable<String> {
+            if (tableName == null)
+                return tables.flatMap { it.value }
+            return tables.getOrElse(tableName, { emptyList<String>() })
+        }
+
+        override fun getTables(): Iterable<String> {
+            return tables.keys
+        }
+
+        fun addColumns(tableName: String, vararg columns: String) {
+            tables.put(tableName, columns.toList())
+        }
+
+        fun clear() {
+            tables.clear()
+        }
     }
 
 }
