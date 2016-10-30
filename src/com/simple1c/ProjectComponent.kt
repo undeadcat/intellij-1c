@@ -11,7 +11,6 @@ import com.simple1c.ui.DataSourcesToolWindow
 class ProjectComponent(val toolWindowManager: ToolWindowManager,
                        project: Project,
                        val dataSourceStorage: DataSourceStorage,
-                       val newDataSourceAction: NewDataSourceAction,
                        val application: Application) : AbstractProjectComponent(project) {
 
     override fun projectOpened() {
@@ -21,11 +20,10 @@ class ProjectComponent(val toolWindowManager: ToolWindowManager,
     private fun registerToolWindow() {
         val toolWindow = toolWindowManager.registerToolWindow("1C: Data Sources", true, ToolWindowAnchor.RIGHT, true)
         val contentManager = toolWindow.contentManager
-        val toolWindowComponent = DataSourcesToolWindow()
-        toolWindowComponent.actionGroup.add(newDataSourceAction)
-        toolWindowComponent.initUi()
-        toolWindowComponent.setDataSources(dataSourceStorage.getAll())
-        contentManager.addContent(contentManager.factory.createContent(toolWindowComponent.content, "", true))
 
+        val content = DataSourcesToolWindow(dataSourceStorage)
+        content.initContent()
+        contentManager.addContent(contentManager.factory.createContent(content, "", true))
     }
 }
+

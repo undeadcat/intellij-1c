@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import generated.GeneratedTypes
 import generated.SqlQuery
 import generated.TableDeclaration
-import utils.toMap
+import coreUtils.toMap
 
 class TestCompletionContributor(val schemaStore: ISchemaStore) : CompletionContributor() {
 

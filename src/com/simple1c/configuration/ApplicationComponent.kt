@@ -14,7 +14,7 @@ class ApplicationComponent(val application: Application) : ApplicationComponent 
 
         for (configurator in container.getComponentInstancesOfType(ApplicationConfigurator::class.java)) {
             logger.info("Running configurator ${configurator.toString()}")
-            (configurator as ApplicationConfigurator).configure()
+            (configurator as ApplicationConfigurator).configure(container)
         }
     }
 
