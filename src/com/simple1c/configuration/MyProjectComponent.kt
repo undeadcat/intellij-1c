@@ -17,6 +17,9 @@ class MyProjectComponent(
     override fun projectOpened() {
         componentAutoRegistrator.autoRegister(project.picoContainer as MutablePicoContainer,
                 {
+                    //TODO. can't register all classes here, otherwise I will get multiple instances of application components
+                    //analyze dependencies?
+                    //use xml??
                     ProjectComponent::class.java.isAssignableFrom(it)
                             && it != MyProjectComponent::class.java
                 })

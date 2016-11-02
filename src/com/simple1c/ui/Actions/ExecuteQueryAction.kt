@@ -4,18 +4,25 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.ShortcutSet
+import com.intellij.psi.PsiElement
+import com.intellij.psi.TokenType
 import com.intellij.psi.util.PsiTreeUtil
 import com.simple1c.boilerplate._1cFile
 import com.simple1c.execution.QueryExecutor
+import generated.GeneratedTypes
 import generated.SqlQuery
 
 class ExecuteQueryAction(val queryExecutor: QueryExecutor) : AnAction("1C:Execute Query", "1C:Execute Query", AllIcons.General.Run) {
+    override fun setShortcutSet(shortcutSet: ShortcutSet?) {
+        super.setShortcutSet(shortcutSet)
+    }
     override fun actionPerformed(e: AnActionEvent?) {
         if (e == null)
             return
         val _1cFile = e.getData(CommonDataKeys.PSI_FILE) as _1cFile
         val editor = e.getData(CommonDataKeys.EDITOR)
-        val query = findSqlQueryAtOffset(_1cFile, editor!!.selectionModel.selectionStart)
+        val query = findQueryAfter(_1cFile, editor!!.selectionModel.selectionStart)
         if (query == null)
             throw Exception("Assertion failed. Expected selection to be ${SqlQuery::class.simpleName} but was ${editor.selectionModel.selectedText}")
         queryExecutor.executeQuery(query.text)
@@ -29,22 +36,23 @@ class ExecuteQueryAction(val queryExecutor: QueryExecutor) : AnAction("1C:Execut
         val _1cFile = psiFile as? _1cFile
         e.presentation.isVisible = _1cFile != null
         val isEnabled = if (_1cFile != null) {
-            val startQuery = findSqlQueryAtOffset(_1cFile, editor!!.selectionModel.selectionStart)
-            val endQuery = findSqlQueryAtOffset(_1cFile, editor.selectionModel.selectionEnd)
+            val startQuery = findQueryAfter(_1cFile, editor!!.selectionModel.selectionStart)
+            val endQuery = findSqlQuery(_1cFile, editor.selectionModel.selectionEnd, { it.prevSibling })
             startQuery != null && endQuery != null && startQuery == endQuery
         } else false
 
         e.presentation.isEnabled = isEnabled
     }
 
-    fun findSqlQueryAtOffset(file: _1cFile, offset: Int): SqlQuery? {
-        fun find(offset: Int): SqlQuery? =
-                PsiTreeUtil.getParentOfType(file.findElementAt(offset), SqlQuery::class.java)
+    private fun findQueryAfter(_1cFile: _1cFile, offset: Int) =
+            findSqlQuery(_1cFile, offset, { it.nextSibling })
 
-        val element = find(offset)
-        if (element == null && offset > 0)
-            return find(offset - 1)
-        return element
+    fun findSqlQuery(file: _1cFile, offset: Int, moveToElement: (PsiElement) -> PsiElement): SqlQuery? {
+        var element = file.findElementAt(offset)
+        while (element != null && (element.node.elementType == GeneratedTypes.LINE_COMMENT
+                || element.node.elementType == TokenType.WHITE_SPACE))
+            element = moveToElement(element)
+        return PsiTreeUtil.getParentOfType(element, SqlQuery::class.java, false)
     }
 
 }

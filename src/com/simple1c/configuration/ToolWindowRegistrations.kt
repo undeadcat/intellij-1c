@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
 import com.simple1c.dataSources.DataSourceStorage
+import com.simple1c.ui.ConsoleLogView
 import com.simple1c.ui.DataSourcesToolWindow
 import coreUtils.getComponentsOfType
 
@@ -26,15 +27,23 @@ class ToolWindowRegistrations(val toolWindowManager: ToolWindowManager,
         fun register(toolWindowManager: ToolWindowManager)
     }
 
-    class DataSourcesWindowRegistration(val dataSourceStorage: DataSourceStorage, project: Project)
+    class DataSourcesWindowRegistration(val dataSourceStorage: DataSourceStorage,
+                                        val dataSourcesToolWindow: DataSourcesToolWindow,
+                                        project: Project)
     : AbstractProjectComponent(project), ToolWindowRegistration {
         override fun register(toolWindowManager: ToolWindowManager) {
-            val toolWindow = toolWindowManager.registerToolWindow("1C: Data Sources", true, ToolWindowAnchor.RIGHT, true)
+            val toolWindow = toolWindowManager.registerToolWindow("1C: Data Sources", false, ToolWindowAnchor.RIGHT, true)
             val contentManager = toolWindow.contentManager
 
-            val content = DataSourcesToolWindow(dataSourceStorage)
-            content.initContent()
-            contentManager.addContent(contentManager.factory.createContent(content, "", true))
+            contentManager.addContent(contentManager.factory.createContent(dataSourcesToolWindow.createContent(), "", true))
+        }
+    }
+
+    class ConsoleWindowRegistration(project: Project, val consoleLogView: ConsoleLogView) : AbstractProjectComponent(project), ToolWindowRegistration {
+        override fun register(toolWindowManager: ToolWindowManager) {
+            val toolWindow = toolWindowManager.registerToolWindow("1C: Console", false, ToolWindowAnchor.BOTTOM, true)
+            consoleLogView.initContent(toolWindow)
         }
     }
 }
+

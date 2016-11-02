@@ -7,6 +7,8 @@ import com.intellij.ui.components.JBList;
 import com.intellij.util.containers.ContainerUtil;
 import com.simple1c.dataSources.DataSource;
 import com.simple1c.dataSources.DataSourceStorage;
+import com.simple1c.ui.Actions.CreateQueryAction;
+import com.simple1c.ui.Actions.EditDataSourceAction;
 import com.simple1c.ui.Actions.MyActionConstants;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -17,28 +19,42 @@ import java.util.List;
 
 public class DataSourcesToolWindow extends SimpleToolWindowPanel implements DataProvider {
     private final DataSourceStorage dataSourceStorage;
+    private final EditDataSourceAction editDataSourceAction;
+    private final CreateQueryAction createQueryAction;
     private JPanel content;
     private JBList dataSourcesList;
     public static DataKey<DataSource> DataSourceKey = DataKey.create("SelectedDataSource");
 
-    public DataSourcesToolWindow(DataSourceStorage dataSourceStorage) {
+    public DataSourcesToolWindow(DataSourceStorage dataSourceStorage, EditDataSourceAction editDataSourceAction,
+                                 CreateQueryAction createQueryAction) {
         super(true, true);
         this.dataSourceStorage = dataSourceStorage;
+        this.editDataSourceAction = editDataSourceAction;
+        this.createQueryAction = createQueryAction;
     }
 
-    public void initContent() {
+    public JComponent createContent() {
         dataSourcesList.setEmptyText("Click 'Add' to create a data source");
         setDataSources(dataSourceStorage.getAll());
         dataSourceStorage.addUpdateListener(this::setDataSources);
         ActionManager actionManager = ActionManager.getInstance();
         final ActionToolbar actionToolbar = actionManager
-                .createActionToolbar(MyActionConstants.Places.DataSourcesToolbar,
+                .createActionToolbar(ActionPlaces.UNKNOWN,
                         (ActionGroup) actionManager.getAction(MyActionConstants.Groups.DataSourcesToolbar), true);
         actionToolbar.setTargetComponent(this.content);
         setContent(content);
         setToolbar(actionToolbar.getComponent());
-        PopupHandler.installPopupHandler(dataSourcesList, MyActionConstants.Groups.DataSources,
-                MyActionConstants.Places.DataSources);
+        PopupHandler.installPopupHandler(dataSourcesList, getPopupActionGroup(),
+                ActionPlaces.UNKNOWN, actionManager);
+        return this.getComponent();
+    }
+
+    @NotNull
+    private DefaultActionGroup getPopupActionGroup() {
+        DefaultActionGroup result = new DefaultActionGroup();
+        result.add(editDataSourceAction);
+        result.add(createQueryAction);
+        return result;
     }
 
     private void setDataSources(@NotNull Iterable<DataSource> dataSources) {

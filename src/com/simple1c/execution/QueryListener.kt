@@ -7,10 +7,13 @@ interface QueryListener {
     fun errorOccurred(exception: Exception)
     fun endExecute(columns: List<String>)
     fun rowFetched(values: List<Any>)
+    fun queryCancelled()
 
     companion object {
 
         val Topic: Topic<QueryListener> = com.intellij.util.messages.Topic.create("1C.ExecuteQuery",
                 QueryListener::class.java, com.intellij.util.messages.Topic.BroadcastDirection.NONE)
     }
+
+
 }

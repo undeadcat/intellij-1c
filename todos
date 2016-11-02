@@ -1,2 +1,16 @@
-UI:
+Data sources:
+    editing
+    persistence
+    test connection
+    scratch files
+    COM?
+
+Execution:
+    .net side
+    table view
+    CSV export
+    Cancellation all the way
+
+
+Improvements:
 	highlight current query in editor
