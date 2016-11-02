@@ -2,6 +2,7 @@
 
 package coreUtils
 
+import org.picocontainer.PicoContainer
 import java.util.*
 
 fun <T, TKey, TValue> Iterable<T>.toMap(keyFunc: (T) -> TKey, valueFunc: (T) -> TValue): HashMap<TKey, TValue> {
@@ -25,5 +26,19 @@ fun parseIntOrNull(string: String): Int? {
     } catch (e: NumberFormatException) {
         return null
     }
+}
+
+fun <T> PicoContainer.getComponentsOfType(clazz: Class<T>): List<T> {
+    return this.getComponentInstancesOfType(clazz).map { uncheckedCast<T>(it) }.toList()
+}
+
+fun <T> nullableCast(obj: Any?): T? {
+    @Suppress("UNCHECKED_CAST")
+    return obj as? T
+}
+
+fun <T> uncheckedCast(obj: Any?): T {
+    @Suppress("UNCHECKED_CAST")
+    return obj as T
 }
 

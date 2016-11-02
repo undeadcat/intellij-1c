@@ -29,9 +29,9 @@ class DataSourceStorage {
             counter++
         return DataSource(nameTemplate + counter)
     }
+
     interface UpdateListener {
         fun run(values: List<DataSource>)
-
     }
 
 }

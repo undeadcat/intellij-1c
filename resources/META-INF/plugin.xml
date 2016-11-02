@@ -35,8 +35,8 @@
 
     <project-components>
         <component>
-            <interface-class>com.simple1c.ProjectComponent</interface-class>
-            <implementation-class>com.simple1c.ProjectComponent</implementation-class>
+            <interface-class>com.simple1c.configuration.MyProjectComponent</interface-class>
+            <implementation-class>com.simple1c.configuration.MyProjectComponent</implementation-class>
         </component>
     </project-components>
 

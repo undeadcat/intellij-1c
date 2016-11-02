@@ -7,6 +7,7 @@ import com.simple1c.dataSources.DataSourceStorage
 import com.simple1c.ui.DataSourcesToolWindow
 import com.simple1c.ui.EditDataSourceDialog
 
+//TODO. Make it not an action? This is used only in one local popup
 class EditDataSourceAction(val dataSourceStorage: DataSourceStorage)
 : AnAction("1C: Edit Data Source", "1c: Edit Data Source", AllIcons.Actions.Edit) {
     override fun actionPerformed(e: AnActionEvent?) {
@@ -19,11 +20,11 @@ class EditDataSourceAction(val dataSourceStorage: DataSourceStorage)
         if (dialog.go())
             dataSourceStorage.addOrUpdate(dialog.dataSource)
     }
-}
 
-class CreateQueryAction() : AnAction("1C: Create query") {
-    override fun actionPerformed(e: AnActionEvent?) {
-        print(e!!.dataContext)
+    override fun update(e: AnActionEvent?) {
+        if (e == null)
+            return
+        e.presentation.isVisible = e.place == MyActionConstants.Places.DataSources
     }
-
 }
+

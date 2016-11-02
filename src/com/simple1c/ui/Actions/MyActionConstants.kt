@@ -4,6 +4,10 @@ object MyActionConstants {
     object Groups {
         @JvmField
         val DataSources = "DataSourceGroup"
+
+        @JvmField
+        val EditorToolbar = "1CEditorToolbar"
+
         @JvmField
         val DataSourcesToolbar = "DataSourcesToolbarGroup"
     }
