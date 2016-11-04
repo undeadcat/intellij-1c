@@ -17,5 +17,4 @@ class CancelQueryAction(val queryExecutor: QueryExecutor) : AnAction("1C:Cancel 
         e.presentation.isEnabled = queryExecutor.hasQueryInProgress()
 
     }
-
 }

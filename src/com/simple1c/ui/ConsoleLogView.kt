@@ -85,7 +85,6 @@ class ConsoleLogView(private val project: Project,
 
     }
 
-
     class ClearLogAction() : AnAction("1C: Clear log", "Clear the 1c console log", AllIcons.Actions.GC) {
         override fun actionPerformed(e: AnActionEvent?) {
             if (e == null)
@@ -101,6 +100,5 @@ class ConsoleLogView(private val project: Project,
             e.presentation.isEnabled = editor != null && editor.document.textLength > 0
         }
     }
-
 
 }

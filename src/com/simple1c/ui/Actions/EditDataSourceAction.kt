@@ -7,7 +7,7 @@ import com.simple1c.dataSources.DataSourceStorage
 import com.simple1c.ui.DataSourcesToolWindow
 import com.simple1c.ui.EditDataSourceDialog
 
-class EditDataSourceAction(val dataSourceStorage: DataSourceStorage)
+class EditDataSourceAction()
 : AnAction("1C: Edit Data Source", "Edit this data source", AllIcons.Actions.Edit) {
     override fun actionPerformed(e: AnActionEvent?) {
         if (e == null)
@@ -17,7 +17,7 @@ class EditDataSourceAction(val dataSourceStorage: DataSourceStorage)
             throw Exception("DataSource was null. Expected toolWindow to provide selected data source")
         val dialog = EditDataSourceDialog(e.project, dataSource)
         if (dialog.go())
-            dataSourceStorage.addOrUpdate(dialog.dataSource)
+            DataSourceStorage.instance(e.project!!).addOrUpdate(dialog.dataSource)
     }
 }
 

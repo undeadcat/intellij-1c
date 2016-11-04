@@ -2,17 +2,17 @@ package com.simple1c.dataSources
 
 import java.util.*
 
-class DataSource(private val explicitName: String?,
-                 val host: String? = null,
-                 val port: Int? = null,
-                 val database: String? = null,
-                 val user: String? = null,
-                 val password: String? = null) {
-    val id: UUID = UUID.randomUUID()
+data class DataSource constructor(val id: UUID,
+                                  private val displayName: String?,
+                                  val connectionString: PostgresConnectionString) {
+    constructor(displayName: String?,
+                connectionString: PostgresConnectionString)
+    : this(UUID.randomUUID(), displayName, connectionString)
 
     fun getName(): String {
-        if (explicitName != null)
-            return explicitName
-        return "$user:$password@$host:$port/$database"
+        if (displayName != null)
+            return displayName
+        return connectionString.format()
     }
 }
+

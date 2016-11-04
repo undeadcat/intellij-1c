@@ -1,8 +1,7 @@
 package com.simple1c.configuration
 
+import com.intellij.openapi.components.impl.ComponentManagerImpl
 import com.intellij.openapi.diagnostic.Logger
-import org.picocontainer.MutablePicoContainer
-import org.picocontainer.PicoContainer
 import java.io.File
 import java.lang.reflect.Modifier
 import java.nio.file.Paths
@@ -11,17 +10,18 @@ import java.nio.file.Paths
 class ComponentAutoRegistrator(val root: File, val excludeType: Class<*>) {
     private var classes: Iterable<Class<*>>? = null
     val logger = Logger.getInstance(javaClass)
-    fun autoRegister(container: PicoContainer, classFilter: (Class<*>) -> Boolean = { true }) {
+    fun autoRegister(description: String,
+                     componentManager: ComponentManagerImpl, classFilter: (Class<*>) -> Boolean = { true }) {
         for (clazz in getClasses()
                 .distinct()
                 .filter(classFilter)
                 .filter { it != excludeType }
                 .filter { !Modifier.isAbstract(it.modifiers) && !it.isInterface }) {
             val interfaces = clazz.interfaces + clazz
-            val logMessage = "Registered class ${clazz.simpleName} as " +
+            val logMessage = "$description: Registering class ${clazz.simpleName} as " +
                     interfaces.map { it.simpleName }.joinToString(",")
             logger.info(logMessage)
-            (container as MutablePicoContainer).registerComponentImplementation(clazz)
+            componentManager.picoContainer.registerComponentImplementation(clazz)
         }
     }
 

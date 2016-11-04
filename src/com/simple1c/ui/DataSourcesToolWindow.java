@@ -1,14 +1,13 @@
 package com.simple1c.ui;
 
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.components.JBList;
 import com.intellij.util.containers.ContainerUtil;
 import com.simple1c.dataSources.DataSource;
 import com.simple1c.dataSources.DataSourceStorage;
-import com.simple1c.ui.Actions.CreateQueryAction;
-import com.simple1c.ui.Actions.EditDataSourceAction;
 import com.simple1c.ui.Actions.MyActionConstants;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -17,20 +16,19 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.List;
 
-public class DataSourcesToolWindow extends SimpleToolWindowPanel implements DataProvider {
+public class DataSourcesToolWindow
+        //extend this because DataProvider implementation must be in the control tree
+        extends SimpleToolWindowPanel implements DataProvider {
     private final DataSourceStorage dataSourceStorage;
-    private final EditDataSourceAction editDataSourceAction;
-    private final CreateQueryAction createQueryAction;
+    private final List<AnAction> actions;
     private JPanel content;
     private JBList dataSourcesList;
     public static DataKey<DataSource> DataSourceKey = DataKey.create("SelectedDataSource");
 
-    public DataSourcesToolWindow(DataSourceStorage dataSourceStorage, EditDataSourceAction editDataSourceAction,
-                                 CreateQueryAction createQueryAction) {
+    public DataSourcesToolWindow(Project project, List<AnAction> actions) {
         super(true, true);
-        this.dataSourceStorage = dataSourceStorage;
-        this.editDataSourceAction = editDataSourceAction;
-        this.createQueryAction = createQueryAction;
+        this.dataSourceStorage = DataSourceStorage.instance(project);
+        this.actions = actions;
     }
 
     public JComponent createContent() {
@@ -46,21 +44,25 @@ public class DataSourcesToolWindow extends SimpleToolWindowPanel implements Data
         setToolbar(actionToolbar.getComponent());
         PopupHandler.installPopupHandler(dataSourcesList, getPopupActionGroup(),
                 ActionPlaces.UNKNOWN, actionManager);
-        return this.getComponent();
+        return getComponent();
     }
 
     @NotNull
     private DefaultActionGroup getPopupActionGroup() {
         DefaultActionGroup result = new DefaultActionGroup();
-        result.add(editDataSourceAction);
-        result.add(createQueryAction);
+        result.addAll(actions);
         return result;
     }
 
     private void setDataSources(@NotNull Iterable<DataSource> dataSources) {
-        List<String> dataSourcesDataList = ContainerUtil.map(dataSources, DataSource::getName);
-        String[] result = new String[dataSourcesDataList.size()];
-        dataSourcesDataList.toArray(result);
+        List<ListItem> listItems = ContainerUtil.map(dataSources, dataSource -> {
+            ListItem listItem = new ListItem();
+            listItem.DisplayName = dataSource.getName();
+            listItem.DataSource = dataSource;
+            return listItem;
+        });
+        ListItem[] result = new ListItem[listItems.size()];
+        listItems.toArray(result);
         //noinspection unchecked
         dataSourcesList.setListData(result);
     }
@@ -69,7 +71,18 @@ public class DataSourcesToolWindow extends SimpleToolWindowPanel implements Data
     @Override
     public Object getData(@NonNls String dataId) {
         if (DataSourceKey.is(dataId))
-            return dataSourcesList.getModel().getElementAt(dataSourcesList.getSelectedIndex());
+            return ((ListItem) dataSourcesList.getModel()
+                    .getElementAt(dataSourcesList.getSelectedIndex())).DataSource;
         return null;
+    }
+
+    private class ListItem {
+        String DisplayName;
+        DataSource DataSource;
+
+        @Override
+        public String toString() {
+            return DisplayName;
+        }
     }
 }

@@ -17,6 +17,7 @@ class ExecuteQueryAction(val queryExecutor: QueryExecutor) : AnAction("1C:Execut
     override fun setShortcutSet(shortcutSet: ShortcutSet?) {
         super.setShortcutSet(shortcutSet)
     }
+
     override fun actionPerformed(e: AnActionEvent?) {
         if (e == null)
             return
@@ -47,11 +48,12 @@ class ExecuteQueryAction(val queryExecutor: QueryExecutor) : AnAction("1C:Execut
     private fun findQueryAfter(_1cFile: _1cFile, offset: Int) =
             findSqlQuery(_1cFile, offset, { it.nextSibling })
 
-    fun findSqlQuery(file: _1cFile, offset: Int, moveToElement: (PsiElement) -> PsiElement): SqlQuery? {
+    fun findSqlQuery(file: _1cFile, offset: Int, getSibling: (PsiElement) -> PsiElement?): SqlQuery? {
         var element = file.findElementAt(offset)
         while (element != null && (element.node.elementType == GeneratedTypes.LINE_COMMENT
-                || element.node.elementType == TokenType.WHITE_SPACE))
-            element = moveToElement(element)
+                || element.node.elementType == TokenType.WHITE_SPACE)) {
+            element = getSibling(element)
+        }
         return PsiTreeUtil.getParentOfType(element, SqlQuery::class.java, false)
     }
 

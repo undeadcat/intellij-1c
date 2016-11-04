@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.simple1c.dataSources.DataSource;
+import com.simple1c.dataSources.PostgresConnectionString;
 import coreUtils.CoreUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,12 +38,11 @@ public class EditDataSourceDialog extends DialogWrapper {
         super.init();
         content.setMinimumSize(new Dimension(600, 400));
         nameTextInput.setText(dataSource.getName());
-        hostInput.setText(dataSource.getHost());
-        Integer port = dataSource.getPort();
-        if (port != null)
-            portTextInput.setText(Integer.toString(port));
-        userTextInput.setText(dataSource.getUser());
-        passwordTextInput.setText(dataSource.getPassword());
+        hostInput.setText(dataSource.getConnectionString().getHost());
+        Integer port = dataSource.getConnectionString().getPort();
+        portTextInput.setText(Integer.toString(port));
+        userTextInput.setText(dataSource.getConnectionString().getUser());
+        passwordTextInput.setText(dataSource.getConnectionString().getPassword());
     }
 
     @Nullable
@@ -57,13 +57,14 @@ public class EditDataSourceDialog extends DialogWrapper {
     public boolean go() {
         init();
         boolean result = showAndGet();
-        if (result)
-            dataSource = new DataSource(nameTextInput.getText(),
-                    hostInput.getText(),
-                    Integer.parseInt(portTextInput.getText()),
-                    databaseInput.getText(),
-                    userTextInput.getText(),
-                    passwordTextInput.getText());
-        return result;
+        if (!result)
+            return false;
+        PostgresConnectionString connectionString = new PostgresConnectionString(hostInput.getText(),
+                Integer.parseInt(portTextInput.getText()),
+                databaseInput.getText(),
+                userTextInput.getText(),
+                passwordTextInput.getText());
+        dataSource = dataSource.copy(dataSource.getId(), nameTextInput.getText(), connectionString);
+        return true;
     }
 }
