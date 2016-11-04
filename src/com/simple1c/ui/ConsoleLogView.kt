@@ -4,7 +4,7 @@ import com.intellij.execution.impl.ConsoleViewUtil
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.Application
-import com.intellij.openapi.components.AbstractProjectComponent
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.ex.DocumentEx
 import com.intellij.openapi.editor.ex.EditorEx
@@ -14,14 +14,14 @@ import com.intellij.openapi.project.ProjectManagerAdapter
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.wm.ToolWindow
 import com.simple1c.execution.QueryListener
-import com.simple1c.ui.Actions.CancelQueryAction
+import com.simple1c.ui.Actions.MyActionIds
 
-class ConsoleLogView(private val project: Project,
-                     private val application: Application,
-                     private val actionManager: ActionManager,
-                     private val cancelQueryAction: CancelQueryAction) : AbstractProjectComponent(project) {
+class ConsoleLogView(private val project: Project) {
     //need to get application, not project bus
+    private val cancelQueryAction = ActionManager.getInstance().getAction(MyActionIds.cancelQuery)!!
+    private val application = ApplicationManager.getApplication()
     private val messageBus = application.messageBus
+    private val actionManager = ActionManager.getInstance()
     private val editor: EditorEx = ConsoleViewUtil.setupConsoleEditor(project, false, false)
             .apply {
                 this.settings.isWhitespacesShown = false

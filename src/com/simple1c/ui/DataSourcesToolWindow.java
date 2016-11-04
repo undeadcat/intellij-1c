@@ -3,11 +3,15 @@ package com.simple1c.ui;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
+import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.content.ContentManager;
 import com.intellij.util.containers.ContainerUtil;
 import com.simple1c.dataSources.DataSource;
 import com.simple1c.dataSources.DataSourceStorage;
+import com.simple1c.ui.Actions.CreateQueryAction;
+import com.simple1c.ui.Actions.EditDataSourceAction;
 import com.simple1c.ui.Actions.MyActionConstants;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -20,18 +24,22 @@ public class DataSourcesToolWindow
         //extend this because DataProvider implementation must be in the control tree
         extends SimpleToolWindowPanel implements DataProvider {
     private final DataSourceStorage dataSourceStorage;
-    private final List<AnAction> actions;
     private JPanel content;
     private JBList dataSourcesList;
     public static DataKey<DataSource> DataSourceKey = DataKey.create("SelectedDataSource");
 
-    public DataSourcesToolWindow(Project project, List<AnAction> actions) {
+    public DataSourcesToolWindow(Project project) {
         super(true, true);
         this.dataSourceStorage = DataSourceStorage.instance(project);
-        this.actions = actions;
     }
 
-    public JComponent createContent() {
+    public void initContent(@NotNull ToolWindow toolWindow) {
+        ContentManager contentManager = toolWindow.getContentManager();
+        JComponent component = createComponent(new EditDataSourceAction(), new CreateQueryAction());
+        toolWindow.getContentManager().addContent(contentManager.getFactory().createContent(component, "", true));
+    }
+
+    private JComponent createComponent(AnAction... actions) {
         dataSourcesList.setEmptyText("Click 'Add' to create a data source");
         setDataSources(dataSourceStorage.getAll());
         dataSourceStorage.addUpdateListener(this::setDataSources);
@@ -42,16 +50,10 @@ public class DataSourcesToolWindow
         actionToolbar.setTargetComponent(this.content);
         setContent(content);
         setToolbar(actionToolbar.getComponent());
-        PopupHandler.installPopupHandler(dataSourcesList, getPopupActionGroup(),
-                ActionPlaces.UNKNOWN, actionManager);
+        DefaultActionGroup popupActionGroup = new DefaultActionGroup();
+        popupActionGroup.addAll(actions);
+        PopupHandler.installPopupHandler(dataSourcesList, popupActionGroup, ActionPlaces.UNKNOWN, actionManager);
         return getComponent();
-    }
-
-    @NotNull
-    private DefaultActionGroup getPopupActionGroup() {
-        DefaultActionGroup result = new DefaultActionGroup();
-        result.addAll(actions);
-        return result;
     }
 
     private void setDataSources(@NotNull Iterable<DataSource> dataSources) {
@@ -75,6 +77,7 @@ public class DataSourcesToolWindow
                     .getElementAt(dataSourcesList.getSelectedIndex())).DataSource;
         return null;
     }
+
 
     private class ListItem {
         String DisplayName;
