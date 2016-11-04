@@ -6,7 +6,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.content.ContentManager;
+import com.intellij.ui.content.ContentManager;gi
 import com.intellij.util.containers.ContainerUtil;
 import com.simple1c.dataSources.DataSource;
 import com.simple1c.dataSources.DataSourceStorage;
@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.Comparator;
 import java.util.List;
 
 public class DataSourcesToolWindow
@@ -41,7 +42,7 @@ public class DataSourcesToolWindow
 
     private JComponent createComponent(AnAction... actions) {
         dataSourcesList.setEmptyText("Click 'Add' to create a data source");
-        setDataSources(dataSourceStorage.getAll());
+        setDataSources(ContainerUtil.sorted(dataSourceStorage.getAll(), Comparator.comparing(DataSource::getName)));
         dataSourceStorage.addUpdateListener(this::setDataSources);
         ActionManager actionManager = ActionManager.getInstance();
         final ActionToolbar actionToolbar = actionManager

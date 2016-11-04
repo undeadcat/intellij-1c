@@ -17,6 +17,7 @@ class PostgresConnectionString constructor(val host: String,
     }
 
     companion object {
+        @JvmStatic
         fun tryParse(value: String): PostgresConnectionString? {
 
             val parts = value.split(";").map {
