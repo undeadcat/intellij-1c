@@ -1,4 +1,4 @@
-package com.simple1c.inspections
+package com.simple1c.lang
 
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.LocalInspectionTool

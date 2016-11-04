@@ -1,4 +1,4 @@
-package com.simple1c.impl
+package com.simple1c.lang
 
 import com.intellij.lexer.FlexAdapter
 import com.intellij.lexer.Lexer

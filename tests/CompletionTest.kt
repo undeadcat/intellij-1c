@@ -1,7 +1,7 @@
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
-import com.simple1c.impl.ISchemaStore
+import com.simple1c.lang.ISchemaStore
 import org.hamcrest.core.Is
 import org.junit.Assert
 import org.junit.Ignore

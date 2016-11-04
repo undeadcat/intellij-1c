@@ -1,4 +1,4 @@
-package com.simple1c.impl
+package com.simple1c.lang
 
 class SchemaStore : ISchemaStore {
     private val tables = hashMapOf(

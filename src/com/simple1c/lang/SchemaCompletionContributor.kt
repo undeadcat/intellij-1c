@@ -1,4 +1,4 @@
-package com.simple1c.impl
+package com.simple1c.lang
 
 import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionParameters
@@ -12,7 +12,7 @@ import generated.SqlQuery
 import generated.TableDeclaration
 import coreUtils.toMap
 
-class TestCompletionContributor(val schemaStore: ISchemaStore) : CompletionContributor() {
+class SchemaCompletionContributor(val schemaStore: ISchemaStore) : CompletionContributor() {
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
         val tableDeclarationPattern = PlatformPatterns.psiElement()

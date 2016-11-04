@@ -1,5 +1,5 @@
 import com.intellij.testFramework.ParsingTestCase
-import com.simple1c._1cParserDefinition
+import com.simple1c.lang._1cParserDefinition
 import org.junit.Assert
 
 /*

@@ -6,7 +6,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.content.ContentManager;gi
+import com.intellij.ui.content.ContentManager;
 import com.intellij.util.containers.ContainerUtil;
 import com.simple1c.dataSources.DataSource;
 import com.simple1c.dataSources.DataSourceStorage;

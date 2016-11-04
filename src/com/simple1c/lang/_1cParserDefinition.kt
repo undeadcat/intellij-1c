@@ -1,4 +1,4 @@
-package com.simple1c
+package com.simple1c.lang
 
 import com.intellij.lang.ASTNode
 import com.intellij.lang.ParserDefinition
@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
 import com.simple1c.boilerplate._1cFile
@@ -56,7 +57,7 @@ class _1cParserDefinition : ParserDefinition {
     }
 
     companion object {
-        private val WhiteSpaces = TokenSet.create(com.intellij.psi.TokenType.WHITE_SPACE)
+        private val WhiteSpaces = TokenSet.create(TokenType.WHITE_SPACE)
         private val Comments = TokenSet.create(GeneratedTypes.LINE_COMMENT)
         private val FileElementType = IFileElementType(_1cLanguage.INSTANCE)
     }

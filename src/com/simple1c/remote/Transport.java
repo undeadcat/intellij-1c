@@ -1,4 +1,4 @@
-package com.simple1c.impl;
+package com.simple1c.remote;
 
 import com.google.gson.Gson;
 import org.apache.http.HttpHost;
