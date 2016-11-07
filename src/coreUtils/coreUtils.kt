@@ -3,6 +3,10 @@
 package coreUtils
 
 import org.picocontainer.PicoContainer
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.util.*
 
 fun String.equalsIgnoreCase(other: String): Boolean {
@@ -48,4 +52,26 @@ fun <T> nullableCast(obj: Any?): T? {
 fun <T> uncheckedCast(obj: Any?): T {
     @Suppress("UNCHECKED_CAST")
     return obj as T
+}
+
+fun Exception.formatStacktrace(): String {
+    val stringWriter = StringWriter()
+    this.printStackTrace(PrintWriter(stringWriter))
+    return stringWriter.toString()
+}
+
+fun readString(stream: InputStream): String {
+    val sb = StringBuilder()
+    val result = CharArray(65 * 1024)
+    InputStreamReader(stream).use {
+        var read: Int
+        while (true) {
+            read = it.read(result)
+            if (read > 0)
+                sb.append(result, 0, read)
+            else
+                break
+        }
+    }
+    return sb.toString()
 }

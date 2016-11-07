@@ -10,8 +10,6 @@ import com.intellij.ui.content.ContentManager;
 import com.intellij.util.containers.ContainerUtil;
 import com.simple1c.dataSources.DataSource;
 import com.simple1c.dataSources.DataSourceStorage;
-import com.simple1c.ui.Actions.CreateQueryAction;
-import com.simple1c.ui.Actions.EditDataSourceAction;
 import com.simple1c.ui.Actions.MyActionConstants;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -27,20 +25,22 @@ public class DataSourcesToolWindow
     private final DataSourceStorage dataSourceStorage;
     private JPanel content;
     private JBList dataSourcesList;
+    private final List<AnAction> actions;
     public static DataKey<DataSource> DataSourceKey = DataKey.create("SelectedDataSource");
 
-    public DataSourcesToolWindow(Project project) {
+    public DataSourcesToolWindow(Project project, List<AnAction> actions) {
         super(true, true);
         this.dataSourceStorage = DataSourceStorage.instance(project);
+        this.actions = actions;
     }
 
     public void initContent(@NotNull ToolWindow toolWindow) {
         ContentManager contentManager = toolWindow.getContentManager();
-        JComponent component = createComponent(new EditDataSourceAction(), new CreateQueryAction());
+        JComponent component = createComponent();
         toolWindow.getContentManager().addContent(contentManager.getFactory().createContent(component, "", true));
     }
 
-    private JComponent createComponent(AnAction... actions) {
+    private JComponent createComponent() {
         dataSourcesList.setEmptyText("Click 'Add' to create a data source");
         setDataSources(ContainerUtil.sorted(dataSourceStorage.getAll(), Comparator.comparing(DataSource::getName)));
         dataSourceStorage.addUpdateListener(this::setDataSources);

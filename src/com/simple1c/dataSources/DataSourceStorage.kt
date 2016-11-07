@@ -35,8 +35,9 @@ class DataSourceStorage : PersistentStateComponent<DataSourceStorage.State> {
         triggerListeners()
     }
 
-    private fun triggerListeners() {
-        listeners.forEach { it.run(dataSources) }
+    fun delete(dataSource: DataSource) {
+        dataSources = (dataSources.filter { it.id != dataSource.id }).toList()
+        triggerListeners()
     }
 
     fun newTemplate(): DataSource {
@@ -45,6 +46,10 @@ class DataSourceStorage : PersistentStateComponent<DataSourceStorage.State> {
         while (dataSources.any { it.getName() == nameTemplate + counter })
             counter++
         return DataSource(nameTemplate + counter, PostgresConnectionString("localhost", 5432, "", "", ""))
+    }
+
+    private fun triggerListeners() {
+        listeners.forEach { it.run(dataSources) }
     }
 
     private fun fromState(it: DataSourceState): DataSource {
@@ -75,5 +80,6 @@ class DataSourceStorage : PersistentStateComponent<DataSourceStorage.State> {
         fun instance(project: Project): DataSourceStorage
                 = ServiceManager.getService(project, DataSourceStorage::class.java)
     }
+
 
 }

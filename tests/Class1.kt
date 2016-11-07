@@ -4,7 +4,6 @@ class Class1 {
 
     @Test
     fun Test() {
-
     }
 
 }

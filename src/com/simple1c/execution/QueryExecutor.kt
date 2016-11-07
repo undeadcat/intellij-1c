@@ -1,34 +1,54 @@
 package com.simple1c.execution
 
-import com.intellij.util.messages.MessageBus
+import com.intellij.openapi.application.Application
+import com.intellij.openapi.progress.PerformInBackgroundOption
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.Project
+import com.simple1c.dataSources.DataSource
+import com.simple1c.remote.*
 import java.util.concurrent.Executors
-import java.util.concurrent.Future
 
-class QueryExecutor(messageBus: MessageBus) {
+//todo. handle cancellation. don't eat threads in case of hanging query.
+class QueryExecutor(val application: Application,
+                    val analysisHostProcess: AnalysisHostProcess,
+                    val progressManager: ProgressManager) {
     private val sync = Any()
-    private var currentQuery: Future<*>? = null
+    private var currentQuery: Task.Backgroundable? = null
     private val backgroundExecutor = Executors.newSingleThreadExecutor()
-    private val publisher = messageBus.syncPublisher(QueryListener.Topic)
+    private val publisher = application.messageBus.syncPublisher(QueryListener.Topic)
 
-    fun executeQuery(query: String) {
+    fun executeQuery(project: Project, query: String, dataSource: DataSource) {
+        val transport = analysisHostProcess.getTransport()
+        val task = object : Task.Backgroundable(project, "Executing query", true, PerformInBackgroundOption.ALWAYS_BACKGROUND) {
+            override fun run(indicator: ProgressIndicator) {
+                indicator.isIndeterminate = true
+                try {
+                    publisher.log(query)
+                    val request = TranslationRequest(dataSource.connectionString.format(), query)
+                    val translated = transport.invoke("translate", request, TranslationResult::class.java)
+                    val translatedQuery = translated.result.orEmpty()
+                    publisher.log(translatedQuery)
+                    val executionRequest = ExecuteQueryRequest(dataSource.connectionString.format(), translatedQuery)
+                    val result = transport.invoke("executeQuery", executionRequest, QueryResult::class.java)
+                    publisher.endExecute(result.columns)
+                    for (row in result.rows)
+                        publisher.rowFetched(row.toList())
+                } catch(e: RemoteException) {
+                    publisher.errorOccurred(e.message.orEmpty())
+                } finally {
+                    synchronized(sync) {
+                        currentQuery = null
+                    }
+                }
+            }
+        }
         synchronized(sync, {
             if (currentQuery != null)
                 throw Exception("Cannot start query while another one is running")
-            val future = backgroundExecutor.submit(
-                    {
-                        try {
-                            publisher.beginExecute(query)
-                            Thread.sleep(500)
-                            publisher.endExecute(listOf("Foo", "Bar"))
-                            publisher.rowFetched(listOf("FooVal", "BarVal"))
-                            synchronized(sync) {
-                                currentQuery = null
-                            }
-                        } catch(e: Exception) {
-                            publisher.errorOccurred(e)
-                        }
-                    })
-            currentQuery = future
+            currentQuery = task
+            task.queue()
         })
     }
 
@@ -40,7 +60,8 @@ class QueryExecutor(messageBus: MessageBus) {
             val myQuery = currentQuery
             if (myQuery == null)
                 return
-            myQuery.cancel(true)
+            //todo.
+//            myQuery.cancel(true)
             currentQuery = null
             publisher.queryCancelled()
         })

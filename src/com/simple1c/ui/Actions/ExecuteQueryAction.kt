@@ -9,11 +9,13 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.TokenType
 import com.intellij.psi.util.PsiTreeUtil
 import com.simple1c.boilerplate._1cFile
+import com.simple1c.dataSources.DataSourceStorage
 import com.simple1c.execution.QueryExecutor
 import generated.GeneratedTypes
 import generated.SqlQuery
 
-class ExecuteQueryAction(val queryExecutor: QueryExecutor) : AnAction("1C:Execute Query", "1C:Execute Query", AllIcons.General.Run) {
+class ExecuteQueryAction(val queryExecutor: QueryExecutor)
+: AnAction("1C:Execute Query", "1C:Execute Query", AllIcons.General.Run) {
     override fun setShortcutSet(shortcutSet: ShortcutSet?) {
         super.setShortcutSet(shortcutSet)
     }
@@ -26,7 +28,8 @@ class ExecuteQueryAction(val queryExecutor: QueryExecutor) : AnAction("1C:Execut
         val query = findQueryAfter(_1cFile, editor!!.selectionModel.selectionStart)
         if (query == null)
             throw Exception("Assertion failed. Expected selection to be ${SqlQuery::class.simpleName} but was ${editor.selectionModel.selectedText}")
-        queryExecutor.executeQuery(query.text)
+        val dataSourceStorage = DataSourceStorage.instance(e.project!!)
+        queryExecutor.executeQuery(e.project!!, query.text, dataSourceStorage.getAll().first())
     }
 
     override fun update(e: AnActionEvent?) {
@@ -38,11 +41,19 @@ class ExecuteQueryAction(val queryExecutor: QueryExecutor) : AnAction("1C:Execut
         e.presentation.isVisible = _1cFile != null
         val isEnabled = if (_1cFile != null) {
             val startQuery = findQueryAfter(_1cFile, editor!!.selectionModel.selectionStart)
-            val endQuery = findSqlQuery(_1cFile, editor.selectionModel.selectionEnd, { it.prevSibling })
-            startQuery != null && endQuery != null && startQuery == endQuery
+            val endQuery = findQueryBefore(_1cFile, editor.selectionModel.selectionEnd)
+            startQuery != null
+                    && endQuery != null
+                    && startQuery == endQuery
+                    && !queryExecutor.hasQueryInProgress()
         } else false
 
         e.presentation.isEnabled = isEnabled
+    }
+
+    private fun findQueryBefore(_1cFile: _1cFile, offset: Int): SqlQuery? {
+        val theOffset = if (offset >= _1cFile.textLength - 1 && offset > 0) offset - 1 else offset
+        return findSqlQuery(_1cFile, theOffset, { it.prevSibling })
     }
 
     private fun findQueryAfter(_1cFile: _1cFile, offset: Int) =

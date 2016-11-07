@@ -14,6 +14,7 @@ import com.intellij.openapi.project.ProjectManagerAdapter
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.wm.ToolWindow
 import com.simple1c.execution.QueryListener
+import com.simple1c.remote.QueryResult
 import com.simple1c.ui.Actions.MyActionIds
 
 class ConsoleLogView(private val project: Project) {
@@ -52,15 +53,11 @@ class ConsoleLogView(private val project: Project) {
                           private val application: Application,
                           private val toolWindow: ToolWindow) : QueryListener {
 
-        override fun beginExecute(query: String) {
-            appendLine("Executing query: $query")
+        override fun log(query: String) {
+            appendLine(query)
         }
 
-        override fun errorOccurred(exception: Exception) {
-            appendLine("Error occurred: $exception")
-        }
-
-        override fun endExecute(columns: List<String>) {
+        override fun endExecute(columns: List<QueryResult.Column>) {
             appendLine(columns.joinToString("|"))
             appendLine("_________")
         }
@@ -71,6 +68,10 @@ class ConsoleLogView(private val project: Project) {
 
         override fun queryCancelled() {
             appendLine("Query cancelled")
+        }
+
+        override fun errorOccurred(message: String) {
+            appendLine("Error occurred:\n" + message)
         }
 
 
