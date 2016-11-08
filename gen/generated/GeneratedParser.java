@@ -47,6 +47,9 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     else if (type == SELECT_STATEMENT) {
       result = select_statement(builder, 0);
     }
+    else if (type == SELECTION_EXPRESSION) {
+      result = selectionExpression(builder, 0);
+    }
     else if (type == SELECTION_ITEM) {
       result = selectionItem(builder, 0);
     }
@@ -81,7 +84,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(COLUMN_SOURCE, SUBQUERY_TABLE, TABLE_DECLARATION),
     create_token_set_(BINARY_EXPRESSION, BOOL_LITERAL, EXPRESSION, IDENTIFIER,
-      NUMBER_LITERAL, STRING_LITERAL, UNARY_EXPRESSION),
+      NUMBER_LITERAL, SELECTION_EXPRESSION, STRING_LITERAL, UNARY_EXPRESSION),
   };
 
   /* ********************************************************** */
@@ -352,19 +355,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ASTERISK | selectionList
-  static boolean selectList(PsiBuilder builder, int level) {
-    if (!recursion_guard_(builder, level, "selectList")) return false;
-    boolean result;
-    Marker marker = enter_section_(builder);
-    result = consumeToken(builder, ASTERISK);
-    if (!result) result = selectionList(builder, level + 1);
-    exit_section_(builder, marker, null, result);
-    return result;
-  }
-
-  /* ********************************************************** */
-  // selectKeyword topOpt distinctOpt selectList
+  // selectKeyword topOpt distinctOpt selectionExpression
   // fromKeyword columnSource
   // joinItem*
   // [whereKeyword expression]
@@ -378,7 +369,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     pinned = result; // pin = 1
     result = result && report_error_(builder, topOpt(builder, level + 1));
     result = pinned && report_error_(builder, distinctOpt(builder, level + 1)) && result;
-    result = pinned && report_error_(builder, selectList(builder, level + 1)) && result;
+    result = pinned && report_error_(builder, selectionExpression(builder, level + 1)) && result;
     result = pinned && report_error_(builder, consumeToken(builder, FROMKEYWORD)) && result;
     result = pinned && report_error_(builder, columnSource(builder, level + 1)) && result;
     result = pinned && report_error_(builder, select_statement_6(builder, level + 1)) && result;
@@ -464,6 +455,18 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     result = consumeToken(builder, HAVINGKEYWORD);
     result = result && expression(builder, level + 1, -1);
     exit_section_(builder, marker, null, result);
+    return result;
+  }
+
+  /* ********************************************************** */
+  // ASTERISK | selectionList
+  public static boolean selectionExpression(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "selectionExpression")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder, level, _NONE_, SELECTION_EXPRESSION, "<selection expression>");
+    result = consumeToken(builder, ASTERISK);
+    if (!result) result = selectionList(builder, level + 1);
+    exit_section_(builder, level, marker, result, false, null);
     return result;
   }
 

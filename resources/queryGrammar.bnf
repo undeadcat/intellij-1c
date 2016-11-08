@@ -73,7 +73,7 @@ private queryItem ::= sqlQuery querySeparator?{
 
 private querySeparator ::= SEMICOLON
 
-select_statement ::= selectKeyword topOpt distinctOpt selectList
+select_statement ::= selectKeyword topOpt distinctOpt selectionExpression
 fromKeyword columnSource
 joinItem*
 [whereKeyword expression]
@@ -90,7 +90,7 @@ joinItem*
     pin = 1
 }
 
-top ::= [topKeyword numberLiteral] //TODO. trash.make private
+topOpt ::= [topKeyword numberLiteral] //TODO. trash.make private
 
 private distinctOpt ::= distinctKeyword?
 alias ::= asKeyword? identifier{ //TODO. trash.make private
@@ -99,6 +99,7 @@ alias ::= asKeyword? identifier{ //TODO. trash.make private
     ]
 }
 //selection
+selectionExpression ::= (ASTERISK | selectionList )
 selectionItem ::= expression alias? {
     methods = [
         identifier = ""
@@ -108,8 +109,6 @@ selectionItem ::= expression alias? {
 selectionList ::= selectionItem (COMMA selectionItem)*{
     //TODO. isSelectAll
 }
-
-private selectList ::= (ASTERISK | selectionList )
 
 //source
 tableDeclaration ::= identifier alias?{

@@ -7,10 +7,10 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import coreUtils.toMap
 import generated.GeneratedTypes
 import generated.SqlQuery
 import generated.TableDeclaration
-import coreUtils.toMap
 
 class SchemaCompletionContributor(val schemaStore: ISchemaStore) : CompletionContributor() {
 

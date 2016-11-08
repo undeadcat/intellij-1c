@@ -19,6 +19,7 @@ public interface GeneratedTypes {
   IElementType JOIN_KIND = new _1cElementType("JOIN_KIND");
   IElementType NUMBER_LITERAL = new _1cElementType("NUMBER_LITERAL");
   IElementType ORDER_ITEM = new _1cElementType("ORDER_ITEM");
+  IElementType SELECTION_EXPRESSION = new _1cElementType("SELECTION_EXPRESSION");
   IElementType SELECTION_ITEM = new _1cElementType("SELECTION_ITEM");
   IElementType SELECTION_LIST = new _1cElementType("SELECTION_LIST");
   IElementType SELECT_STATEMENT = new _1cElementType("SELECT_STATEMENT");
@@ -110,6 +111,9 @@ public interface GeneratedTypes {
       }
       else if (type == ORDER_ITEM) {
         return new OrderItemImpl(node);
+      }
+      else if (type == SELECTION_EXPRESSION) {
+        return new SelectionExpressionImpl(node);
       }
       else if (type == SELECTION_ITEM) {
         return new SelectionItemImpl(node);

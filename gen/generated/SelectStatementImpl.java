@@ -45,12 +45,6 @@ public class SelectStatementImpl extends ASTWrapperPsiElement implements SelectS
 
   @Override
   @Nullable
-  public SelectionList getSelectionList() {
-    return findChildByClass(SelectionList.class);
-  }
-
-  @Override
-  @Nullable
   public PsiElement getDistinctKeyword() {
     return findChildByType(DISTINCTKEYWORD);
   }

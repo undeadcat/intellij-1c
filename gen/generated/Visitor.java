@@ -55,6 +55,10 @@ public class Visitor<R> extends PsiElementVisitor {
     return visitPsiElement(o);
   }
 
+  public R visitSelectionExpression(@NotNull SelectionExpression o) {
+    return visitExpression(o);
+  }
+
   public R visitSelectionItem(@NotNull SelectionItem o) {
     return visitPsiElement(o);
   }

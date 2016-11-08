@@ -51,6 +51,7 @@
                                        implementationClass="com.simple1c.lang._1cHighlighterFactory"/>
 
         <completion.contributor language="1c" implementationClass="com.simple1c.lang.SchemaCompletionContributor"/>
+        <lang.formatter language="1c" implementationClass="com.simple1c.lang._1cFormattingModelBuilder"/>
 
         <!--<colorSettingsPage implementation="com.simpleplugin.SimpleColorSettingsPage"/>-->
         <!--<annotator language="JAVA" implementationClass="com.simpleplugin.SimpleAnnotator"/>-->
@@ -64,7 +65,6 @@
         <!--<gotoSymbolContributor implementation="com.simpleplugin.SimpleChooseByNameContributor"/>-->
         <!--<lang.psiStructureViewFactory language="Simple"-->
         <!--implementationClass="com.simpleplugin.SimpleStructureViewFactory"/>-->
-        <!--<lang.formatter language="Simple" implementationClass="com.simpleplugin.SimpleFormattingModelBuilder"/>-->
         <!--<codeStyleSettingsProvider implementation="com.simpleplugin.SimpleCodeStyleSettingsProvider"/>-->
         <!--<langCodeStyleSettingsProvider implementation="com.simpleplugin.SimpleLanguageCodeStyleSettingsProvider"/>-->
         <!--<lang.commenter language="Simple" implementationClass="com.simpleplugin.SimpleCommenter"/>-->

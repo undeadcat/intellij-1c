@@ -17,9 +17,6 @@ public interface SelectStatement extends PsiElement {
   List<JoinItem> getJoinItemList();
 
   @Nullable
-  SelectionList getSelectionList();
-
-  @Nullable
   PsiElement getDistinctKeyword();
 
   @Nullable
