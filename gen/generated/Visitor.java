@@ -43,6 +43,10 @@ public class Visitor<R> extends PsiElementVisitor {
     return visitPsiElement(o);
   }
 
+  public R visitNullLiteral(@NotNull NullLiteral o) {
+    return visitExpression(o);
+  }
+
   public R visitNumberLiteral(@NotNull NumberLiteral o) {
     return visitExpression(o);
   }

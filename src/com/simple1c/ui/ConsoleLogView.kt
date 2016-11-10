@@ -79,7 +79,7 @@ class ConsoleLogView(private val project: Project) {
             application.invokeLater {
                 toolWindow.show(null)
                 toolWindow.activate(null)
-                document.insertString(document.textLength, string + "\n")
+                document.insertString(document.textLength, string.replace("\r\n", "\n") + "\n")
             }
 
         }

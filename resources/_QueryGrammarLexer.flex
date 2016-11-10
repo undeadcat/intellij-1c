@@ -48,7 +48,7 @@ WHITE_SPACE=[\s]+
 NUMBER=[0-9]+
 BOOL=true|false|истина|ложь
 ID_TOKEN=([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*)(\.([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*))*
-STRING=('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\'|\\)*\")
+STRING=(\"([^\"\\]|\\\"|\\)*\")
 LINE_COMMENT="//".*
 
 %%
@@ -73,7 +73,6 @@ LINE_COMMENT="//".*
   "by"                   { return BYKEYWORD; }
   "on"                   { return ONKEYWORD; }
   "по"                   { return ПОKEYWORD; }
-  "IDENTIFIER"           { return IDENTIFIER; }
 
   {OP_NEQ}               { return OP_NEQ; }
   {OP_LIKE}              { return OP_LIKE; }

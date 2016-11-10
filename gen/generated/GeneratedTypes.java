@@ -17,6 +17,7 @@ public interface GeneratedTypes {
   IElementType IDENTIFIER = new _1cElementType("IDENTIFIER");
   IElementType JOIN_ITEM = new _1cElementType("JOIN_ITEM");
   IElementType JOIN_KIND = new _1cElementType("JOIN_KIND");
+  IElementType NULL_LITERAL = new _1cElementType("NULL_LITERAL");
   IElementType NUMBER_LITERAL = new _1cElementType("NUMBER_LITERAL");
   IElementType ORDER_ITEM = new _1cElementType("ORDER_ITEM");
   IElementType SELECTION_ITEM = new _1cElementType("SELECTION_ITEM");
@@ -50,6 +51,7 @@ public interface GeneratedTypes {
   IElementType LEFTKEYWORD = new IElementType("leftKeyword", null);
   IElementType LINE_COMMENT = new IElementType("line_comment", null);
   IElementType LPAREN = new IElementType("(", null);
+  IElementType NULL = new IElementType("null", null);
   IElementType NUMBER = new IElementType("number", null);
   IElementType ONKEYWORD = new IElementType("on", null);
   IElementType OP_AND = new IElementType("OP_AND", null);
@@ -57,6 +59,7 @@ public interface GeneratedTypes {
   IElementType OP_EQ = new IElementType("=", null);
   IElementType OP_GT = new IElementType(">", null);
   IElementType OP_GTE = new IElementType(">=", null);
+  IElementType OP_IS = new IElementType("OP_IS", null);
   IElementType OP_LIKE = new IElementType("OP_LIKE", null);
   IElementType OP_LT = new IElementType("<", null);
   IElementType OP_LTE = new IElementType("<=", null);
@@ -104,6 +107,9 @@ public interface GeneratedTypes {
       }
       else if (type == JOIN_KIND) {
         return new JoinKindImpl(node);
+      }
+      else if (type == NULL_LITERAL) {
+        return new NullLiteralImpl(node);
       }
       else if (type == NUMBER_LITERAL) {
         return new NumberLiteralImpl(node);

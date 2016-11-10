@@ -1,0 +1,14 @@
+
+select * from Table where true or false or ложь or истина
+
+select * from Table where Column = null
+
+select * from Table where Column = 123
+
+select * from Table where Column = "123"
+
+//string literal with escaped quotes
+select a,b from testTable where c != "ООО \"\"Название в кавычках\"\"
+
+//expect error
+select a,b from testTable where c != ''

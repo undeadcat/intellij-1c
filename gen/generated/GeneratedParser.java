@@ -81,7 +81,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(COLUMN_SOURCE, SUBQUERY_TABLE, TABLE_DECLARATION),
     create_token_set_(BINARY_EXPRESSION, BOOL_LITERAL, EXPRESSION, IDENTIFIER,
-      NUMBER_LITERAL, STRING_LITERAL, UNARY_EXPRESSION),
+      NULL_LITERAL, NUMBER_LITERAL, STRING_LITERAL, UNARY_EXPRESSION),
   };
 
   /* ********************************************************** */
@@ -532,7 +532,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // unionList [orderKeyword (byKeyword| поKeyword) orderByExpressionList]
+  // unionList [orderKeyword (byKeyword | поKeyword) orderByExpressionList]
   public static boolean sqlQuery(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "sqlQuery")) return false;
     if (!nextTokenIs(builder, SELECTKEYWORD)) return false;
@@ -544,14 +544,14 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     return result;
   }
 
-  // [orderKeyword (byKeyword| поKeyword) orderByExpressionList]
+  // [orderKeyword (byKeyword | поKeyword) orderByExpressionList]
   private static boolean sqlQuery_1(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "sqlQuery_1")) return false;
     sqlQuery_1_0(builder, level + 1);
     return true;
   }
 
-  // orderKeyword (byKeyword| поKeyword) orderByExpressionList
+  // orderKeyword (byKeyword | поKeyword) orderByExpressionList
   private static boolean sqlQuery_1_0(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "sqlQuery_1_0")) return false;
     boolean result;
@@ -563,7 +563,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     return result;
   }
 
-  // byKeyword| поKeyword
+  // byKeyword | поKeyword
   private static boolean sqlQuery_1_0_1(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "sqlQuery_1_0_1")) return false;
     boolean result;
@@ -682,12 +682,13 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   static boolean unionList(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "unionList")) return false;
     if (!nextTokenIs(builder, SELECTKEYWORD)) return false;
-    boolean result;
-    Marker marker = enter_section_(builder);
+    boolean result, pinned;
+    Marker marker = enter_section_(builder, level, _NONE_);
     result = select_statement(builder, level + 1);
+    pinned = result; // pin = 1
     result = result && unionList_1(builder, level + 1);
-    exit_section_(builder, marker, null, result);
-    return result;
+    exit_section_(builder, level, marker, result, pinned, null);
+    return result || pinned;
   }
 
   // (unionItem)*
@@ -721,8 +722,8 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   //    BINARY(gtExpr) BINARY(gteExpr) BINARY(likeExpr)
   // 3: BINARY(addExpr) BINARY(subtractExpr)
   // 4: BINARY(multExpr) BINARY(divExpr) BINARY(remExpr)
-  // 5: ATOM(identifier) ATOM(numberLiteral) ATOM(boolLiteral) ATOM(stringLiteral)
-  //    PREFIX(parExpr)
+  // 5: ATOM(identifier) ATOM(numberLiteral) ATOM(boolLiteral) ATOM(nullLiteral)
+  //    ATOM(stringLiteral) PREFIX(parExpr)
   public static boolean expression(PsiBuilder builder, int level, int priority) {
     if (!recursion_guard_(builder, level, "expression")) return false;
     addVariant(builder, "<expression>");
@@ -731,6 +732,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     result = identifier(builder, level + 1);
     if (!result) result = numberLiteral(builder, level + 1);
     if (!result) result = boolLiteral(builder, level + 1);
+    if (!result) result = nullLiteral(builder, level + 1);
     if (!result) result = stringLiteral(builder, level + 1);
     if (!result) result = parExpr(builder, level + 1);
     pinned = result;
@@ -838,6 +840,17 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     Marker marker = enter_section_(builder);
     result = consumeTokenSmart(builder, BOOL);
     exit_section_(builder, marker, BOOL_LITERAL, result);
+    return result;
+  }
+
+  // null
+  public static boolean nullLiteral(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "nullLiteral")) return false;
+    if (!nextTokenIsSmart(builder, NULL)) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = consumeTokenSmart(builder, NULL);
+    exit_section_(builder, marker, NULL_LITERAL, result);
     return result;
   }
 

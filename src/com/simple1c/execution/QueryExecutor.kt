@@ -1,5 +1,7 @@
 package com.simple1c.execution
 
+import com.intellij.notification.Notification
+import com.intellij.notification.Notifications
 import com.intellij.openapi.application.Application
 import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProgressIndicator
@@ -14,6 +16,15 @@ import java.util.concurrent.Executors
 class QueryExecutor(val application: Application,
                     val analysisHostProcess: AnalysisHostProcess,
                     val progressManager: ProgressManager) {
+    init {
+        if (counter != 0)
+            throw Exception("You fucked up again")
+        counter++
+        if (true){
+
+        }
+    }
+
     private val sync = Any()
     private var currentQuery: Task.Backgroundable? = null
     private val backgroundExecutor = Executors.newSingleThreadExecutor()
@@ -28,6 +39,12 @@ class QueryExecutor(val application: Application,
                     publisher.log(query)
                     val request = TranslationRequest(dataSource.connectionString.format(), query)
                     val translated = transport.invoke("translate", request, TranslationResult::class.java)
+                    val error = translated.error
+                    if (error != null) {
+                        publisher.errorOccurred(error)
+                        return
+                    }
+
                     val translatedQuery = translated.result.orEmpty()
                     publisher.log(translatedQuery)
                     val executionRequest = ExecuteQueryRequest(dataSource.connectionString.format(), translatedQuery)
@@ -65,5 +82,9 @@ class QueryExecutor(val application: Application,
             currentQuery = null
             publisher.queryCancelled()
         })
+    }
+
+    companion object {
+        var counter = 0
     }
 }

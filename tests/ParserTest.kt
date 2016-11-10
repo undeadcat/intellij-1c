@@ -13,7 +13,6 @@ UnaryNotOperator
 InOperator
 AllowExtraneousBracesInExpressions
 LikeOperator
-StringLiteralWithEscapedQuote
 AggregateWithWildcard
 AggregateWithColumnExpression
 FilterByNullCondition (is null)
@@ -47,6 +46,22 @@ class ParserTest : ParsingTestCase("parser", "1c", _1cParserDefinition()) {
 
     fun testPartialQuery() {
         doTest(true)
+    }
+
+    fun testLiterals() {
+        doTest(true)
+    }
+
+    fun testIsNull() {
+        doTest(true)
+    }
+
+    fun testUnaryOperatorPriorities() {
+
+    }
+
+    fun testBinaryOperatorPriorities() {
+
     }
 
     override fun skipSpaces(): Boolean {

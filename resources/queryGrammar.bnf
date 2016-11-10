@@ -30,6 +30,7 @@
     OP_GT = '>'
     OP_GTE = '>='
     OP_LIKE = 'regexp:like|подобно'
+    OP_IS = 'regexp:is|есть'
     OP_NOT = 'regexp:not|не'
     OP_AND = 'regexp:and|и'
     OP_OR = 'regexp:or|или'
@@ -60,8 +61,9 @@
     WHITE_SPACE = 'regexp:[\s]+'
     number = 'regexp:\d+'
     bool = 'regexp:true|false|истина|ложь'
+    null = 'null'
     ID_TOKEN = 'regexp:([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*)(\.([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*))*'
-    string = "regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
+    string = "regexp:(\"([^\"\\]|\\\"|\\)*\")"
     line_comment = 'regexp://.*'
   ]
 }
@@ -90,7 +92,7 @@ joinItem*
     pin = 1
 }
 
-top ::= [topKeyword numberLiteral] //TODO. trash.make private
+topOpt ::= [topKeyword numberLiteral] //TODO. trash.make private
 
 private distinctOpt ::= distinctKeyword?
 alias ::= asKeyword? identifier{ //TODO. trash.make private
@@ -133,12 +135,15 @@ orderItem ::= expression [ascKeyword | descKeyword]
 private orderByExpressionList ::= orderItem (COMMA orderItem) *
 
 //union
-private unionList ::= select_statement (unionItem)*
+private unionList ::= select_statement (unionItem)* {
+    pin = 1
+}
+
 private unionItem ::= unionKeyword allKeyword? select_statement {
     pin = 1
 }
 
-sqlQuery::= unionList [orderKeyword (byKeyword| поKeyword) orderByExpressionList]
+sqlQuery::= unionList [orderKeyword (byKeyword | поKeyword) orderByExpressionList]
 
 //join
 joinItem ::= joinKind? joinKeyword columnSource (onKeyword | поKeyword) expression {
@@ -149,6 +154,7 @@ joinKind::= innerKeyword | ((fullKeyword | leftKeyword| rightKeyword) (outerKeyw
 stringLiteral ::= string
 numberLiteral ::= number
 boolLiteral ::= bool
+nullLiteral ::= null
 
 expressionList ::=  expression (COMMA expression)*
 
@@ -211,8 +217,10 @@ private primary_group ::=
     identifier
     | numberLiteral
     | boolLiteral
+    | nullLiteral
     | stringLiteral
     | parExpr
+
 identifier ::= ID_TOKEN
 parExpr::= '(' expression ')' {elementType = expression}
 
