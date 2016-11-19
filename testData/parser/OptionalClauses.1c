@@ -1,0 +1,6 @@
+select * from Table order by Number desc;
+
+select * from Table 
+    group by ContractorId 
+    having count(Id) > 0
+order by count(Id) desc

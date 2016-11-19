@@ -1,0 +1,1 @@
+select Наименование from Справочник.Контрагенты where true or false and false

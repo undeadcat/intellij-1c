@@ -1,0 +1,3 @@
+select * from Table where Column in (1,2,3)
+
+select * from Table where Column in (select Id from Another)

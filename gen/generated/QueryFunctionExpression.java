@@ -5,12 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SubqueryTable extends ColumnSource {
+public interface QueryFunctionExpression extends Expression {
 
   @NotNull
-  Subquery getSubquery();
+  Identifier getFunctionName();
 
   @Nullable
-  Identifier getAlias();
+  ExpressionList getArguments();
 
 }

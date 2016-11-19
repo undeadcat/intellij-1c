@@ -1,0 +1,4 @@
+select * from (select * from Table) t where t.Id = 1
+
+//error - missing alias
+select * from (select * from Table) where t.Id = 1

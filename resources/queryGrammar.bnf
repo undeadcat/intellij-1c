@@ -21,7 +21,6 @@
     SEMICOLON = ';'
     OP_EQ = '='
     OP_DIV = '/'
-    OP_REM = '%'
     OP_PLUS = '+'
     OP_MINUS = '-'
     OP_NEQ = 'regexp:<>|\!\='
@@ -31,11 +30,13 @@
     OP_GTE = '>='
     OP_LIKE = 'regexp:like|подобно'
     OP_IS = 'regexp:is|есть'
+    OP_IN = 'regexp:in|в'
     OP_NOT = 'regexp:not|не'
     OP_AND = 'regexp:and|и'
     OP_OR = 'regexp:or|или'
     //pretending these words are reserved (they're not)
     //if anyone calls a column 'различные', we're screwed
+    aggregationFunction = 'regexp:sum|сумма|count|количество|min|минимум|max|максимум|avg|среднее'
     selectKeyword = 'regexp:select|выбрать'
     whereKeyword = 'regexp:where|где'
     fromKeyword = 'regexp:from|из'
@@ -58,6 +59,11 @@
     byKeyword = 'by'
     onKeyword = 'on'
     поKeyword = 'по'
+    caseKeyword = 'regexp:case|выбор'
+    whenKeyword = 'regexp:when|когда'
+    thenKeyword = 'regexp:then|тогда'
+    elseKeyword = 'regexp:else|иначе'
+    endKeyword = 'regexp:end|конец'
     WHITE_SPACE = 'regexp:[\s]+'
     number = 'regexp:\d+'
     bool = 'regexp:true|false|истина|ложь'
@@ -95,19 +101,21 @@ joinItem*
 topOpt ::= [topKeyword numberLiteral] //TODO. trash.make private
 
 private distinctOpt ::= distinctKeyword?
-alias ::= asKeyword? identifier{ //TODO. trash.make private
+alias ::= asKeyword? identifier { //TODO. trash.make private
     methods = [
         asKeyword=""
     ]
 }
 //selection
 selectionItem ::= expression alias? {
+    pin = 1
     methods = [
         identifier = ""
         alias = "alias/identifier"
     ]
 }
-selectionList ::= selectionItem (COMMA selectionItem)*{
+selectionList ::= selectionItem (COMMA selectionItem)* {
+    pin = 1
     //TODO. isSelectAll
 }
 
@@ -121,8 +129,11 @@ tableDeclaration ::= identifier alias?{
         tableName = "identifier"
     ]
 }
-subquery ::= LPAREN sqlQuery RPAREN
-subqueryTable::= subquery alias{
+subquery ::= LPAREN sqlQuery RPAREN {
+    pin = 1
+}
+subqueryTable::= subquery alias {
+    pin = 1
     methods = [
         subquery = "/subquery"
         alias = "alias/identifier"
@@ -135,12 +146,16 @@ orderItem ::= expression [ascKeyword | descKeyword]
 private orderByExpressionList ::= orderItem (COMMA orderItem) *
 
 //union
-private unionList ::= select_statement (unionItem)* {
+private unionList ::= select_statement (unionClause)* {
     pin = 1
 }
 
-private unionItem ::= unionKeyword allKeyword? select_statement {
+unionClause ::= unionKeyword allKeyword? select_statement {
     pin = 1
+    methods = [
+        topCount = "topOpt/numberLiteral"
+        unionKeyword = ""
+    ]
 }
 
 sqlQuery::= unionList [orderKeyword (byKeyword | поKeyword) orderByExpressionList]
@@ -161,10 +176,12 @@ expressionList ::=  expression (COMMA expression)*
 expression ::=
 //Priority increases from top to bottom
   boolean_group
-  | unary_group
+  | unary_not_group
   | comparison_group
+  | isNull_group
   | add_group
   | mul_group
+  | unary_neg_group
   | primary_group
 
 fake binaryExpression::= expression expression {
@@ -185,13 +202,19 @@ private add_group ::=  addExpr| subtractExpr
 addExpr ::= expression '+' expression {elementType = binaryExpression}
 subtractExpr ::= expression '-' expression {elementType = binaryExpression}
 
-private mul_group ::= multExpr | divExpr | remExpr
+private mul_group ::= multExpr | divExpr 
 multExpr ::= expression ASTERISK expression {elementType = binaryExpression}
 divExpr ::= expression OP_DIV expression {elementType = binaryExpression}
-remExpr ::= expression OP_REM expression {elementType = binaryExpression}
 
-private unary_group ::= unaryNotExpr
+//todo. GrammarKit requires duplication for some reason
+private unary_not_group ::= unaryNotExpr | unaryNotExpr
 unaryNotExpr ::= OP_NOT expression {elementType = unaryExpression}
+
+private unary_neg_group ::= unaryNegExpr | unaryNegExpr
+unaryNegExpr ::= OP_MINUS expression {elementType = unaryExpression}
+
+private isNull_group ::= isNullExpr | isNullExpr
+isNullExpr ::= expression OP_IS OP_NOT? null {elementType = unaryExpression}
 
 private comparison_group ::= eqExpr
     | neqExpr
@@ -200,6 +223,7 @@ private comparison_group ::= eqExpr
     | gtExpr
     | gteExpr
     | likeExpr
+    | notLikeExpr
 
 eqExpr ::= expression OP_EQ expression {elementType = binaryExpression}
 neqExpr ::= expression OP_NEQ expression {elementType = binaryExpression}
@@ -208,20 +232,68 @@ lteExpr ::= expression OP_LTE expression {elementType = binaryExpression}
 gtExpr ::= expression OP_GT expression {elementType = binaryExpression}
 gteExpr ::= expression OP_GTE expression {elementType = binaryExpression}
 likeExpr ::= expression OP_LIKE expression {elementType = binaryExpression}
+notLikeExpr ::= expression OP_NOT OP_LIKE expression {elementType = binaryExpression}
 
 private boolean_group ::= andExpr | orExpr
 andExpr ::= expression OP_AND expression {elementType = binaryExpression}
 orExpr ::= expression OP_OR expression {elementType = binaryExpression}
 
 private primary_group ::=
-    identifier
+    aggregateExpression
+    | queryFunctionExpression
+    | caseExpression
+    | inExpression
+    | parExpr
+    | identifier
     | numberLiteral
     | boolLiteral
     | nullLiteral
     | stringLiteral
-    | parExpr
 
 identifier ::= ID_TOKEN
-parExpr::= '(' expression ')' {elementType = expression}
+parExpr::= '(' expression ')' {
+    pin = 1
+    elementType = expression
+}
 
+//aggregate
+aggregateExpression ::= aggregationFunction LPAREN (ASTERISK | distinctOpt expression) RPAREN {
+    pin = 2
+}
+
+queryFunctionExpression ::= identifier LPAREN expressionList RPAREN {
+    pin = 2
+    methods = [
+        FunctionName = "identifier"
+        arguments = "expressionList"
+    ]
+}
+
+inExpression ::= expression OP_IN (LPAREN expressionList RPAREN | subquery) {
+    pin = 2
+    methods = [
+        OP_IN = ""
+    ]
+}
+
+caseExpression ::= caseKeyword caseElementList [elseKeyword expression] endKeyword {
+    pin = 1
+    methods = [
+        default = "expression"
+        caseKeyword = ""
+        elseKeyword = ""
+        endKeyword = ""
+    ]
+}
+private caseElementList ::= caseElement+
+caseElement ::= whenKeyword expression thenKeyword expression {
+    pin = 1
+    methods = [
+        condition = "expression[0]"
+        result = "expression[1]"
+        expressionList = ""
+        thenKeyword = ""
+        whenKeyword = ""
+    ]
+}
 

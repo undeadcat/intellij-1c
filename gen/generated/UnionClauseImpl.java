@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static generated.GeneratedTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 
-public class SqlQueryImpl extends ASTWrapperPsiElement implements SqlQuery {
+public class UnionClauseImpl extends ASTWrapperPsiElement implements UnionClause {
 
-  public SqlQueryImpl(ASTNode node) {
+  public UnionClauseImpl(ASTNode node) {
     super(node);
   }
 
   public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitSqlQuery(this);
+    return visitor.visitUnionClause(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -26,27 +26,15 @@ public class SqlQueryImpl extends ASTWrapperPsiElement implements SqlQuery {
   }
 
   @Override
-  @NotNull
-  public List<OrderItem> getOrderItemList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, OrderItem.class);
-  }
-
-  @Override
-  @NotNull
+  @Nullable
   public SelectStatement getSelectStatement() {
-    return findNotNullChildByClass(SelectStatement.class);
-  }
-
-  @Override
-  @NotNull
-  public List<UnionClause> getUnionClauseList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, UnionClause.class);
+    return findChildByClass(SelectStatement.class);
   }
 
   @Override
   @Nullable
-  public PsiElement getOrderKeyword() {
-    return findChildByType(ORDERKEYWORD);
+  public PsiElement getAllKeyword() {
+    return findChildByType(ALLKEYWORD);
   }
 
 }

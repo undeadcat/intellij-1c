@@ -8,16 +8,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static generated.GeneratedTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 
-public class SubqueryImpl extends ASTWrapperPsiElement implements Subquery {
+public class CaseExpressionImpl extends ExpressionImpl implements CaseExpression {
 
-  public SubqueryImpl(ASTNode node) {
+  public CaseExpressionImpl(ASTNode node) {
     super(node);
   }
 
   public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitSubquery(this);
+    return visitor.visitCaseExpression(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -26,9 +25,15 @@ public class SubqueryImpl extends ASTWrapperPsiElement implements Subquery {
   }
 
   @Override
+  @NotNull
+  public List<CaseElement> getCaseElementList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, CaseElement.class);
+  }
+
+  @Override
   @Nullable
-  public SqlQuery getSqlQuery() {
-    return findChildByClass(SqlQuery.class);
+  public Expression getDefault() {
+    return findChildByClass(Expression.class);
   }
 
 }

@@ -8,16 +8,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static generated.GeneratedTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 
-public class SubqueryImpl extends ASTWrapperPsiElement implements Subquery {
+public class QueryFunctionExpressionImpl extends ExpressionImpl implements QueryFunctionExpression {
 
-  public SubqueryImpl(ASTNode node) {
+  public QueryFunctionExpressionImpl(ASTNode node) {
     super(node);
   }
 
   public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitSubquery(this);
+    return visitor.visitQueryFunctionExpression(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -26,9 +25,15 @@ public class SubqueryImpl extends ASTWrapperPsiElement implements Subquery {
   }
 
   @Override
+  @NotNull
+  public Identifier getFunctionName() {
+    return findNotNullChildByClass(Identifier.class);
+  }
+
+  @Override
   @Nullable
-  public SqlQuery getSqlQuery() {
-    return findChildByClass(SqlQuery.class);
+  public ExpressionList getArguments() {
+    return findChildByClass(ExpressionList.class);
   }
 
 }

@@ -5,12 +5,15 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SubqueryTable extends ColumnSource {
-
-  @NotNull
-  Subquery getSubquery();
+public interface AggregateExpression extends Expression {
 
   @Nullable
-  Identifier getAlias();
+  Expression getExpression();
+
+  @NotNull
+  PsiElement getAggregationFunction();
+
+  @Nullable
+  PsiElement getDistinctKeyword();
 
 }

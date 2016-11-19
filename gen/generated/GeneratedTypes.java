@@ -8,18 +8,23 @@ import com.simple1c.boilerplate._1cElementType;
 
 public interface GeneratedTypes {
 
+  IElementType AGGREGATE_EXPRESSION = new _1cElementType("AGGREGATE_EXPRESSION");
   IElementType ALIAS = new _1cElementType("ALIAS");
   IElementType BINARY_EXPRESSION = new _1cElementType("BINARY_EXPRESSION");
   IElementType BOOL_LITERAL = new _1cElementType("BOOL_LITERAL");
+  IElementType CASE_ELEMENT = new _1cElementType("CASE_ELEMENT");
+  IElementType CASE_EXPRESSION = new _1cElementType("CASE_EXPRESSION");
   IElementType COLUMN_SOURCE = new _1cElementType("COLUMN_SOURCE");
   IElementType EXPRESSION = new _1cElementType("EXPRESSION");
   IElementType EXPRESSION_LIST = new _1cElementType("EXPRESSION_LIST");
   IElementType IDENTIFIER = new _1cElementType("IDENTIFIER");
+  IElementType IN_EXPRESSION = new _1cElementType("IN_EXPRESSION");
   IElementType JOIN_ITEM = new _1cElementType("JOIN_ITEM");
   IElementType JOIN_KIND = new _1cElementType("JOIN_KIND");
   IElementType NULL_LITERAL = new _1cElementType("NULL_LITERAL");
   IElementType NUMBER_LITERAL = new _1cElementType("NUMBER_LITERAL");
   IElementType ORDER_ITEM = new _1cElementType("ORDER_ITEM");
+  IElementType QUERY_FUNCTION_EXPRESSION = new _1cElementType("QUERY_FUNCTION_EXPRESSION");
   IElementType SELECTION_ITEM = new _1cElementType("SELECTION_ITEM");
   IElementType SELECTION_LIST = new _1cElementType("SELECTION_LIST");
   IElementType SELECT_STATEMENT = new _1cElementType("SELECT_STATEMENT");
@@ -30,17 +35,22 @@ public interface GeneratedTypes {
   IElementType TABLE_DECLARATION = new _1cElementType("TABLE_DECLARATION");
   IElementType TOP_OPT = new _1cElementType("TOP_OPT");
   IElementType UNARY_EXPRESSION = new _1cElementType("UNARY_EXPRESSION");
+  IElementType UNION_CLAUSE = new _1cElementType("UNION_CLAUSE");
 
+  IElementType AGGREGATIONFUNCTION = new IElementType("aggregationFunction", null);
   IElementType ALLKEYWORD = new IElementType("allKeyword", null);
   IElementType ASCKEYWORD = new IElementType("ascKeyword", null);
   IElementType ASKEYWORD = new IElementType("asKeyword", null);
   IElementType ASTERISK = new IElementType("*", null);
   IElementType BOOL = new IElementType("bool", null);
   IElementType BYKEYWORD = new IElementType("by", null);
+  IElementType CASEKEYWORD = new IElementType("caseKeyword", null);
   IElementType COMMA = new IElementType(",", null);
   IElementType DESCKEYWORD = new IElementType("descKeyword", null);
   IElementType DISTINCTKEYWORD = new IElementType("distinctKeyword", null);
   IElementType DOT = new IElementType(".", null);
+  IElementType ELSEKEYWORD = new IElementType("elseKeyword", null);
+  IElementType ENDKEYWORD = new IElementType("endKeyword", null);
   IElementType FROMKEYWORD = new IElementType("fromKeyword", null);
   IElementType FULLKEYWORD = new IElementType("fullKeyword", null);
   IElementType GROUPKEYWORD = new IElementType("groupKeyword", null);
@@ -59,6 +69,7 @@ public interface GeneratedTypes {
   IElementType OP_EQ = new IElementType("=", null);
   IElementType OP_GT = new IElementType(">", null);
   IElementType OP_GTE = new IElementType(">=", null);
+  IElementType OP_IN = new IElementType("OP_IN", null);
   IElementType OP_IS = new IElementType("OP_IS", null);
   IElementType OP_LIKE = new IElementType("OP_LIKE", null);
   IElementType OP_LT = new IElementType("<", null);
@@ -68,7 +79,6 @@ public interface GeneratedTypes {
   IElementType OP_NOT = new IElementType("OP_NOT", null);
   IElementType OP_OR = new IElementType("OP_OR", null);
   IElementType OP_PLUS = new IElementType("+", null);
-  IElementType OP_REM = new IElementType("%", null);
   IElementType ORDERKEYWORD = new IElementType("orderKeyword", null);
   IElementType OUTERKEYWORD = new IElementType("outerKeyword", null);
   IElementType RIGHTKEYWORD = new IElementType("rightKeyword", null);
@@ -76,15 +86,20 @@ public interface GeneratedTypes {
   IElementType SELECTKEYWORD = new IElementType("selectKeyword", null);
   IElementType SEMICOLON = new IElementType(";", null);
   IElementType STRING = new IElementType("string", null);
+  IElementType THENKEYWORD = new IElementType("thenKeyword", null);
   IElementType TOPKEYWORD = new IElementType("topKeyword", null);
   IElementType UNIONKEYWORD = new IElementType("unionKeyword", null);
+  IElementType WHENKEYWORD = new IElementType("whenKeyword", null);
   IElementType WHEREKEYWORD = new IElementType("whereKeyword", null);
   IElementType ПОKEYWORD = new IElementType("по", null);
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ALIAS) {
+       if (type == AGGREGATE_EXPRESSION) {
+        return new AggregateExpressionImpl(node);
+      }
+      else if (type == ALIAS) {
         return new AliasImpl(node);
       }
       else if (type == BINARY_EXPRESSION) {
@@ -92,6 +107,12 @@ public interface GeneratedTypes {
       }
       else if (type == BOOL_LITERAL) {
         return new BoolLiteralImpl(node);
+      }
+      else if (type == CASE_ELEMENT) {
+        return new CaseElementImpl(node);
+      }
+      else if (type == CASE_EXPRESSION) {
+        return new CaseExpressionImpl(node);
       }
       else if (type == EXPRESSION) {
         return new ExpressionImpl(node);
@@ -101,6 +122,9 @@ public interface GeneratedTypes {
       }
       else if (type == IDENTIFIER) {
         return new IdentifierImpl(node);
+      }
+      else if (type == IN_EXPRESSION) {
+        return new InExpressionImpl(node);
       }
       else if (type == JOIN_ITEM) {
         return new JoinItemImpl(node);
@@ -116,6 +140,9 @@ public interface GeneratedTypes {
       }
       else if (type == ORDER_ITEM) {
         return new OrderItemImpl(node);
+      }
+      else if (type == QUERY_FUNCTION_EXPRESSION) {
+        return new QueryFunctionExpressionImpl(node);
       }
       else if (type == SELECTION_ITEM) {
         return new SelectionItemImpl(node);
@@ -146,6 +173,9 @@ public interface GeneratedTypes {
       }
       else if (type == UNARY_EXPRESSION) {
         return new UnaryExpressionImpl(node);
+      }
+      else if (type == UNION_CLAUSE) {
+        return new UnionClauseImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

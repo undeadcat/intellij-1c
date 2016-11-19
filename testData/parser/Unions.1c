@@ -1,0 +1,3 @@
+select Id1 from Table1 where Column1 = 1 union select Id2 from Bar where Column2 = 2
+
+select Id from Foo union all select Id from Bar order by Id desc

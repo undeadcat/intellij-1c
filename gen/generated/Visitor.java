@@ -7,6 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public class Visitor<R> extends PsiElementVisitor {
 
+  public R visitAggregateExpression(@NotNull AggregateExpression o) {
+    return visitExpression(o);
+  }
+
   public R visitAlias(@NotNull Alias o) {
     return visitPsiElement(o);
   }
@@ -16,6 +20,14 @@ public class Visitor<R> extends PsiElementVisitor {
   }
 
   public R visitBoolLiteral(@NotNull BoolLiteral o) {
+    return visitExpression(o);
+  }
+
+  public R visitCaseElement(@NotNull CaseElement o) {
+    return visitPsiElement(o);
+  }
+
+  public R visitCaseExpression(@NotNull CaseExpression o) {
     return visitExpression(o);
   }
 
@@ -32,6 +44,10 @@ public class Visitor<R> extends PsiElementVisitor {
   }
 
   public R visitIdentifier(@NotNull Identifier o) {
+    return visitExpression(o);
+  }
+
+  public R visitInExpression(@NotNull InExpression o) {
     return visitExpression(o);
   }
 
@@ -53,6 +69,10 @@ public class Visitor<R> extends PsiElementVisitor {
 
   public R visitOrderItem(@NotNull OrderItem o) {
     return visitPsiElement(o);
+  }
+
+  public R visitQueryFunctionExpression(@NotNull QueryFunctionExpression o) {
+    return visitExpression(o);
   }
 
   public R visitSelectStatement(@NotNull SelectStatement o) {
@@ -93,6 +113,10 @@ public class Visitor<R> extends PsiElementVisitor {
 
   public R visitUnaryExpression(@NotNull UnaryExpression o) {
     return visitExpression(o);
+  }
+
+  public R visitUnionClause(@NotNull UnionClause o) {
+    return visitPsiElement(o);
   }
 
   public R visitPsiElement(@NotNull PsiElement o) {

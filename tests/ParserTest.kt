@@ -4,21 +4,6 @@ import org.junit.Assert
 
 /*
 TODO:
-unions don't work
-Parenthesis
-not equals operators
-subqueries don't work
-QueryFunction
-UnaryNotOperator
-InOperator
-AllowExtraneousBracesInExpressions
-LikeOperator
-AggregateWithWildcard
-AggregateWithColumnExpression
-FilterByNullCondition (is null)
-SelectFromSubquery
-EmbeddedQueryInFilterExpression
-
 EmbeddedQueryCanReferToOuterTables -- need to rewrite references
 Сумма - название колонки vs функция
 */
@@ -33,6 +18,10 @@ class ParserTest : ParsingTestCase("parser", "1c", _1cParserDefinition()) {
     }
 
     fun testSimple() {
+        doTest(true)
+    }
+
+    fun testOptionalClauses() {
         doTest(true)
     }
 
@@ -56,12 +45,40 @@ class ParserTest : ParsingTestCase("parser", "1c", _1cParserDefinition()) {
         doTest(true)
     }
 
-    fun testUnaryOperatorPriorities() {
-
+    fun testUnaryNotPriority() {
+        doTest(true)
     }
 
     fun testBinaryOperatorPriorities() {
+        doTest(true)
+    }
 
+    fun testAllowExtraneousBracesInExpressions() {
+        doTest(true)
+    }
+
+    fun testUnions() {
+        doTest(true)
+    }
+
+    fun testSelectFromSubquery() {
+        doTest(true)
+    }
+
+    fun testInExpression() {
+        doTest(true)
+    }
+
+    fun testAggregateFunctions() {
+        doTest(true)
+    }
+
+    fun testCaseExpression() {
+        doTest(true)
+    }
+
+    fun testColumnNameMatchesAggregationFunction() {
+        doTest(true);
     }
 
     override fun skipSpaces(): Boolean {

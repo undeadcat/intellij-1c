@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface Subquery extends PsiElement {
 
-  @NotNull
+  @Nullable
   SqlQuery getSqlQuery();
 
 }

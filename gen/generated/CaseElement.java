@@ -5,15 +5,15 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface IsNullExpression extends Expression {
-
-  @Nullable
-  Expression getExpression();
+public interface CaseElement extends PsiElement {
 
   @NotNull
-  PsiElement getOpIs();
+  List<Expression> getExpressionList();
 
   @Nullable
-  PsiElement getOpNot();
+  Expression getCondition();
+
+  @Nullable
+  Expression getResult();
 
 }

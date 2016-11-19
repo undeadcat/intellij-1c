@@ -26,6 +26,9 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     if (type == ALIAS) {
       result = alias(builder, 0);
     }
+    else if (type == CASE_ELEMENT) {
+      result = caseElement(builder, 0);
+    }
     else if (type == COLUMN_SOURCE) {
       result = columnSource(builder, 0);
     }
@@ -68,6 +71,9 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     else if (type == TOP_OPT) {
       result = topOpt(builder, 0);
     }
+    else if (type == UNION_CLAUSE) {
+      result = unionClause(builder, 0);
+    }
     else {
       result = parse_root_(type, builder, 0);
     }
@@ -80,8 +86,9 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(COLUMN_SOURCE, SUBQUERY_TABLE, TABLE_DECLARATION),
-    create_token_set_(BINARY_EXPRESSION, BOOL_LITERAL, EXPRESSION, IDENTIFIER,
-      NULL_LITERAL, NUMBER_LITERAL, STRING_LITERAL, UNARY_EXPRESSION),
+    create_token_set_(AGGREGATE_EXPRESSION, BINARY_EXPRESSION, BOOL_LITERAL, CASE_EXPRESSION,
+      EXPRESSION, IDENTIFIER, IN_EXPRESSION, NULL_LITERAL,
+      NUMBER_LITERAL, QUERY_FUNCTION_EXPRESSION, STRING_LITERAL, UNARY_EXPRESSION),
   };
 
   /* ********************************************************** */
@@ -102,6 +109,40 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(builder, level, "alias_0")) return false;
     consumeToken(builder, ASKEYWORD);
     return true;
+  }
+
+  /* ********************************************************** */
+  // whenKeyword expression thenKeyword expression
+  public static boolean caseElement(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "caseElement")) return false;
+    if (!nextTokenIs(builder, WHENKEYWORD)) return false;
+    boolean result, pinned;
+    Marker marker = enter_section_(builder, level, _NONE_, CASE_ELEMENT, null);
+    result = consumeToken(builder, WHENKEYWORD);
+    pinned = result; // pin = 1
+    result = result && report_error_(builder, expression(builder, level + 1, -1));
+    result = pinned && report_error_(builder, consumeToken(builder, THENKEYWORD)) && result;
+    result = pinned && expression(builder, level + 1, -1) && result;
+    exit_section_(builder, level, marker, result, pinned, null);
+    return result || pinned;
+  }
+
+  /* ********************************************************** */
+  // caseElement+
+  static boolean caseElementList(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "caseElementList")) return false;
+    if (!nextTokenIs(builder, WHENKEYWORD)) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = caseElement(builder, level + 1);
+    int pos = current_position_(builder);
+    while (result) {
+      if (!caseElement(builder, level + 1)) break;
+      if (!empty_element_parsed_guard_(builder, "caseElementList", pos)) break;
+      pos = current_position_(builder);
+    }
+    exit_section_(builder, marker, null, result);
+    return result;
   }
 
   /* ********************************************************** */
@@ -471,12 +512,13 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   // expression alias?
   public static boolean selectionItem(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "selectionItem")) return false;
-    boolean result;
+    boolean result, pinned;
     Marker marker = enter_section_(builder, level, _NONE_, SELECTION_ITEM, "<selection item>");
     result = expression(builder, level + 1, -1);
+    pinned = result; // pin = 1
     result = result && selectionItem_1(builder, level + 1);
-    exit_section_(builder, level, marker, result, false, null);
-    return result;
+    exit_section_(builder, level, marker, result, pinned, null);
+    return result || pinned;
   }
 
   // alias?
@@ -487,18 +529,16 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // selectionItem (COMMA selectionItem)*{
-  //     //TODO. isSelectAll
-  // }
+  // selectionItem (COMMA selectionItem)*
   public static boolean selectionList(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "selectionList")) return false;
-    boolean result;
+    boolean result, pinned;
     Marker marker = enter_section_(builder, level, _NONE_, SELECTION_LIST, "<selection list>");
     result = selectionItem(builder, level + 1);
+    pinned = result; // pin = 1
     result = result && selectionList_1(builder, level + 1);
-    result = result && selectionList_2(builder, level + 1);
-    exit_section_(builder, level, marker, result, false, null);
-    return result;
+    exit_section_(builder, level, marker, result, pinned, null);
+    return result || pinned;
   }
 
   // (COMMA selectionItem)*
@@ -522,13 +562,6 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     result = result && selectionItem(builder, level + 1);
     exit_section_(builder, marker, null, result);
     return result;
-  }
-
-  // {
-  //     //TODO. isSelectAll
-  // }
-  private static boolean selectionList_2(PsiBuilder builder, int level) {
-    return true;
   }
 
   /* ********************************************************** */
@@ -579,13 +612,14 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   public static boolean subquery(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "subquery")) return false;
     if (!nextTokenIs(builder, LPAREN)) return false;
-    boolean result;
-    Marker marker = enter_section_(builder);
+    boolean result, pinned;
+    Marker marker = enter_section_(builder, level, _NONE_, SUBQUERY, null);
     result = consumeToken(builder, LPAREN);
-    result = result && sqlQuery(builder, level + 1);
-    result = result && consumeToken(builder, RPAREN);
-    exit_section_(builder, marker, SUBQUERY, result);
-    return result;
+    pinned = result; // pin = 1
+    result = result && report_error_(builder, sqlQuery(builder, level + 1));
+    result = pinned && consumeToken(builder, RPAREN) && result;
+    exit_section_(builder, level, marker, result, pinned, null);
+    return result || pinned;
   }
 
   /* ********************************************************** */
@@ -593,12 +627,13 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   public static boolean subqueryTable(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "subqueryTable")) return false;
     if (!nextTokenIs(builder, LPAREN)) return false;
-    boolean result;
-    Marker marker = enter_section_(builder);
+    boolean result, pinned;
+    Marker marker = enter_section_(builder, level, _NONE_, SUBQUERY_TABLE, null);
     result = subquery(builder, level + 1);
+    pinned = result; // pin = 1
     result = result && alias(builder, level + 1);
-    exit_section_(builder, marker, SUBQUERY_TABLE, result);
-    return result;
+    exit_section_(builder, level, marker, result, pinned, null);
+    return result || pinned;
   }
 
   /* ********************************************************** */
@@ -643,42 +678,29 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OP_NOT expression
-  public static boolean unaryNotExpr(PsiBuilder builder, int level) {
-    if (!recursion_guard_(builder, level, "unaryNotExpr")) return false;
-    if (!nextTokenIs(builder, OP_NOT)) return false;
-    boolean result;
-    Marker marker = enter_section_(builder);
-    result = consumeToken(builder, OP_NOT);
-    result = result && expression(builder, level + 1, -1);
-    exit_section_(builder, marker, UNARY_EXPRESSION, result);
-    return result;
-  }
-
-  /* ********************************************************** */
   // unionKeyword allKeyword? select_statement
-  static boolean unionItem(PsiBuilder builder, int level) {
-    if (!recursion_guard_(builder, level, "unionItem")) return false;
+  public static boolean unionClause(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "unionClause")) return false;
     if (!nextTokenIs(builder, UNIONKEYWORD)) return false;
     boolean result, pinned;
-    Marker marker = enter_section_(builder, level, _NONE_);
+    Marker marker = enter_section_(builder, level, _NONE_, UNION_CLAUSE, null);
     result = consumeToken(builder, UNIONKEYWORD);
     pinned = result; // pin = 1
-    result = result && report_error_(builder, unionItem_1(builder, level + 1));
+    result = result && report_error_(builder, unionClause_1(builder, level + 1));
     result = pinned && select_statement(builder, level + 1) && result;
     exit_section_(builder, level, marker, result, pinned, null);
     return result || pinned;
   }
 
   // allKeyword?
-  private static boolean unionItem_1(PsiBuilder builder, int level) {
-    if (!recursion_guard_(builder, level, "unionItem_1")) return false;
+  private static boolean unionClause_1(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "unionClause_1")) return false;
     consumeToken(builder, ALLKEYWORD);
     return true;
   }
 
   /* ********************************************************** */
-  // select_statement (unionItem)*
+  // select_statement (unionClause)*
   static boolean unionList(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "unionList")) return false;
     if (!nextTokenIs(builder, SELECTKEYWORD)) return false;
@@ -691,7 +713,7 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     return result || pinned;
   }
 
-  // (unionItem)*
+  // (unionClause)*
   private static boolean unionList_1(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "unionList_1")) return false;
     int pos = current_position_(builder);
@@ -703,12 +725,12 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (unionItem)
+  // (unionClause)
   private static boolean unionList_1_0(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "unionList_1_0")) return false;
     boolean result;
     Marker marker = enter_section_(builder);
-    result = unionItem(builder, level + 1);
+    result = unionClause(builder, level + 1);
     exit_section_(builder, marker, null, result);
     return result;
   }
@@ -717,24 +739,31 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   // Expression root: expression
   // Operator priority table:
   // 0: BINARY(andExpr) BINARY(orExpr)
-  // 1:
+  // 1: PREFIX(unaryNotExpr)
   // 2: BINARY(eqExpr) BINARY(neqExpr) BINARY(ltExpr) BINARY(lteExpr)
-  //    BINARY(gtExpr) BINARY(gteExpr) BINARY(likeExpr)
-  // 3: BINARY(addExpr) BINARY(subtractExpr)
-  // 4: BINARY(multExpr) BINARY(divExpr) BINARY(remExpr)
-  // 5: ATOM(identifier) ATOM(numberLiteral) ATOM(boolLiteral) ATOM(nullLiteral)
-  //    ATOM(stringLiteral) PREFIX(parExpr)
+  //    BINARY(gtExpr) BINARY(gteExpr) BINARY(likeExpr) BINARY(notLikeExpr)
+  // 3: POSTFIX(isNullExpr)
+  // 4: BINARY(addExpr) BINARY(subtractExpr)
+  // 5: BINARY(multExpr) BINARY(divExpr)
+  // 6: PREFIX(unaryNegExpr)
+  // 7: ATOM(aggregateExpression) POSTFIX(queryFunctionExpression) ATOM(caseExpression) POSTFIX(inExpression)
+  //    ATOM(parExpr) ATOM(identifier) ATOM(numberLiteral) ATOM(boolLiteral)
+  //    ATOM(nullLiteral) ATOM(stringLiteral)
   public static boolean expression(PsiBuilder builder, int level, int priority) {
     if (!recursion_guard_(builder, level, "expression")) return false;
     addVariant(builder, "<expression>");
     boolean result, pinned;
     Marker marker = enter_section_(builder, level, _NONE_, "<expression>");
-    result = identifier(builder, level + 1);
+    result = unaryNotExpr(builder, level + 1);
+    if (!result) result = unaryNegExpr(builder, level + 1);
+    if (!result) result = aggregateExpression(builder, level + 1);
+    if (!result) result = caseExpression(builder, level + 1);
+    if (!result) result = parExpr(builder, level + 1);
+    if (!result) result = identifier(builder, level + 1);
     if (!result) result = numberLiteral(builder, level + 1);
     if (!result) result = boolLiteral(builder, level + 1);
     if (!result) result = nullLiteral(builder, level + 1);
     if (!result) result = stringLiteral(builder, level + 1);
-    if (!result) result = parExpr(builder, level + 1);
     pinned = result;
     result = result && expression_0(builder, level + 1, priority);
     exit_section_(builder, level, marker, null, result, pinned, null);
@@ -782,25 +811,37 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
         result = expression(builder, level, 2);
         exit_section_(builder, level, marker, BINARY_EXPRESSION, result, true, null);
       }
-      else if (priority < 3 && consumeTokenSmart(builder, OP_PLUS)) {
-        result = expression(builder, level, 3);
+      else if (priority < 2 && parseTokensSmart(builder, 0, OP_NOT, OP_LIKE)) {
+        result = expression(builder, level, 2);
         exit_section_(builder, level, marker, BINARY_EXPRESSION, result, true, null);
       }
-      else if (priority < 3 && consumeTokenSmart(builder, OP_MINUS)) {
-        result = expression(builder, level, 3);
-        exit_section_(builder, level, marker, BINARY_EXPRESSION, result, true, null);
+      else if (priority < 3 && isNullExpr_0(builder, level + 1)) {
+        result = true;
+        exit_section_(builder, level, marker, UNARY_EXPRESSION, result, true, null);
       }
-      else if (priority < 4 && consumeTokenSmart(builder, ASTERISK)) {
+      else if (priority < 4 && consumeTokenSmart(builder, OP_PLUS)) {
         result = expression(builder, level, 4);
         exit_section_(builder, level, marker, BINARY_EXPRESSION, result, true, null);
       }
-      else if (priority < 4 && consumeTokenSmart(builder, OP_DIV)) {
+      else if (priority < 4 && consumeTokenSmart(builder, OP_MINUS)) {
         result = expression(builder, level, 4);
         exit_section_(builder, level, marker, BINARY_EXPRESSION, result, true, null);
       }
-      else if (priority < 4 && consumeTokenSmart(builder, OP_REM)) {
-        result = expression(builder, level, 4);
+      else if (priority < 5 && consumeTokenSmart(builder, ASTERISK)) {
+        result = expression(builder, level, 5);
         exit_section_(builder, level, marker, BINARY_EXPRESSION, result, true, null);
+      }
+      else if (priority < 5 && consumeTokenSmart(builder, OP_DIV)) {
+        result = expression(builder, level, 5);
+        exit_section_(builder, level, marker, BINARY_EXPRESSION, result, true, null);
+      }
+      else if (priority < 7 && leftMarkerIs(builder, IDENTIFIER) && queryFunctionExpression_0(builder, level + 1)) {
+        result = true;
+        exit_section_(builder, level, marker, QUERY_FUNCTION_EXPRESSION, result, true, null);
+      }
+      else if (priority < 7 && inExpression_0(builder, level + 1)) {
+        result = true;
+        exit_section_(builder, level, marker, IN_EXPRESSION, result, true, null);
       }
       else {
         exit_section_(builder, level, marker, null, false, false, null);
@@ -808,6 +849,178 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
       }
     }
     return result;
+  }
+
+  public static boolean unaryNotExpr(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "unaryNotExpr")) return false;
+    if (!nextTokenIsSmart(builder, OP_NOT)) return false;
+    boolean result, pinned;
+    Marker marker = enter_section_(builder, level, _NONE_, null);
+    result = consumeTokenSmart(builder, OP_NOT);
+    pinned = result;
+    result = pinned && expression(builder, level, 1);
+    exit_section_(builder, level, marker, UNARY_EXPRESSION, result, pinned, null);
+    return result || pinned;
+  }
+
+  // OP_IS OP_NOT? null
+  private static boolean isNullExpr_0(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "isNullExpr_0")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = consumeTokenSmart(builder, OP_IS);
+    result = result && isNullExpr_0_1(builder, level + 1);
+    result = result && consumeToken(builder, NULL);
+    exit_section_(builder, marker, null, result);
+    return result;
+  }
+
+  // OP_NOT?
+  private static boolean isNullExpr_0_1(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "isNullExpr_0_1")) return false;
+    consumeTokenSmart(builder, OP_NOT);
+    return true;
+  }
+
+  public static boolean unaryNegExpr(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "unaryNegExpr")) return false;
+    if (!nextTokenIsSmart(builder, OP_MINUS)) return false;
+    boolean result, pinned;
+    Marker marker = enter_section_(builder, level, _NONE_, null);
+    result = consumeTokenSmart(builder, OP_MINUS);
+    pinned = result;
+    result = pinned && expression(builder, level, 6);
+    exit_section_(builder, level, marker, UNARY_EXPRESSION, result, pinned, null);
+    return result || pinned;
+  }
+
+  // aggregationFunction LPAREN (ASTERISK | distinctOpt expression) RPAREN
+  public static boolean aggregateExpression(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "aggregateExpression")) return false;
+    if (!nextTokenIsSmart(builder, AGGREGATIONFUNCTION)) return false;
+    boolean result, pinned;
+    Marker marker = enter_section_(builder, level, _NONE_, AGGREGATE_EXPRESSION, null);
+    result = consumeTokens(builder, 2, AGGREGATIONFUNCTION, LPAREN);
+    pinned = result; // pin = 2
+    result = result && report_error_(builder, aggregateExpression_2(builder, level + 1));
+    result = pinned && consumeToken(builder, RPAREN) && result;
+    exit_section_(builder, level, marker, result, pinned, null);
+    return result || pinned;
+  }
+
+  // ASTERISK | distinctOpt expression
+  private static boolean aggregateExpression_2(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "aggregateExpression_2")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = consumeTokenSmart(builder, ASTERISK);
+    if (!result) result = aggregateExpression_2_1(builder, level + 1);
+    exit_section_(builder, marker, null, result);
+    return result;
+  }
+
+  // distinctOpt expression
+  private static boolean aggregateExpression_2_1(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "aggregateExpression_2_1")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = distinctOpt(builder, level + 1);
+    result = result && expression(builder, level + 1, -1);
+    exit_section_(builder, marker, null, result);
+    return result;
+  }
+
+  // LPAREN expressionList RPAREN
+  private static boolean queryFunctionExpression_0(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "queryFunctionExpression_0")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = consumeTokenSmart(builder, LPAREN);
+    result = result && expressionList(builder, level + 1);
+    result = result && consumeToken(builder, RPAREN);
+    exit_section_(builder, marker, null, result);
+    return result;
+  }
+
+  // caseKeyword caseElementList [elseKeyword expression] endKeyword
+  public static boolean caseExpression(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "caseExpression")) return false;
+    if (!nextTokenIsSmart(builder, CASEKEYWORD)) return false;
+    boolean result, pinned;
+    Marker marker = enter_section_(builder, level, _NONE_, CASE_EXPRESSION, null);
+    result = consumeTokenSmart(builder, CASEKEYWORD);
+    pinned = result; // pin = 1
+    result = result && report_error_(builder, caseElementList(builder, level + 1));
+    result = pinned && report_error_(builder, caseExpression_2(builder, level + 1)) && result;
+    result = pinned && consumeToken(builder, ENDKEYWORD) && result;
+    exit_section_(builder, level, marker, result, pinned, null);
+    return result || pinned;
+  }
+
+  // [elseKeyword expression]
+  private static boolean caseExpression_2(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "caseExpression_2")) return false;
+    caseExpression_2_0(builder, level + 1);
+    return true;
+  }
+
+  // elseKeyword expression
+  private static boolean caseExpression_2_0(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "caseExpression_2_0")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = consumeTokenSmart(builder, ELSEKEYWORD);
+    result = result && expression(builder, level + 1, -1);
+    exit_section_(builder, marker, null, result);
+    return result;
+  }
+
+  // OP_IN (LPAREN expressionList RPAREN | subquery)
+  private static boolean inExpression_0(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "inExpression_0")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = consumeTokenSmart(builder, OP_IN);
+    result = result && inExpression_0_1(builder, level + 1);
+    exit_section_(builder, marker, null, result);
+    return result;
+  }
+
+  // LPAREN expressionList RPAREN | subquery
+  private static boolean inExpression_0_1(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "inExpression_0_1")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = inExpression_0_1_0(builder, level + 1);
+    if (!result) result = subquery(builder, level + 1);
+    exit_section_(builder, marker, null, result);
+    return result;
+  }
+
+  // LPAREN expressionList RPAREN
+  private static boolean inExpression_0_1_0(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "inExpression_0_1_0")) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = consumeTokenSmart(builder, LPAREN);
+    result = result && expressionList(builder, level + 1);
+    result = result && consumeToken(builder, RPAREN);
+    exit_section_(builder, marker, null, result);
+    return result;
+  }
+
+  // '(' expression ')'
+  public static boolean parExpr(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "parExpr")) return false;
+    if (!nextTokenIsSmart(builder, LPAREN)) return false;
+    boolean result, pinned;
+    Marker marker = enter_section_(builder, level, _NONE_, EXPRESSION, null);
+    result = consumeTokenSmart(builder, LPAREN);
+    pinned = result; // pin = 1
+    result = result && report_error_(builder, expression(builder, level + 1, -1));
+    result = pinned && consumeToken(builder, RPAREN) && result;
+    exit_section_(builder, level, marker, result, pinned, null);
+    return result || pinned;
   }
 
   // ID_TOKEN
@@ -863,19 +1076,6 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     result = consumeTokenSmart(builder, STRING);
     exit_section_(builder, marker, STRING_LITERAL, result);
     return result;
-  }
-
-  public static boolean parExpr(PsiBuilder builder, int level) {
-    if (!recursion_guard_(builder, level, "parExpr")) return false;
-    if (!nextTokenIsSmart(builder, LPAREN)) return false;
-    boolean result, pinned;
-    Marker marker = enter_section_(builder, level, _NONE_, null);
-    result = consumeTokenSmart(builder, LPAREN);
-    pinned = result;
-    result = pinned && expression(builder, level, -1);
-    result = pinned && report_error_(builder, consumeToken(builder, RPAREN)) && result;
-    exit_section_(builder, level, marker, EXPRESSION, result, pinned, null);
-    return result || pinned;
   }
 
 }

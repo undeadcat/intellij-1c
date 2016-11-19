@@ -1,0 +1,3 @@
+select count (Id) from docs;
+select count(*) from docs;
+select count(distinct Id) from docs;

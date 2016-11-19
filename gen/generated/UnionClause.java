@@ -5,18 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SqlQuery extends PsiElement {
-
-  @NotNull
-  List<OrderItem> getOrderItemList();
-
-  @NotNull
-  SelectStatement getSelectStatement();
-
-  @NotNull
-  List<UnionClause> getUnionClauseList();
+public interface UnionClause extends PsiElement {
 
   @Nullable
-  PsiElement getOrderKeyword();
+  SelectStatement getSelectStatement();
+
+  @Nullable
+  PsiElement getAllKeyword();
 
 }

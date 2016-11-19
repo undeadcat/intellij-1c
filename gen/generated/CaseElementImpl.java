@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static generated.GeneratedTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 
-public class SqlQueryImpl extends ASTWrapperPsiElement implements SqlQuery {
+public class CaseElementImpl extends ASTWrapperPsiElement implements CaseElement {
 
-  public SqlQueryImpl(ASTNode node) {
+  public CaseElementImpl(ASTNode node) {
     super(node);
   }
 
   public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitSqlQuery(this);
+    return visitor.visitCaseElement(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -27,26 +27,22 @@ public class SqlQueryImpl extends ASTWrapperPsiElement implements SqlQuery {
 
   @Override
   @NotNull
-  public List<OrderItem> getOrderItemList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, OrderItem.class);
-  }
-
-  @Override
-  @NotNull
-  public SelectStatement getSelectStatement() {
-    return findNotNullChildByClass(SelectStatement.class);
-  }
-
-  @Override
-  @NotNull
-  public List<UnionClause> getUnionClauseList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, UnionClause.class);
+  public List<Expression> getExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, Expression.class);
   }
 
   @Override
   @Nullable
-  public PsiElement getOrderKeyword() {
-    return findChildByType(ORDERKEYWORD);
+  public Expression getCondition() {
+    List<Expression> p1 = getExpressionList();
+    return p1.size() < 1 ? null : p1.get(0);
+  }
+
+  @Override
+  @Nullable
+  public Expression getResult() {
+    List<Expression> p1 = getExpressionList();
+    return p1.size() < 2 ? null : p1.get(1);
   }
 
 }

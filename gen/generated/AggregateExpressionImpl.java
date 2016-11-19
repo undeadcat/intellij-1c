@@ -9,14 +9,14 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static generated.GeneratedTypes.*;
 
-public class IsNullExpressionImpl extends ExpressionImpl implements IsNullExpression {
+public class AggregateExpressionImpl extends ExpressionImpl implements AggregateExpression {
 
-  public IsNullExpressionImpl(ASTNode node) {
+  public AggregateExpressionImpl(ASTNode node) {
     super(node);
   }
 
   public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitIsNullExpression(this);
+    return visitor.visitAggregateExpression(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -32,14 +32,14 @@ public class IsNullExpressionImpl extends ExpressionImpl implements IsNullExpres
 
   @Override
   @NotNull
-  public PsiElement getOpIs() {
-    return findNotNullChildByType(OP_IS);
+  public PsiElement getAggregationFunction() {
+    return findNotNullChildByType(AGGREGATIONFUNCTION);
   }
 
   @Override
   @Nullable
-  public PsiElement getOpNot() {
-    return findChildByType(OP_NOT);
+  public PsiElement getDistinctKeyword() {
+    return findChildByType(DISTINCTKEYWORD);
   }
 
 }

@@ -5,12 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SubqueryTable extends ColumnSource {
+public interface CaseExpression extends Expression {
 
   @NotNull
-  Subquery getSubquery();
+  List<CaseElement> getCaseElementList();
 
   @Nullable
-  Identifier getAlias();
+  Expression getDefault();
 
 }

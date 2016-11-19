@@ -1,0 +1,1 @@
+select * from foo where (Column1 = (1) or ((Column2 = 2) or (Column3 = 3)))

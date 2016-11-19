@@ -31,9 +31,10 @@ public class SubqueryTableImpl extends ColumnSourceImpl implements SubqueryTable
   }
 
   @Override
-  @NotNull
+  @Nullable
   public Identifier getAlias() {
-    Alias p1 = findNotNullChildByClass(Alias.class);
+    Alias p1 = findChildByClass(Alias.class);
+    if (p1 == null) return null;
     return p1.getIdentifier();
   }
 
