@@ -89,7 +89,7 @@ LINE_COMMENT="//".*
   {OP_NOT}                   { return OP_NOT; }
   {OP_AND}                   { return OP_AND; }
   {OP_OR}                    { return OP_OR; }
-  {AGGREGATIONFUNCTION}   { return AGGREGATIONFUNCTION; }
+  {AGGREGATIONFUNCTION} /\s*\(     { return AGGREGATIONFUNCTION; }
   {SELECTKEYWORD}            { return SELECTKEYWORD; }
   {WHEREKEYWORD}             { return WHEREKEYWORD; }
   {FROMKEYWORD}              { return FROMKEYWORD; }
