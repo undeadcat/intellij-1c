@@ -5,12 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface TopOpt extends _1cElement {
+public interface RootQuery extends _1cElement {
 
-  @Nullable
-  NumberLiteral getNumberLiteral();
-
-  @Nullable
-  PsiElement getTopKeyword();
+  @NotNull
+  SqlQuery getSqlQuery();
 
 }

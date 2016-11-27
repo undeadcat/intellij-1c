@@ -47,6 +47,9 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     else if (type == ORDER_ITEM) {
       result = orderItem(builder, 0);
     }
+    else if (type == ROOT_QUERY) {
+      result = rootQuery(builder, 0);
+    }
     else if (type == SELECT_STATEMENT) {
       result = select_statement(builder, 0);
     }
@@ -366,13 +369,13 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // sqlQuery querySeparator?
+  // rootQuery querySeparator?
   static boolean queryItem(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "queryItem")) return false;
     if (!nextTokenIs(builder, SELECTKEYWORD)) return false;
     boolean result, pinned;
     Marker marker = enter_section_(builder, level, _NONE_);
-    result = sqlQuery(builder, level + 1);
+    result = rootQuery(builder, level + 1);
     pinned = result; // pin = 1
     result = result && queryItem_1(builder, level + 1);
     exit_section_(builder, level, marker, result, pinned, null);
@@ -390,6 +393,18 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   // SEMICOLON
   static boolean querySeparator(PsiBuilder builder, int level) {
     return consumeToken(builder, SEMICOLON);
+  }
+
+  /* ********************************************************** */
+  // sqlQuery
+  public static boolean rootQuery(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "rootQuery")) return false;
+    if (!nextTokenIs(builder, SELECTKEYWORD)) return false;
+    boolean result;
+    Marker marker = enter_section_(builder);
+    result = sqlQuery(builder, level + 1);
+    exit_section_(builder, marker, ROOT_QUERY, result);
+    return result;
   }
 
   /* ********************************************************** */

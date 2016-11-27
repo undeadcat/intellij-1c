@@ -16,8 +16,8 @@ public class CaseElementImpl extends ASTWrapperPsiElement implements CaseElement
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitCaseElement(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitCaseElement(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

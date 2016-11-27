@@ -15,8 +15,8 @@ public class IdentifierImpl extends ExpressionImpl implements Identifier {
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitIdentifier(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitIdentifier(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

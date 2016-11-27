@@ -15,8 +15,8 @@ public class CaseExpressionImpl extends ExpressionImpl implements CaseExpression
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitCaseExpression(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitCaseExpression(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface Alias extends PsiElement {
+public interface Alias extends _1cElement {
 
   @NotNull
   Identifier getIdentifier();

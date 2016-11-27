@@ -25,6 +25,7 @@ public interface GeneratedTypes {
   IElementType NUMBER_LITERAL = new _1cElementType("NUMBER_LITERAL");
   IElementType ORDER_ITEM = new _1cElementType("ORDER_ITEM");
   IElementType QUERY_FUNCTION_EXPRESSION = new _1cElementType("QUERY_FUNCTION_EXPRESSION");
+  IElementType ROOT_QUERY = new _1cElementType("ROOT_QUERY");
   IElementType SELECTION_ITEM = new _1cElementType("SELECTION_ITEM");
   IElementType SELECTION_LIST = new _1cElementType("SELECTION_LIST");
   IElementType SELECT_STATEMENT = new _1cElementType("SELECT_STATEMENT");
@@ -143,6 +144,9 @@ public interface GeneratedTypes {
       }
       else if (type == QUERY_FUNCTION_EXPRESSION) {
         return new QueryFunctionExpressionImpl(node);
+      }
+      else if (type == ROOT_QUERY) {
+        return new RootQueryImpl(node);
       }
       else if (type == SELECTION_ITEM) {
         return new SelectionItemImpl(node);

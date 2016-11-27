@@ -15,8 +15,8 @@ public class UnaryExpressionImpl extends ExpressionImpl implements UnaryExpressi
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitUnaryExpression(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitUnaryExpression(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

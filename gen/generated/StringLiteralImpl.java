@@ -15,8 +15,8 @@ public class StringLiteralImpl extends ExpressionImpl implements StringLiteral {
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitStringLiteral(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitStringLiteral(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

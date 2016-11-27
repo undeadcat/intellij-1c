@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SelectionList extends PsiElement {
+public interface SelectionList extends _1cElement {
 
   @NotNull
   List<SelectionItem> getSelectionItemList();

@@ -15,8 +15,8 @@ public class TableDeclarationImpl extends ColumnSourceImpl implements TableDecla
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitTableDeclaration(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitTableDeclaration(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

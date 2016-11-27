@@ -16,8 +16,8 @@ public class SubqueryImpl extends ASTWrapperPsiElement implements Subquery {
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitSubquery(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitSubquery(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

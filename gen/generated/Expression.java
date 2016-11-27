@@ -5,6 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface Expression extends PsiElement {
+public interface Expression extends _1cElement {
 
 }

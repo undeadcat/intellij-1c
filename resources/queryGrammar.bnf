@@ -1,10 +1,11 @@
 {
-  generate = [names = "long" visitor-value = "R"]
+  generate = [names = "long" visitor-value = "void"]
   psiPackage = "generated"
   psiImplPackage = "generated"
   psiClassPrefix = ""
   psiImplClassSuffix = "Impl"
   elementTypeClass="com.simple1c.boilerplate._1cElementType"
+  implements="generated._1cElement"
   extends(".*Literal") = expression
   extends("identifier") = expression
   extends(".*Expr") = expression
@@ -75,7 +76,7 @@
 }
 
 grammar ::= (queryItem)*
-private queryItem ::= sqlQuery querySeparator?{
+private queryItem ::= rootQuery querySeparator?{
     pin = 1
 }
 
@@ -158,6 +159,7 @@ unionClause ::= unionKeyword allKeyword? select_statement {
     ]
 }
 
+rootQuery::= sqlQuery
 sqlQuery::= unionList [orderKeyword (byKeyword | поKeyword) orderByExpressionList]
 
 //join

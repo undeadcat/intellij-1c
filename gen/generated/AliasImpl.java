@@ -16,8 +16,8 @@ public class AliasImpl extends ASTWrapperPsiElement implements Alias {
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitAlias(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitAlias(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

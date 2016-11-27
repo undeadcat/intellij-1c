@@ -16,8 +16,8 @@ public class OrderItemImpl extends ASTWrapperPsiElement implements OrderItem {
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitOrderItem(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitOrderItem(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

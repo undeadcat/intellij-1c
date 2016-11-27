@@ -16,8 +16,8 @@ public class SqlQueryImpl extends ASTWrapperPsiElement implements SqlQuery {
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitSqlQuery(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitSqlQuery(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

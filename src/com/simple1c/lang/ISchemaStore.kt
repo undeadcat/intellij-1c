@@ -1,6 +1,8 @@
 package com.simple1c.lang
 
 interface ISchemaStore {
-    fun getColumns(tableName: String?): Iterable<String>
-    fun getTables(): Iterable<String>
+    fun getSchema(tableName: String): List<PropertyInfo>
+    fun getTables(): List<String>
 }
+
+class PropertyInfo(val name: String, val referencedTables: List<String>)

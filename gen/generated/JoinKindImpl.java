@@ -16,8 +16,8 @@ public class JoinKindImpl extends ASTWrapperPsiElement implements JoinKind {
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitJoinKind(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitJoinKind(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

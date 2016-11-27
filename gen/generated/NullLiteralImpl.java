@@ -15,8 +15,8 @@ public class NullLiteralImpl extends ExpressionImpl implements NullLiteral {
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitNullLiteral(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitNullLiteral(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

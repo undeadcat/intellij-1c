@@ -15,8 +15,8 @@ public class AggregateExpressionImpl extends ExpressionImpl implements Aggregate
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitAggregateExpression(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitAggregateExpression(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

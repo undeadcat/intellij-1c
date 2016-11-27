@@ -12,6 +12,7 @@ import com.simple1c.dataSources.DataSource
 import com.simple1c.remote.*
 import java.util.concurrent.Executors
 
+//todo. add timeout
 //todo. handle cancellation. don't eat threads in case of hanging query.
 class QueryExecutor(val application: Application,
                     val analysisHostProcess: AnalysisHostProcess,

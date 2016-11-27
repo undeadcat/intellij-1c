@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface Subquery extends PsiElement {
+public interface Subquery extends _1cElement {
 
   @Nullable
   SqlQuery getSqlQuery();

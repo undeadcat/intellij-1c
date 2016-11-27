@@ -2,11 +2,6 @@ import com.intellij.testFramework.ParsingTestCase
 import com.simple1c.lang._1cParserDefinition
 import org.junit.Assert
 
-/*
-TODO:
-EmbeddedQueryCanReferToOuterTables -- need to rewrite references
-Сумма - название колонки vs функция
-*/
 class ParserTest : ParsingTestCase("parser", "1c", _1cParserDefinition()) {
 
     fun testNoErrorsOnEmptyFile() {

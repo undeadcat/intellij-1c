@@ -16,8 +16,8 @@ public class TopOptImpl extends ASTWrapperPsiElement implements TopOpt {
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitTopOpt(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitTopOpt(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

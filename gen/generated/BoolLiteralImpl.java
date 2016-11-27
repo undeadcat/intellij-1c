@@ -15,8 +15,8 @@ public class BoolLiteralImpl extends ExpressionImpl implements BoolLiteral {
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitBoolLiteral(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitBoolLiteral(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

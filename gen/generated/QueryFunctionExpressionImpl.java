@@ -15,8 +15,8 @@ public class QueryFunctionExpressionImpl extends ExpressionImpl implements Query
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitQueryFunctionExpression(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitQueryFunctionExpression(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

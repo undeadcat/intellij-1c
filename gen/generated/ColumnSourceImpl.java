@@ -16,8 +16,8 @@ public abstract class ColumnSourceImpl extends ASTWrapperPsiElement implements C
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitColumnSource(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitColumnSource(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

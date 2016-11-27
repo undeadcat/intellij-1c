@@ -15,8 +15,8 @@ public class BinaryExpressionImpl extends ExpressionImpl implements BinaryExpres
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitBinaryExpression(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitBinaryExpression(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

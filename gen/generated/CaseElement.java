@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface CaseElement extends PsiElement {
+public interface CaseElement extends _1cElement {
 
   @NotNull
   List<Expression> getExpressionList();

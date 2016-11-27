@@ -16,8 +16,8 @@ public class SelectionItemImpl extends ASTWrapperPsiElement implements Selection
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitSelectionItem(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitSelectionItem(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

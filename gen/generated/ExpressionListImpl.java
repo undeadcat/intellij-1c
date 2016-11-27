@@ -16,8 +16,8 @@ public class ExpressionListImpl extends ASTWrapperPsiElement implements Expressi
     super(node);
   }
 
-  public <R> R accept(@NotNull Visitor<R> visitor) {
-    return visitor.visitExpressionList(this);
+  public void accept(@NotNull Visitor visitor) {
+    visitor.visitExpressionList(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
