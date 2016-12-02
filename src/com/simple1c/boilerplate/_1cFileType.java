@@ -38,7 +38,7 @@ public class _1cFileType extends LanguageFileType {
     @Nullable
     @Override
     public Icon getIcon() {
-        return _1cIcons.FILE;
+        return null;
     }
 }
 
