@@ -6,12 +6,8 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.PsiTreeUtil
-import com.simple1c.boilerplate.RecursiveVisitor
 import coreUtils.equalsIgnoreCase
-import coreUtils.toMap
 import generated.*
-import java.util.*
 
 class SchemaCompletionContributor(val schemaStore: ISchemaStore) : CompletionContributor() {
 
@@ -24,12 +20,12 @@ class SchemaCompletionContributor(val schemaStore: ISchemaStore) : CompletionCon
         }
 
         val path = getPath(parameters.originalPosition)
-        val context = getDefinedTables(parameters.position)
+        val context = QueryContext.forElement(parameters.position, { schemaStore.getSchema(it) })
 
         if (!path.tableSegments.isEmpty()) {
             applyPrefixMatch(evaluatePath(context, path.tableSegments), path.localPath, result)
-        } else if (context.tables.any()) {
-            val candidates = context.getAliases().plus(getColumnNames(context.tables))
+        } else if (context.getUsedTables().any() || context.getIntroducedNames().any()) {
+            val candidates = context.getIntroducedNames().plus(getColumnNames(context.getUsedTables()))
             applyPrefixMatch(candidates, path.localPath, result)
         } else {
             val tables = schemaStore.getTables()
@@ -38,27 +34,21 @@ class SchemaCompletionContributor(val schemaStore: ISchemaStore) : CompletionCon
         }
     }
 
-    private fun getColumnNames(tables: Iterable<String>) = tables.flatMap { schemaStore.getSchema(it).map { it.name } }
+    private fun getColumnNames(tables: Iterable<String>): List<String> {
+        return tables.flatMap { schemaStore.getSchema(it).properties.map { it.name } }
+    }
 
     private fun applyPrefixMatch(columns: List<String>, prefix: String, result: CompletionResultSet) {
         addStrings(columns, result.withPrefixMatcher(prefix))
     }
 
-    private fun getDefinedTables(position: PsiElement): TableContext {
-        val definedTables = collectTableDeclarationsInScope(position)
-        val aliases = definedTables
-                .filter { it.alias?.text != null }
-                .toMap({ it.alias?.text!! }, { it.tableName.text })
-        return TableContext(definedTables.map({ it.tableName.text }).toSet(), aliases)
-    }
-
-    private fun evaluatePath(context: TableContext, tableSegments: List<String>): List<String> {
-        fun evalChildPath(segments: List<String>, schema: List<PropertyInfo>): List<PropertyInfo> {
+    private fun evaluatePath(context: QueryContext, tableSegments: List<String>): List<String> {
+        fun evalChildPath(segments: List<String>, schema: TableSchema): List<PropertyInfo> {
             val first = segments.firstOrNull()
             if (first == null)
-                return schema
+                return schema.properties
             val remaining = segments.subList(1, segments.size)
-            return schema.filter { it.name.equalsIgnoreCase(first) }
+            return schema.properties.filter { it.name.equalsIgnoreCase(first) }
                     .flatMap {
                         it.referencedTables.flatMap { evalChildPath(remaining, schemaStore.getSchema(it)) }
                     }
@@ -71,9 +61,8 @@ class SchemaCompletionContributor(val schemaStore: ISchemaStore) : CompletionCon
                 .firstOrNull()
         if (rootTable == null)
             return emptyList()
-        val rootSchema = schemaStore.getSchema(rootTable.second!!)
         val localPath = tableSegments.subList(rootTable.first.size, tableSegments.size)
-        return evalChildPath(localPath, rootSchema).map { it.name }
+        return evalChildPath(localPath, rootTable.second!!).map { it.name }
     }
 
     private fun getPath(originalText: PsiElement?): Path {
@@ -94,61 +83,10 @@ class SchemaCompletionContributor(val schemaStore: ISchemaStore) : CompletionCon
         return Path(tableSegments.split('.'), localPath)
     }
 
-    private fun collectTableDeclarationsInScope(element: PsiElement): List<TableDeclaration> {
-        val _1cElement = PsiTreeUtil.getParentOfType(element, _1cElement::class.java)
-        val rootQuery = PsiTreeUtil.getParentOfType(element, RootQuery::class.java)
-        if (_1cElement == null || rootQuery == null)
-            return emptyList()
-        var result: List<TableDeclaration>? = null
-
-        val visitor: RecursiveVisitor = object : RecursiveVisitor() {
-            val contextStack = Stack<ArrayList<TableDeclaration>>()
-            var elementFound = false
-            override fun visitSqlQuery(o: SqlQuery) {
-                contextStack.push(arrayListOf<TableDeclaration>())
-                super.visitSqlQuery(o)
-                if (elementFound && result == null)
-                    result = contextStack.reversed().flatMap { it }
-                else
-                    contextStack.pop()
-
-            }
-
-            override fun visitTableDeclaration(o: TableDeclaration) {
-                contextStack.peek().add(o)
-                super.visitTableDeclaration(o)
-            }
-
-            override fun visit_1cElement(o: _1cElement) {
-                if (elementFound)
-                    return
-                super.visit_1cElement(o)
-                if (o == _1cElement)
-                    elementFound = true
-            }
-
-        }
-        visitor.visit_1cElement(rootQuery)
-        return result ?: emptyList<TableDeclaration>()
-    }
-
     private fun addStrings(strings: Iterable<String>, result: CompletionResultSet) {
         result.addAllElements(strings.map { LookupElementBuilder.create(it) })
     }
 
     private data class Path(val tableSegments: List<String>, val localPath: String)
-
-    private data class TableContext(val tables: Set<String>, private val aliases: Map<String, String>) {
-        fun resolve(name: String): String? {
-            if (tables.contains(name))
-                return name
-            return aliases[name]
-        }
-
-        fun getAliases(): Iterable<String> {
-            return aliases.keys
-        }
-    }
-
 }
 

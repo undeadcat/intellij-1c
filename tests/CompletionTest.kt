@@ -3,9 +3,15 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 import com.simple1c.lang.ISchemaStore
 import com.simple1c.lang.PropertyInfo
+import com.simple1c.lang.TableSchema
 import org.hamcrest.core.Is
 import org.junit.Assert
 import org.picocontainer.MutablePicoContainer
+
+//TODO. Ordering.
+//      Have aliases -> first aliases, then columns
+//      No aliases -> first columns, then tables
+//TODO. do we need fully qualified names?
 
 //TODO. trigger completion before bracket.
 //todo. TableSection. Do I need to do anything?
@@ -43,7 +49,7 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         testEquivalentTo("select * from Table1 join <caret>", listOf("Table1", "Table2"))
     }
 
-    fun testIdentifierStartsWithFullyQualifiedTable_ResolveColumnsFromTable() {
+    fun _testIdentifierStartsWithFullyQualifiedTable_ResolveColumnsFromTable() {
         schemaStore.addColumns("Справочник.Сотрудники", "Column1")
         schemaStore.addColumns("Справочник.Контрагенты", "Column2")
         testEquivalentTo("select Справочник.Контрагенты.<caret> from Справочник.Сотрудники join Справочник.Контрагенты", listOf("Column2"))
@@ -65,7 +71,6 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
     fun testHasDefinedAliases_IncludeInCompletion() {
         schemaStore.addColumns("Table", "Column1", "Column2")
         schemaStore.addColumns("Table2", "Column3")
-        //TODO. test ordering.
         testEquivalentTo("select * from Table t where <caret>", listOf("t", "Column1", "Column2"))
         testEquivalentTo("select * from Table t where t.<caret>", listOf("Column1", "Column2"))
     }
@@ -107,7 +112,6 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         schemaStore.addColumns("table1", "id1", "table2Key")
         schemaStore.addColumns("table2", "id2", "table3Key")
         schemaStore.addColumns("table3", "id3", "table1Key")
-        schemaStore.addColumns("table4", "id4")
         testEquivalentTo("""SELECT *
 FROM table1 t1
 WHERE table2Key in
@@ -127,8 +131,7 @@ WHERE table2Key in
        WHERE table3Key in
                  (SELECT id
                   FROM table3 t3
-                  WHERE id = t2.table3Key AND table1Key = i<caret> ))
-union select id4 from table4""", listOf("id3", "id2", "id1"))
+                  WHERE id = t2.table3Key AND table1Key = i<caret> ))""", listOf("id3", "id2", "id1"))
     }
 
     fun testCannotReferToTableUsedInSubqueryOutsideScope() {
@@ -141,10 +144,35 @@ union select id4 from table4""", listOf("id3", "id2", "id1"))
 
     }
 
+    fun testSelectFromSubquery_NamesMustBeQualifiedWithAlias() {
+        schemaStore.addColumns("table2", "a", "b", "c")
+        //TODO. should suggest qualified names
+        testEquivalentTo("select * from (select a as alias1, b as alias2 from table2) t where <caret>", listOf("t"))
+        testEquivalentTo("select * from (select a as alias1, b as alias2 from table2) t where t.<caret>", listOf("alias1", "alias2"))
+    }
+
     fun testSelectFromSubqueryWithWildcard() {
-        schemaStore.addColumns("table1", "a", "b", "c")
-        testEquivalentTo("select * from " +
-                "(select * from table2) t where <caret>", listOf("t", "a", "b", "c"))
+        schemaStore.addColumns("table2", "a", "b", "c")
+        schemaStore.addColumns("table3", "d", "e", "f")
+        testEquivalentTo("""select * from
+            (select * from table2 t2
+            join (select * from table3) t3 on t2.id = t3.id) t
+            where t.<caret>""", listOf("a", "b", "c", "d", "e", "f"))
+    }
+
+    fun testSelectFromSubquery_TryExtractColumnNamesFromExpressions() {
+        schemaStore.addColumns("table2", "a", "b", "c")
+        testEquivalentTo("""select * from
+            (select a, sum(b), sum(c + d) from table) as subquery
+            where subquery.<caret>""", listOf("a", "b"))
+    }
+
+    fun testSelectFromSubquery_TryExtractColumnsFromQualifiedNames() {
+        schemaStore.addColumns("table2", PropertyInfo("Nested", listOf("NestedTable")))
+        schemaStore.addColumns("NestedTable", "a", "b", "c")
+        testEquivalentTo("""select * from
+            (select t.Nested.a, t.Nested.b, t.Nested.c from table as t) as subquery
+            where subquery.<caret>""", listOf("a", "b", "c"))
     }
 
     private fun testEquivalentTo(input: String, expected: List<String>) {
@@ -170,8 +198,8 @@ union select id4 from table4""", listOf("id3", "id2", "id1"))
     class FakeSchemaStore : ISchemaStore {
         private val tables = hashMapOf<String, List<PropertyInfo>>()
 
-        override fun getSchema(tableName: String): List<PropertyInfo> {
-            return tables.getOrElse(tableName, { emptyList<PropertyInfo>() })
+        override fun getSchema(tableName: String): TableSchema {
+            return TableSchema(tableName, tables.getOrElse(tableName, { emptyList<PropertyInfo>() }))
         }
 
         override fun getTables(): List<String> {

@@ -1,7 +1,7 @@
 package com.simple1c.lang
 
 interface ISchemaStore {
-    fun getSchema(tableName: String): List<PropertyInfo>
+    fun getSchema(tableName: String): TableSchema
     fun getTables(): List<String>
 }
 

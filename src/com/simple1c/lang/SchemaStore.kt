@@ -13,12 +13,15 @@ class SchemaStore(private val analysisHost: AnalysisHostProcess,
                 .invoke("listTables", request, TableListResult::class.java)
     }
 
-    override fun getSchema(tableName: String): List<PropertyInfo> {
+    override fun getSchema(tableName: String): TableSchema {
         val dataSource = dataSourceStorage.getAll().first()
         val request = TableSchemaRequest(dataSource.connectionString.format(), tableName)
-        return analysisHost.getTransport()
+        val props = analysisHost.getTransport()
                 .invoke("tableMapping", request, TableMappingDto::class.java)
                 .properties.map { PropertyInfo(it.name, it.tables) }
+        return TableSchema(tableName, props)
     }
 }
+
+class TableSchema(val name: String, val properties: List<PropertyInfo>)
 
