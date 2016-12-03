@@ -1,4 +1,4 @@
-package generated;
+package com.simple1c.boilerplate;
 
 import com.intellij.psi.PsiElement;
 

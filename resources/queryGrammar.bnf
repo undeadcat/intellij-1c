@@ -5,7 +5,7 @@
   psiClassPrefix = ""
   psiImplClassSuffix = "Impl"
   elementTypeClass="com.simple1c.boilerplate._1cElementType"
-  implements="generated._1cElement"
+  implements="com.simple1c.boilerplate._1cElement"
   extends(".*Literal") = expression
   extends("identifier") = expression
   extends(".*Expr") = expression
@@ -82,22 +82,25 @@ private queryItem ::= rootQuery querySeparator?{
 
 private querySeparator ::= SEMICOLON
 
-select_statement ::= selectKeyword topOpt distinctOpt selectList
+select_statement ::= selectKeyword topOpt distinctOpt selectionList
 fromKeyword columnSource
 joinItem*
-[whereKeyword expression]
-[groupKeyword (byKeyword| поKeyword) expressionList [havingKeyword expression]]{
+[where_expression] [group_expression] {
     methods = [
         topCount = "topOpt/numberLiteral"
         topOpt = ""
-        whereExpression = "expression[0]"
-        havingExpression ="expression[1]"
         grouping = "expressionList"
-        expressionList =""
-        //todo. isDistinct
+        distinctKeyword = ""
+        fromKeyword = ""
+        groupKeyword = ""
+        havingKeyword = ""
+        selectKeyword = ""
+        whereKeyword = ""
     ]
     pin = 1
 }
+private where_expression ::= whereKeyword expression
+private group_expression ::= groupKeyword (byKeyword| поKeyword) expressionList [havingKeyword expression]
 
 topOpt ::= [topKeyword numberLiteral] //TODO. trash.make private
 
@@ -115,12 +118,10 @@ selectionItem ::= expression alias? {
         alias = "alias/identifier"
     ]
 }
-selectionList ::= selectionItem (COMMA selectionItem)* {
-    pin = 1
-    //TODO. isSelectAll
-}
 
-private selectList ::= (ASTERISK | selectionList )
+selectionList ::= (ASTERISK | selectionItem (COMMA selectionItem)* ) {
+    pin = 1
+}
 
 //source
 tableDeclaration ::= identifier alias?{
@@ -130,8 +131,9 @@ tableDeclaration ::= identifier alias?{
         tableName = "identifier"
     ]
 }
-subquery ::= LPAREN sqlQuery RPAREN {
+subquery ::= LPAREN targetQuery RPAREN {
     pin = 1
+
 }
 subqueryTable::= subquery alias {
     pin = 1
@@ -159,8 +161,12 @@ unionClause ::= unionKeyword allKeyword? select_statement {
     ]
 }
 
-rootQuery::= sqlQuery
-sqlQuery::= unionList [orderKeyword (byKeyword | поKeyword) orderByExpressionList]
+rootQuery::= targetQuery
+targetQuery::= unionList [orderKeyword (byKeyword | поKeyword) orderByExpressionList] {
+    methods = [
+            orderKeyword = ""
+        ]
+}
 
 //join
 joinItem ::= joinKind? joinKeyword columnSource (onKeyword | поKeyword) expression {

@@ -5,7 +5,8 @@
         PsiElement(selectKeyword)('select')
         TopOptImpl(TOP_OPT)
           <empty list>
-        PsiElement(*)('*')
+        SelectionListImpl(SELECTION_LIST)
+          PsiElement(*)('*')
         PsiElement(fromKeyword)('from')
         SubqueryTableImpl(SUBQUERY_TABLE)
           SubqueryImpl(SUBQUERY)
@@ -15,7 +16,8 @@
                 PsiElement(selectKeyword)('select')
                 TopOptImpl(TOP_OPT)
                   <empty list>
-                PsiElement(*)('*')
+                SelectionListImpl(SELECTION_LIST)
+                  PsiElement(*)('*')
                 PsiElement(fromKeyword)('from')
                 TableDeclarationImpl(TABLE_DECLARATION)
                   IdentifierImpl(IDENTIFIER)
@@ -38,7 +40,8 @@
         PsiElement(selectKeyword)('select')
         TopOptImpl(TOP_OPT)
           <empty list>
-        PsiElement(*)('*')
+        SelectionListImpl(SELECTION_LIST)
+          PsiElement(*)('*')
         PsiElement(fromKeyword)('from')
         SubqueryTableImpl(SUBQUERY_TABLE)
           SubqueryImpl(SUBQUERY)
@@ -48,7 +51,8 @@
                 PsiElement(selectKeyword)('select')
                 TopOptImpl(TOP_OPT)
                   <empty list>
-                PsiElement(*)('*')
+                SelectionListImpl(SELECTION_LIST)
+                  PsiElement(*)('*')
                 PsiElement(fromKeyword)('from')
                 TableDeclarationImpl(TABLE_DECLARATION)
                   IdentifierImpl(IDENTIFIER)

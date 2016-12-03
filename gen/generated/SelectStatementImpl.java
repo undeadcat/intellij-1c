@@ -51,42 +51,6 @@ public class SelectStatementImpl extends ASTWrapperPsiElement implements SelectS
 
   @Override
   @Nullable
-  public PsiElement getDistinctKeyword() {
-    return findChildByType(DISTINCTKEYWORD);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getFromKeyword() {
-    return findChildByType(FROMKEYWORD);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getGroupKeyword() {
-    return findChildByType(GROUPKEYWORD);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getHavingKeyword() {
-    return findChildByType(HAVINGKEYWORD);
-  }
-
-  @Override
-  @NotNull
-  public PsiElement getSelectKeyword() {
-    return findNotNullChildByType(SELECTKEYWORD);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getWhereKeyword() {
-    return findChildByType(WHEREKEYWORD);
-  }
-
-  @Override
-  @Nullable
   public NumberLiteral getTopCount() {
     TopOpt p1 = findChildByClass(TopOpt.class);
     if (p1 == null) return null;
@@ -95,16 +59,8 @@ public class SelectStatementImpl extends ASTWrapperPsiElement implements SelectS
 
   @Override
   @Nullable
-  public Expression getWhereExpression() {
-    List<Expression> p1 = getExpressionList();
-    return p1.size() < 1 ? null : p1.get(0);
-  }
-
-  @Override
-  @Nullable
-  public Expression getHavingExpression() {
-    List<Expression> p1 = getExpressionList();
-    return p1.size() < 2 ? null : p1.get(1);
+  public ExpressionList getGrouping() {
+    return findChildByClass(ExpressionList.class);
   }
 
 }

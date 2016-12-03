@@ -4,6 +4,7 @@ package generated;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.simple1c.boilerplate._1cElement;
 
 public interface SelectStatement extends _1cElement {
 
@@ -20,30 +21,9 @@ public interface SelectStatement extends _1cElement {
   SelectionList getSelectionList();
 
   @Nullable
-  PsiElement getDistinctKeyword();
-
-  @Nullable
-  PsiElement getFromKeyword();
-
-  @Nullable
-  PsiElement getGroupKeyword();
-
-  @Nullable
-  PsiElement getHavingKeyword();
-
-  @NotNull
-  PsiElement getSelectKeyword();
-
-  @Nullable
-  PsiElement getWhereKeyword();
-
-  @Nullable
   NumberLiteral getTopCount();
 
   @Nullable
-  Expression getWhereExpression();
-
-  @Nullable
-  Expression getHavingExpression();
+  ExpressionList getGrouping();
 
 }

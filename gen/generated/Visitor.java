@@ -3,6 +3,7 @@ package generated;
 
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
+import com.simple1c.boilerplate._1cElement;
 
 public class Visitor extends PsiElementVisitor {
 
