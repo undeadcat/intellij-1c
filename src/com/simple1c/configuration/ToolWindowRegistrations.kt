@@ -3,6 +3,7 @@ package com.simple1c.configuration
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
@@ -13,7 +14,7 @@ import com.simple1c.ui.ConsoleLogView
 import com.simple1c.ui.DataSourcesToolWindow
 import com.simple1c.ui.EditDataSourceDialog
 
-class DataSourcesWindowRegistration(val analysisHostProcess: AnalysisHostProcess) : ToolWindowFactory {
+class DataSourcesWindowRegistration(val analysisHostProcess: AnalysisHostProcess) : ToolWindowFactory, DumbAware {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val dataSourceStorage = DataSourceStorage.instance(project)
         val actions = listOf(EditDataSourceAction(analysisHostProcess),
@@ -48,7 +49,7 @@ class DataSourcesWindowRegistration(val analysisHostProcess: AnalysisHostProcess
 
 }
 
-class ConsoleWindowRegistration : ToolWindowFactory {
+class ConsoleWindowRegistration : ToolWindowFactory, DumbAware {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val consoleLogView = ConsoleLogView(project)
         consoleLogView.initContent(toolWindow)

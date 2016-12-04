@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.ShortcutSet
+import com.intellij.openapi.project.DumbAware
 import com.intellij.psi.PsiElement
 import com.intellij.psi.TokenType
 import com.intellij.psi.util.PsiTreeUtil
@@ -15,7 +16,7 @@ import generated.GeneratedTypes
 import generated.SqlQuery
 
 class ExecuteQueryAction(val queryExecutor: QueryExecutor)
-: AnAction("1C:Execute Query", "1C:Execute Query", AllIcons.General.Run) {
+: AnAction("1C:Execute Query", "1C:Execute Query", AllIcons.General.Run), DumbAware {
     override fun setShortcutSet(shortcutSet: ShortcutSet?) {
         super.setShortcutSet(shortcutSet)
     }
