@@ -10,13 +10,15 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.TokenType
 import com.intellij.psi.util.PsiTreeUtil
 import com.simple1c.boilerplate._1cFile
+import com.simple1c.dataSources.DataSourceAssociations
 import com.simple1c.dataSources.DataSourceStorage
 import com.simple1c.execution.QueryExecutor
 import generated.GeneratedTypes
 import generated.SqlQuery
 
-class ExecuteQueryAction(val queryExecutor: QueryExecutor)
-: AnAction("1C:Execute Query", "1C:Execute Query", AllIcons.General.Run), DumbAware {
+class ExecuteQueryAction(private val queryExecutor: QueryExecutor,
+                         private val dataSourceAssociations: DataSourceAssociations)
+    : AnAction("1C:Execute Query", "1C:Execute Query", AllIcons.General.Run), DumbAware {
     override fun setShortcutSet(shortcutSet: ShortcutSet?) {
         super.setShortcutSet(shortcutSet)
     }
@@ -29,8 +31,9 @@ class ExecuteQueryAction(val queryExecutor: QueryExecutor)
         val query = findQueryAfter(_1cFile, editor!!.selectionModel.selectionStart)
         if (query == null)
             throw Exception("Assertion failed. Expected selection to be ${SqlQuery::class.simpleName} but was ${editor.selectionModel.selectedText}")
-        val dataSourceStorage = DataSourceStorage.instance(e.project!!)
-        queryExecutor.executeQuery(e.project!!, query.text, dataSourceStorage.getAll().first())
+        val dataSource = dataSourceAssociations.getOrNull(_1cFile)
+        if (dataSource != null)
+            queryExecutor.executeQuery(e.project!!, query.text, dataSource)
     }
 
     override fun update(e: AnActionEvent?) {
@@ -46,7 +49,9 @@ class ExecuteQueryAction(val queryExecutor: QueryExecutor)
             startQuery != null
                     && endQuery != null
                     && startQuery == endQuery
+                    && queryExecutor.isAvailable()
                     && !queryExecutor.hasQueryInProgress()
+                    && dataSourceAssociations.getOrNull(_1cFile) != null
         } else false
 
         e.presentation.isEnabled = isEnabled

@@ -2,8 +2,10 @@ package com.simple1c.dataSources
 
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
+import com.simple1c.configuration.ProjectService
 import java.util.*
 
+@ProjectService
 @State(name = "1C.DataSourceStorage.State", storages = arrayOf(Storage(StoragePathMacros.WORKSPACE_FILE)))
 class DataSourceStorage : PersistentStateComponent<DataSourceStorage.State> {
     private val listeners = arrayListOf<UpdateListener>()
@@ -24,6 +26,10 @@ class DataSourceStorage : PersistentStateComponent<DataSourceStorage.State> {
 
     fun getAll(): Iterable<DataSource> {
         return dataSources
+    }
+
+    fun getByIdOrNull(id: UUID): DataSource? {
+        return dataSources.firstOrNull { it.id == id }
     }
 
     fun addUpdateListener(listener: UpdateListener) {
@@ -80,6 +86,4 @@ class DataSourceStorage : PersistentStateComponent<DataSourceStorage.State> {
         fun instance(project: Project): DataSourceStorage
                 = ServiceManager.getService(project, DataSourceStorage::class.java)
     }
-
-
 }

@@ -1,5 +1,6 @@
 package com.simple1c.configuration
 
+import com.intellij.openapi.components.ApplicationComponent
 import com.intellij.openapi.components.impl.ComponentManagerImpl
 import com.intellij.openapi.diagnostic.Logger
 import java.io.File
@@ -15,8 +16,13 @@ class ComponentAutoRegistrator(val root: File, val excludeType: Class<*>) {
         for (clazz in getClasses()
                 .distinct()
                 .filter(classFilter)
-                .filter { it != excludeType }
-                .filter { !Modifier.isAbstract(it.modifiers) && !it.isInterface }) {
+                .filter {
+                    it != excludeType
+                            && !Modifier.isAbstract(it.modifiers)
+                            && !it.isInterface
+                            && !ApplicationComponent::class.java.isAssignableFrom(it)
+                            && it.getAnnotationsByType(ProjectService::class.java).isEmpty()
+                }) {
             val interfaces = clazz.interfaces + clazz
             val logMessage = "$description: Registering class ${clazz.simpleName} as " +
                     interfaces.map { it.simpleName }.joinToString(",")

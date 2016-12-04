@@ -75,3 +75,5 @@ fun readString(stream: InputStream): String {
     }
     return sb.toString()
 }
+
+fun <T> Iterable<T>.isEmpty() = !this.any()

@@ -16,7 +16,8 @@ class CancelQueryAction(val queryExecutor: QueryExecutor)
     override fun update(e: AnActionEvent?) {
         if (e == null)
             return
-        e.presentation.isEnabled = queryExecutor.hasQueryInProgress()
+        e.presentation.isEnabled = queryExecutor.isAvailable()
+                && queryExecutor.hasQueryInProgress()
 
     }
 }

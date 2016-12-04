@@ -122,7 +122,7 @@ public class EditDataSourceDialog extends DialogWrapper {
                 public void run(@NotNull ProgressIndicator indicator) {
                     indicator.setIndeterminate(true);
                     try {
-                        analysisHostProcess.getTransport().invoke("testConnection", connectionString.format());
+                        analysisHostProcess.getTransportOrNull().invoke("testConnection", connectionString.format());
                         EventQueue.invokeLater(() -> {
                             testResult.setVisible(true);
                             testResult.setForeground(JBColor.BLACK);

@@ -7,6 +7,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.Application
+import com.intellij.openapi.components.ApplicationComponent
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.Disposer
 import coreUtils.formatStacktrace
@@ -16,32 +17,38 @@ import java.io.File
 import java.io.IOException
 import java.net.ServerSocket
 
-class AnalysisHostProcess(private val application: Application) {
+class AnalysisHostProcess(private val application: Application) : ApplicationComponent {
     private val logger = Logger.getInstance(javaClass)
     private val retryAction = RetryAction(this)
     private val exeDir = "/Users/mskr/sources/simple-1c/bin/"
     private val executableName = "Simple1c.AnalysisHost.exe"
 
     private val startingPort = 12345
-    private var lastException: Exception? = null
     private var port: Int? = null
 
-    fun getTransport(): HttpTransport {
-        if (lastException != null)
-            throw Exception(lastException)
-        if (port == null) {
-            try {
-                port = createProcess()
-            } catch (e: Exception) {
-                lastException = e
-                throw e
-            }
-        }
+    fun getTransportOrNull(): HttpTransport? {
+        if (port == null)
+            return null
 
         return HttpTransport(port!!)
     }
 
-    private fun createProcess(): Int {
+    override fun getComponentName(): String {
+        return AnalysisHostProcess::class.java.simpleName
+    }
+
+    override fun disposeComponent() {
+    }
+
+    override fun initComponent() {
+        port = createProcess()
+    }
+
+    fun isAvailable(): Boolean {
+        return port != null
+    }
+
+    private fun createProcess(): Int? {
         var commandLine = emptyList<String>()
         try {
             val openPort = findPort()
@@ -81,7 +88,7 @@ StackTrace: $stacktrace"""
             notification.isImportant = true
             notification.addAction(retryAction)
             Notifications.Bus.notify(notification)
-            throw e
+            return null
         }
     }
 

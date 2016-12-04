@@ -6,43 +6,49 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
+import com.simple1c.remote.AnalysisHostProcess
 import coreUtils.equalsIgnoreCase
 import generated.*
 
-class SchemaCompletionContributor(val schemaStore: ISchemaStore) : CompletionContributor() {
+class SchemaCompletionContributor(private val schemaStore: ISchemaStore,
+                                  private val analysisHostProcess: AnalysisHostProcess) : CompletionContributor() {
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
+        if (!analysisHostProcess.isAvailable())
+            return
         val tableDeclarationPattern = PlatformPatterns.psiElement()
                 .inside(PlatformPatterns.psiElement(GeneratedTypes.TABLE_DECLARATION))
+        val file = parameters.originalFile
         if (tableDeclarationPattern.accepts(parameters.position)) {
-            addStrings(schemaStore.getTables(), result)
+            addStrings(schemaStore.getTables(file), result)
             return
         }
 
         val path = getPath(parameters.originalPosition)
-        val context = QueryContext.forElement(parameters.position, { schemaStore.getSchema(it) })
+        val context = QueryContext.forElement(parameters.position, { schemaStore.getSchemaOrNull(file, it) })
 
         if (!path.tableSegments.isEmpty()) {
-            applyPrefixMatch(evaluatePath(context, path.tableSegments), path.localPath, result)
+            applyPrefixMatch(evaluatePath(file, schemaStore, context, path.tableSegments), path.localPath, result)
         } else if (context.getUsedTables().any() || context.getIntroducedNames().any()) {
-            val candidates = context.getIntroducedNames().plus(getColumnNames(context.getUsedTables()))
+            val candidates = context.getIntroducedNames().plus(getColumnNames(file, schemaStore, context.getUsedTables()))
             applyPrefixMatch(candidates, path.localPath, result)
         } else {
-            val tables = schemaStore.getTables()
-            val candidates = tables.plus(getColumnNames(tables))
+            val tables = schemaStore.getTables(file)
+            val candidates = tables.plus(getColumnNames(file, schemaStore, tables))
             applyPrefixMatch(candidates, path.localPath, result)
         }
     }
 
-    private fun getColumnNames(tables: Iterable<String>): List<String> {
-        return tables.flatMap { schemaStore.getSchema(it).properties.map { it.name } }
+    private fun getColumnNames(file: PsiFile, schemaStore: ISchemaStore, tables: Iterable<String>): List<String> {
+        return tables.flatMap { schemaStore.getSchemaOrNull(file, it)?.properties?.map { it.name } ?: emptyList() }
     }
 
     private fun applyPrefixMatch(columns: List<String>, prefix: String, result: CompletionResultSet) {
         addStrings(columns, result.withPrefixMatcher(prefix))
     }
 
-    private fun evaluatePath(context: QueryContext, tableSegments: List<String>): List<String> {
+    private fun evaluatePath(file: PsiFile, schemaStore: ISchemaStore, context: QueryContext, tableSegments: List<String>): List<String> {
         fun evalChildPath(segments: List<String>, schema: TableSchema): List<PropertyInfo> {
             val first = segments.firstOrNull()
             if (first == null)
@@ -50,7 +56,12 @@ class SchemaCompletionContributor(val schemaStore: ISchemaStore) : CompletionCon
             val remaining = segments.subList(1, segments.size)
             return schema.properties.filter { it.name.equalsIgnoreCase(first) }
                     .flatMap {
-                        it.referencedTables.flatMap { evalChildPath(remaining, schemaStore.getSchema(it)) }
+                        it.referencedTables.flatMap {
+                            val childSchema = schemaStore.getSchemaOrNull(file, it)
+                            if (childSchema != null)
+                                evalChildPath(remaining, childSchema)
+                            else emptyList()
+                        }
                     }
         }
 

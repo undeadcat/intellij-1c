@@ -1,6 +1,8 @@
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.psi.PsiFile
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
+import com.simple1c.configuration.ProjectService
 import com.simple1c.lang.ISchemaStore
 import com.simple1c.lang.PropertyInfo
 import com.simple1c.lang.TableSchema
@@ -189,20 +191,27 @@ WHERE table2Key in
         return myFixture.lookupElementStrings.orEmpty()
     }
 
-    private fun <T> registerImplementation(implementation: T, clazz: Class<T>) {
-        val container = ApplicationManager.getApplication().picoContainer as MutablePicoContainer
-        container.unregisterComponent(clazz)
-        container.registerComponentInstance(clazz, implementation)
+    private fun <T> registerImplementation(implementation: T, interfaceClazz: Class<T>) {
+        val container = getContainer(interfaceClazz)
+        container.unregisterComponent(interfaceClazz)
+        container.registerComponentInstance(interfaceClazz, implementation)
+    }
+
+    private fun <T> getContainer(interfaceClazz: Class<T>): MutablePicoContainer {
+        val container = if (interfaceClazz.getAnnotationsByType(ProjectService::class.java).any())
+            myFixture.project.picoContainer
+        else ApplicationManager.getApplication().picoContainer
+        return container as MutablePicoContainer
     }
 
     class FakeSchemaStore : ISchemaStore {
         private val tables = hashMapOf<String, List<PropertyInfo>>()
 
-        override fun getSchema(tableName: String): TableSchema {
+        override fun getSchemaOrNull(file: PsiFile, tableName: String): TableSchema {
             return TableSchema(tableName, tables.getOrElse(tableName, { emptyList<PropertyInfo>() }))
         }
 
-        override fun getTables(): List<String> {
+        override fun getTables(file: PsiFile): List<String> {
             return tables.keys.toList()
         }
 
