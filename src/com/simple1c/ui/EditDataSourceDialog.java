@@ -112,6 +112,11 @@ public class EditDataSourceDialog extends DialogWrapper {
             }
         }));
 
+        if (!analysisHostProcess.isAvailable()) {
+            testButton.setEnabled(false);
+            return;
+        }
+
         testButton.addActionListener(unused -> {
             PostgresConnectionString connectionString = tryGatherConnectionString();
             if (connectionString == null)

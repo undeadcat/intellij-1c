@@ -11,9 +11,9 @@ import com.intellij.psi.TokenType
 import com.intellij.psi.util.PsiTreeUtil
 import com.simple1c.boilerplate._1cFile
 import com.simple1c.dataSources.DataSourceAssociations
-import com.simple1c.dataSources.DataSourceStorage
 import com.simple1c.execution.QueryExecutor
 import generated.GeneratedTypes
+import generated.RootQuery
 import generated.SqlQuery
 
 class ExecuteQueryAction(private val queryExecutor: QueryExecutor,
@@ -57,7 +57,7 @@ class ExecuteQueryAction(private val queryExecutor: QueryExecutor,
         e.presentation.isEnabled = isEnabled
     }
 
-    private fun findQueryBefore(_1cFile: _1cFile, offset: Int): SqlQuery? {
+    private fun findQueryBefore(_1cFile: _1cFile, offset: Int): RootQuery? {
         val theOffset = if (offset >= _1cFile.textLength - 1 && offset > 0) offset - 1 else offset
         return findSqlQuery(_1cFile, theOffset, { it.prevSibling })
     }
@@ -65,13 +65,13 @@ class ExecuteQueryAction(private val queryExecutor: QueryExecutor,
     private fun findQueryAfter(_1cFile: _1cFile, offset: Int) =
             findSqlQuery(_1cFile, offset, { it.nextSibling })
 
-    fun findSqlQuery(file: _1cFile, offset: Int, getSibling: (PsiElement) -> PsiElement?): SqlQuery? {
+    fun findSqlQuery(file: _1cFile, offset: Int, getSibling: (PsiElement) -> PsiElement?): RootQuery? {
         var element = file.findElementAt(offset)
         while (element != null && (element.node.elementType == GeneratedTypes.LINE_COMMENT
                 || element.node.elementType == TokenType.WHITE_SPACE)) {
             element = getSibling(element)
         }
-        return PsiTreeUtil.getParentOfType(element, SqlQuery::class.java, false)
+        return PsiTreeUtil.getNonStrictParentOfType(element, RootQuery::class.java)
     }
 
 }

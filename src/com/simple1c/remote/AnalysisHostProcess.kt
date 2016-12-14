@@ -20,11 +20,12 @@ import java.net.ServerSocket
 class AnalysisHostProcess(private val application: Application) : ApplicationComponent {
     private val logger = Logger.getInstance(javaClass)
     private val retryAction = RetryAction(this)
-    private val exeDir = "/Users/mskr/sources/simple-1c/bin/"
+    private val exeDir = "/Users/jetbrains/sources/simple-1c/bin/"
     private val executableName = "Simple1c.AnalysisHost.exe"
+    private val currentNotifications = arrayListOf<Notification>()
 
     private val startingPort = 12345
-    private var port: Int? = null
+    private var port: Int? = 12345
 
     fun getTransportOrNull(): HttpTransport? {
         if (port == null)
@@ -49,6 +50,7 @@ class AnalysisHostProcess(private val application: Application) : ApplicationCom
     }
 
     private fun createProcess(): Int? {
+        currentNotifications.forEach { it.expire() }
         var commandLine = emptyList<String>()
         try {
             val openPort = findPort()
@@ -57,6 +59,8 @@ class AnalysisHostProcess(private val application: Application) : ApplicationCom
 
             val process = ProcessBuilder()
                     .command(commandLine)
+                    .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                    .redirectError(ProcessBuilder.Redirect.INHERIT)
                     .start()
             logger.info("Started analysis host process")
             Disposer.register(application, Disposable {
@@ -88,6 +92,7 @@ StackTrace: $stacktrace"""
             notification.isImportant = true
             notification.addAction(retryAction)
             Notifications.Bus.notify(notification)
+            currentNotifications.add(notification)
             return null
         }
     }
