@@ -1,0 +1,5 @@
+select * from table where;
+
+select * from table group by having;
+
+select * from table join order by union;

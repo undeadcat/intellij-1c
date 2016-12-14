@@ -1,0 +1,59 @@
+1c query File
+  RootQueryImpl(ROOT_QUERY)
+    SqlQueryImpl(SQL_QUERY)
+      SelectStatementImpl(SELECT_STATEMENT)
+        PsiElement(selectKeyword)('select')
+        TopOptImpl(TOP_OPT)
+          <empty list>
+        SelectionListImpl(SELECTION_LIST)
+          PsiElement(*)('*')
+        PsiElement(fromKeyword)('from')
+        TableDeclarationImpl(TABLE_DECLARATION)
+          IdentifierImpl(IDENTIFIER)
+            PsiElement(ID_TOKEN)('table')
+        PsiElement(whereKeyword)('where')
+        PsiErrorElement:<expression> expected, got ';'
+          <empty list>
+  PsiElement(;)(';')
+  RootQueryImpl(ROOT_QUERY)
+    SqlQueryImpl(SQL_QUERY)
+      SelectStatementImpl(SELECT_STATEMENT)
+        PsiElement(selectKeyword)('select')
+        TopOptImpl(TOP_OPT)
+          <empty list>
+        SelectionListImpl(SELECTION_LIST)
+          PsiElement(*)('*')
+        PsiElement(fromKeyword)('from')
+        TableDeclarationImpl(TABLE_DECLARATION)
+          IdentifierImpl(IDENTIFIER)
+            PsiElement(ID_TOKEN)('table')
+        PsiElement(groupKeyword)('group')
+        PsiElement(by)('by')
+        PsiErrorElement:<expression> expected, got 'having'
+          <empty list>
+        PsiElement(havingKeyword)('having')
+        PsiErrorElement:<expression> expected, got ';'
+          <empty list>
+  PsiElement(;)(';')
+  RootQueryImpl(ROOT_QUERY)
+    SqlQueryImpl(SQL_QUERY)
+      SelectStatementImpl(SELECT_STATEMENT)
+        PsiElement(selectKeyword)('select')
+        TopOptImpl(TOP_OPT)
+          <empty list>
+        SelectionListImpl(SELECTION_LIST)
+          PsiElement(*)('*')
+        PsiElement(fromKeyword)('from')
+        TableDeclarationImpl(TABLE_DECLARATION)
+          IdentifierImpl(IDENTIFIER)
+            PsiElement(ID_TOKEN)('table')
+        JoinItemImpl(JOIN_ITEM)
+          PsiElement(joinKeyword)('join')
+          PsiErrorElement:<column source> expected, got 'order'
+            <empty list>
+      PsiElement(orderKeyword)('order')
+      PsiElement(by)('by')
+      PsiErrorElement:<expression> expected, got 'union'
+        <empty list>
+  PsiElement(unionKeyword)('union')
+  PsiElement(;)(';')

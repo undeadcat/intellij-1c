@@ -99,10 +99,19 @@ joinItem*
     ]
     pin = 1
 }
-private where_expression ::= whereKeyword expression
-private group_expression ::= groupKeyword (byKeyword| поKeyword) expressionList [havingKeyword expression]
+private where_expression ::= whereKeyword expression {
+    pin = 1
+}
+private group_expression ::= groupKeyword (byKeyword| поKeyword) expressionList [having_expression] {
+    pin = 1
+}
 
-topOpt ::= [topKeyword numberLiteral] //TODO. trash.make private
+private having_expression ::= havingKeyword expression {
+    pin = 1
+}
+
+//TODO. trash.make private
+topOpt ::= [topKeyword numberLiteral]
 
 private distinctOpt ::= distinctKeyword?
 alias ::= asKeyword? identifier { //TODO. trash.make private
@@ -131,7 +140,7 @@ tableDeclaration ::= identifier alias?{
         tableName = "identifier"
     ]
 }
-subquery ::= LPAREN targetQuery RPAREN {
+subquery ::= LPAREN sqlQuery RPAREN {
     pin = 1
 
 }
@@ -161,11 +170,15 @@ unionClause ::= unionKeyword allKeyword? select_statement {
     ]
 }
 
-rootQuery::= targetQuery
-targetQuery::= unionList [orderKeyword (byKeyword | поKeyword) orderByExpressionList] {
+rootQuery::= sqlQuery
+sqlQuery ::= unionList [orderExpression] {
     methods = [
             orderKeyword = ""
         ]
+}
+
+private orderExpression ::= orderKeyword (byKeyword | поKeyword) orderByExpressionList {
+    pin = 1
 }
 
 //join

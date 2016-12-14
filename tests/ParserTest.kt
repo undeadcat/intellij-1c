@@ -73,7 +73,11 @@ class ParserTest : ParsingTestCase("parser", "1c", _1cParserDefinition()) {
     }
 
     fun testColumnNameMatchesAggregationFunction() {
-        doTest(true);
+        doTest(true)
+    }
+
+    fun testIncludeIncompleteOptionalClausesInParseTree() {
+        doTest(true)
     }
 
     override fun skipSpaces(): Boolean {
