@@ -28,6 +28,10 @@ class ParserTest : ParsingTestCase("parser", "1c", _1cParserDefinition()) {
         doTest(true)
     }
 
+    fun testCanSeparateQueriesWithNewLine(){
+        doTest(true)
+    }
+
     fun testPartialQuery() {
         doTest(true)
     }

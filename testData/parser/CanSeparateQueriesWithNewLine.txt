@@ -1,0 +1,59 @@
+1c query File
+  PsiElement(line_comment)('//query with error')
+  RootQueryImpl(ROOT_QUERY)
+    SqlQueryImpl(SQL_QUERY)
+      SelectStatementImpl(SELECT_STATEMENT)
+        PsiElement(selectKeyword)('select')
+        TopOptImpl(TOP_OPT)
+          <empty list>
+        SelectionListImpl(SELECTION_LIST)
+          PsiElement(*)('*')
+        PsiElement(fromKeyword)('from')
+        TableDeclarationImpl(TABLE_DECLARATION)
+          IdentifierImpl(IDENTIFIER)
+            PsiElement(ID_TOKEN)('Table2')
+        PsiElement(whereKeyword)('where')
+        BinaryExpressionImpl(BINARY_EXPRESSION)
+          NumberLiteralImpl(NUMBER_LITERAL)
+            PsiElement(number)('1')
+          PsiElement(=)('=')
+          PsiErrorElement:<expression> expected, got 'select'
+            <empty list>
+  PsiElement(line_comment)('//query with error')
+  RootQueryImpl(ROOT_QUERY)
+    SqlQueryImpl(SQL_QUERY)
+      SelectStatementImpl(SELECT_STATEMENT)
+        PsiElement(selectKeyword)('select')
+        TopOptImpl(TOP_OPT)
+          <empty list>
+        PsiErrorElement:<selection list>, distinctKeyword or topKeyword expected, got 'from'
+          <empty list>
+        PsiElement(fromKeyword)('from')
+        PsiErrorElement:<column source> expected, got 'select'
+          <empty list>
+  PsiElement(line_comment)('//successfully parsed')
+  RootQueryImpl(ROOT_QUERY)
+    SqlQueryImpl(SQL_QUERY)
+      SelectStatementImpl(SELECT_STATEMENT)
+        PsiElement(selectKeyword)('select')
+        TopOptImpl(TOP_OPT)
+          <empty list>
+        SelectionListImpl(SELECTION_LIST)
+          PsiElement(*)('*')
+        PsiElement(fromKeyword)('from')
+        TableDeclarationImpl(TABLE_DECLARATION)
+          IdentifierImpl(IDENTIFIER)
+            PsiElement(ID_TOKEN)('ValidTable')
+  PsiElement(line_comment)('//query with error')
+  RootQueryImpl(ROOT_QUERY)
+    SqlQueryImpl(SQL_QUERY)
+      SelectStatementImpl(SELECT_STATEMENT)
+        PsiElement(selectKeyword)('select')
+        TopOptImpl(TOP_OPT)
+          <empty list>
+        PsiErrorElement:<selection list>, distinctKeyword or topKeyword expected, got 'from'
+          <empty list>
+        PsiElement(fromKeyword)('from')
+        PsiErrorElement:<column source> expected, got ';'
+          <empty list>
+  PsiElement(;)(';')
