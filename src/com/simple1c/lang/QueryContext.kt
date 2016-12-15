@@ -42,11 +42,7 @@ data class QueryContext(
     }
 
     companion object {
-        fun forElement(element: PsiElement, resolver: (String) -> TableSchema?): QueryContext {
-            val sqlQuery = PsiTreeUtil.getParentOfType(element, SqlQuery::class.java)
-            if (sqlQuery == null)
-                throw Exception("Could not find SqlQuery for element $element (${element.text})")
-
+        fun createForQuery(sqlQuery: SqlQuery, resolver: (String) -> TableSchema?): QueryContext {
             val visitor = ContextVisitor(sqlQuery, resolver)
             val rootQuery = PsiTreeUtil.getParentOfType(sqlQuery, RootQuery::class.java)
             rootQuery!!.accept(visitor)

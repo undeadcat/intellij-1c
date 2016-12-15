@@ -17,6 +17,8 @@ import java.io.File
 import java.io.IOException
 import java.net.ServerSocket
 
+//should this be a project component?
+//TODO. should not start in tests. make it lazy again?
 class AnalysisHostProcess(private val application: Application) : ApplicationComponent {
     private val logger = Logger.getInstance(javaClass)
     private val retryAction = RetryAction(this)
@@ -25,13 +27,13 @@ class AnalysisHostProcess(private val application: Application) : ApplicationCom
     private val currentNotifications = arrayListOf<Notification>()
 
     private val startingPort = 12345
-    private var port: Int? = 12345
+    private var handle: Handle? = null
 
     fun getTransportOrNull(): HttpTransport? {
-        if (port == null)
+        if (handle == null)
             return null
 
-        return HttpTransport(port!!)
+        return HttpTransport(handle!!.port)
     }
 
     override fun getComponentName(): String {
@@ -42,15 +44,16 @@ class AnalysisHostProcess(private val application: Application) : ApplicationCom
     }
 
     override fun initComponent() {
-        port = createProcess()
+        handle = createProcess()
     }
 
     fun isAvailable(): Boolean {
-        return port != null
+        return handle != null
     }
 
-    private fun createProcess(): Int? {
+    private fun createProcess(): Handle? {
         currentNotifications.forEach { it.expire() }
+        currentNotifications.clear()
         var commandLine = emptyList<String>()
         try {
             val openPort = findPort()
@@ -78,7 +81,7 @@ class AnalysisHostProcess(private val application: Application) : ApplicationCom
                 throw Exception("Process exited unexpectedly with exit code ${process.exitValue()}: $output $error")
             }
 
-            return openPort
+            return Handle(process, openPort)
         } catch (e: Exception) {
             val stacktrace = e.formatStacktrace()
             val msg = """Error starting analysis host process.
@@ -119,11 +122,12 @@ StackTrace: $stacktrace"""
         throw Exception("Could not find open port")
     }
 
-    class RetryAction(private val analysisHostProcess: AnalysisHostProcess) : AnAction("Retry", "Some message", null) {
+    private class RetryAction(private val analysisHostProcess: AnalysisHostProcess)
+        : AnAction("Retry", "Some message", null) {
         override fun actionPerformed(e: AnActionEvent?) {
-            if (e == null || e.project == null)
-                return
-            analysisHostProcess.createProcess()
+            analysisHostProcess.initComponent()
         }
     }
+
+    private class Handle(val process: Process, val port: Int)
 }

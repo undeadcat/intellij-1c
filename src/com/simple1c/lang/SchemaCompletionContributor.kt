@@ -7,16 +7,14 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.simple1c.remote.AnalysisHostProcess
+import com.intellij.psi.util.PsiTreeUtil
 import coreUtils.equalsIgnoreCase
 import generated.*
 
-class SchemaCompletionContributor(private val schemaStore: ISchemaStore,
-                                  private val analysisHostProcess: AnalysisHostProcess) : CompletionContributor() {
+class SchemaCompletionContributor(private val schemaStore: ISchemaStore) : CompletionContributor() {
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
-        if (!analysisHostProcess.isAvailable())
-            return
+
         val tableDeclarationPattern = PlatformPatterns.psiElement()
                 .inside(PlatformPatterns.psiElement(GeneratedTypes.TABLE_DECLARATION))
         val file = parameters.originalFile
@@ -25,8 +23,11 @@ class SchemaCompletionContributor(private val schemaStore: ISchemaStore,
             return
         }
 
-        val path = getPath(parameters.originalPosition)
-        val context = QueryContext.forElement(parameters.position, { schemaStore.getSchemaOrNull(file, it) })
+        val path = getPath(result.prefixMatcher.prefix)
+        val sqlQuery = PsiTreeUtil.getParentOfType(parameters.position, SqlQuery::class.java)
+        if (sqlQuery == null)
+            return
+        val context = QueryContext.createForQuery(sqlQuery, { schemaStore.getSchemaOrNull(file, it) })
 
         if (!path.tableSegments.isEmpty()) {
             applyPrefixMatch(evaluatePath(file, schemaStore, context, path.tableSegments), path.localPath, result)
@@ -76,21 +77,12 @@ class SchemaCompletionContributor(private val schemaStore: ISchemaStore,
         return evalChildPath(localPath, rootTable.second!!).map { it.name }
     }
 
-    private fun getPath(originalText: PsiElement?): Path {
-        if (originalText == null || originalText.text.isNullOrEmpty())
-            return Path(emptyList(), "")
-        val endOffset = originalText.textRange.endOffset
-        val maybeDot = if (endOffset < originalText.containingFile.textLength)
-            originalText.containingFile.text.substring(endOffset, endOffset + 1)
-        else ""
-        val withDot = if (maybeDot == "." && !originalText.text.endsWith("."))
-            originalText.text + maybeDot
-        else originalText.text
-        val lastDot = withDot.lastIndexOf('.')
+    private fun getPath(prefix: String): Path {
+        val lastDot = prefix.lastIndexOf('.')
         if (lastDot < 0)
-            return Path(emptyList(), withDot)
-        val tableSegments = withDot.substring(0, lastDot)
-        val localPath = if (lastDot < withDot.length - 1) withDot.substring(lastDot + 1) else ""
+            return Path(emptyList(), prefix)
+        val tableSegments = prefix.substring(0, lastDot)
+        val localPath = if (lastDot < prefix.length - 1) prefix.substring(lastDot + 1) else ""
         return Path(tableSegments.split('.'), localPath)
     }
 

@@ -1,11 +1,17 @@
 import com.intellij.codeInsight.completion.CompletionType
+import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.codeInsight.lookup.LookupManager
+import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.Result
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.psi.PsiFile
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 import com.simple1c.configuration.ProjectService
 import com.simple1c.lang.ISchemaStore
 import com.simple1c.lang.PropertyInfo
 import com.simple1c.lang.TableSchema
+import junit.framework.TestCase
 import org.hamcrest.core.Is
 import org.junit.Assert
 import org.picocontainer.MutablePicoContainer
@@ -35,6 +41,12 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         schemaStore.addColumns("Other")
         testEquivalentTo("select * from <caret>", listOf("Other", "Table1", "Table2"))
         testEquivalentTo("select * from Tab<caret>", listOf("Table1", "Table2"))
+    }
+
+    fun testAcceptColumnCompletion_Bug(){
+        schemaStore.addColumns("Table", "Col1", "Col2")
+        selectElement(getLookupElements("select <caret> from Table").first())
+        myFixture.checkResult("select Col1 from Table")
     }
 
     fun testAfterSelectKeyword_completeTablesAndColumns() {
@@ -89,6 +101,16 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
 
     fun testNestedTables() {
         schemaStore.addColumns("Документ.ПоступлениеНаРасчетныйСчет",
+                PropertyInfo("Контрагент", listOf("Справочник.Контрагенты")))
+        schemaStore.addColumns("Справочник.Контрагенты",
+                PropertyInfo("Владелец", listOf("Справочник.Контрагенты")),
+                PropertyInfo("ИНН", emptyList()))
+        testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет where <caret>", listOf("Контрагент"))
+        testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет d where Контрагент.<caret>", listOf("Владелец", "ИНН", "Фамилия", "Имя", "Отчество"))
+    }
+
+    fun testNestedTablesWithAlias() {
+        schemaStore.addColumns("Документ.ПоступлениеНаРасчетныйСчет",
                 PropertyInfo("Контрагент", listOf("Справочник.Контрагенты", "Справочник.ФизическиеЛица")))
         schemaStore.addColumns("Справочник.Контрагенты",
                 PropertyInfo("Владелец", listOf("Справочник.Контрагенты")),
@@ -101,6 +123,7 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет d where d.Контрагент.<caret>", listOf("Владелец", "ИНН", "Фамилия", "Имя", "Отчество"))
         testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет d where d.Контрагент.Владелец.<caret>", listOf("Владелец", "ИНН"))
     }
+
 
     fun testNestedTableWithQualifiedName() {
         schemaStore.addColumns("Документ.ПоступлениеНаРасчетныйСчет",
@@ -148,7 +171,7 @@ WHERE table2Key in
 
     fun testSelectFromSubquery_NamesMustBeQualifiedWithAlias() {
         schemaStore.addColumns("table2", "a", "b", "c")
-        //TODO. should suggest qualified names
+        //TODO. should suggest qualified column names: t.alias1, t.alias2
         testEquivalentTo("select * from (select a as alias1, b as alias2 from table2) t where <caret>", listOf("t"))
         testEquivalentTo("select * from (select a as alias1, b as alias2 from table2) t where t.<caret>", listOf("alias1", "alias2"))
     }
@@ -177,18 +200,42 @@ WHERE table2Key in
             where subquery.<caret>""", listOf("a", "b", "c"))
     }
 
+    fun testTriggerCompletionOutsideQuery() {
+        testEquivalentTo("select * from Table where;   <caret>", emptyList())
+    }
+
+    fun testTriggerDotCompletionOnPrimitiveColumn() {
+        testEquivalentTo("select * from Справочник.Контрагенты c where c.ИНН.<caret>", emptyList())
+        Assert.fail()
+    }
+
     private fun testEquivalentTo(input: String, expected: List<String>) {
-        Assert.assertThat(getCompletionResult(input).toSet(), Is.`is`(expected.toSet()))
+        Assert.assertThat(getLookupStrings(input).toSet(), Is.`is`(expected.toSet()))
     }
 
     private fun testEqualTo(query: String, expected: List<String>) {
-        Assert.assertThat(getCompletionResult(query), Is.`is`(expected))
+        Assert.assertThat(getLookupStrings(query), Is.`is`(expected))
     }
 
-    private fun getCompletionResult(content: String): List<String> {
+    private fun getLookupStrings(content: String): List<String> {
+        return getLookupElements(content).map { it.lookupString }
+    }
+
+    private fun getLookupElements(content: String): Array<LookupElement> {
         myFixture.configureByText("test.1c", content)
-        myFixture.complete(CompletionType.BASIC, 1)
-        return myFixture.lookupElementStrings.orEmpty()
+        val lookupElements = myFixture.complete(CompletionType.BASIC, 1)
+        return lookupElements
+    }
+
+    private fun selectElement(item: LookupElement) {
+        object : WriteCommandAction<Unit>(project, file) {
+            override fun run(result: Result<Unit>) {
+                val lookup = (LookupManager.getInstance(project).activeLookup as LookupImpl)
+                lookup.currentItem = item
+                lookup.finishLookup(0.toChar())
+            }
+
+        }.execute()
     }
 
     private fun <T> registerImplementation(implementation: T, interfaceClazz: Class<T>) {

@@ -9,6 +9,8 @@ class SchemaStore(private val analysisHost: AnalysisHostProcess,
                   private val dataSourceAssociations: DataSourceAssociations) : ISchemaStore {
 
     override fun getTables(file: PsiFile): List<String> {
+        if (!analysisHost.isAvailable())
+            return emptyList()
         val dataSource = dataSourceAssociations.getOrNull(file)
         if (dataSource == null)
             return emptyList()
@@ -18,6 +20,8 @@ class SchemaStore(private val analysisHost: AnalysisHostProcess,
     }
 
     override fun getSchemaOrNull(file: PsiFile, tableName: String): TableSchema? {
+        if (!analysisHost.isAvailable())
+            return null
         val dataSource = dataSourceAssociations.getOrNull(file)
         if (dataSource == null)
             return null
