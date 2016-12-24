@@ -5,13 +5,13 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import coreUtils.equalsIgnoreCase
 import generated.*
 
 class SchemaCompletionContributor(private val schemaStore: ISchemaStore) : CompletionContributor() {
+    private val limit = 100
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
 
@@ -30,23 +30,23 @@ class SchemaCompletionContributor(private val schemaStore: ISchemaStore) : Compl
         val context = QueryContext.createForQuery(sqlQuery, { schemaStore.getSchemaOrNull(file, it) })
 
         if (!path.tableSegments.isEmpty()) {
-            applyPrefixMatch(evaluatePath(file, schemaStore, context, path.tableSegments), path.localPath, result)
+            addElements(evaluatePath(file, schemaStore, context, path.tableSegments).asSequence(), path.localPath, result)
         } else if (context.getUsedTables().any() || context.getIntroducedNames().any()) {
-            val candidates = context.getIntroducedNames().plus(getColumnNames(file, schemaStore, context.getUsedTables()))
-            applyPrefixMatch(candidates, path.localPath, result)
+            val candidates = context.getIntroducedNames().asSequence().plus(getColumnNames(file, schemaStore, context.getUsedTables()))
+            addElements(candidates, path.localPath, result)
         } else {
             val tables = schemaStore.getTables(file)
-            val candidates = tables.plus(getColumnNames(file, schemaStore, tables))
-            applyPrefixMatch(candidates, path.localPath, result)
+            val candidates = getColumnNames(file, schemaStore, schemaStore.getTables(file)).plus(tables)
+            addElements(candidates, path.localPath, result)
         }
     }
 
-    private fun getColumnNames(file: PsiFile, schemaStore: ISchemaStore, tables: Iterable<String>): List<String> {
-        return tables.flatMap { schemaStore.getSchemaOrNull(file, it)?.properties?.map { it.name } ?: emptyList() }
+    private fun getColumnNames(file: PsiFile, schemaStore: ISchemaStore, tables: Iterable<String>): Sequence<String> {
+        return tables.asSequence().flatMap { schemaStore.getSchemaOrNull(file, it)?.properties?.map { it.name }?.asSequence() ?: emptySequence() }
     }
 
-    private fun applyPrefixMatch(columns: List<String>, prefix: String, result: CompletionResultSet) {
-        addStrings(columns, result.withPrefixMatcher(prefix))
+    private fun addElements(columns: Sequence<String>, prefix: String, result: CompletionResultSet) {
+        addStrings(columns.take(limit).toList(), result.withPrefixMatcher(prefix))
     }
 
     private fun evaluatePath(file: PsiFile, schemaStore: ISchemaStore, context: QueryContext, tableSegments: List<String>): List<String> {
@@ -66,8 +66,8 @@ class SchemaCompletionContributor(private val schemaStore: ISchemaStore) : Compl
                     }
         }
 
-        val rootTable = tableSegments.withIndex()
-                .map { tableSegments.take(it.index + 1) }
+        val candidateNames = tableSegments.withIndex().map { tableSegments.take(it.index + 1) }
+        val rootTable = candidateNames
                 .map { Pair(it, context.resolve(it.joinToString("."))) }
                 .filter { it.second != null }
                 .firstOrNull()
