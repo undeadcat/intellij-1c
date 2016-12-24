@@ -1,17 +1,13 @@
 package com.simple1c.boilerplate;
 
-import com.intellij.extapi.psi.PsiFileBase;
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.LanguageFileType;
-import com.intellij.psi.FileViewProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-
 public class _1cFileType extends LanguageFileType {
-    public static final _1cFileType INSTANCE = new _1cFileType();
+    static final _1cFileType INSTANCE = new _1cFileType();
 
     private _1cFileType() {
         super(_1cLanguage.INSTANCE);

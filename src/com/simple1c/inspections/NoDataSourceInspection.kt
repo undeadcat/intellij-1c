@@ -7,7 +7,6 @@ import com.intellij.psi.PsiFile
 import com.simple1c.dataSources.DataSourceStorage
 import com.simple1c.ui.Actions.NewDataSourceAction
 
-
 class NoDataSourceInspection(private val createDataSourceQuickFix: CreateDataSourceQuickFix) : LocalInspectionTool(), DumbAware {
 
     override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<out ProblemDescriptor> {
@@ -21,8 +20,8 @@ class NoDataSourceInspection(private val createDataSourceQuickFix: CreateDataSou
             return "Create data source"
         }
 
-        override fun applyFix(p0: Project, p1: ProblemDescriptor) {
-            newDataSourceAction.run(p0)
+        override fun applyFix(project: Project, problemDescriptor: ProblemDescriptor) {
+            newDataSourceAction.run(project)
         }
 
     }

@@ -29,8 +29,6 @@ class RetryStrategyTest {
 
     }
 
-    class TestException : Exception() {
-
-    }
+    class TestException : Exception()
 }
 

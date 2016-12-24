@@ -1,5 +1,4 @@
-package com.simple1c.dataSources
-
+import com.simple1c.dataSources.PostgresConnectionString
 import org.hamcrest.core.Is
 import org.junit.Assert
 import org.junit.Test

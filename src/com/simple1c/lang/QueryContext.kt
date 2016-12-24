@@ -1,8 +1,6 @@
 package com.simple1c.lang
 
-import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.simple1c.boilerplate.RecursiveVisitor
 import generated.*
 import java.util.*
 

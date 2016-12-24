@@ -60,8 +60,5 @@ internal class SyntaxHighlighter : com.intellij.openapi.fileTypes.SyntaxHighligh
             return KeywordHighlight
         return Default
     }
-
-
-
 }
 

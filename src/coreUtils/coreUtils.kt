@@ -41,7 +41,7 @@ fun parseIntOrNull(string: String): Int? {
 }
 
 fun <T> PicoContainer.getComponentsOfType(clazz: Class<T>): List<T> {
-    return this.getComponentInstancesOfType(clazz).map { uncheckedCast<T>(it) }.toList()
+    return this.getComponentInstancesOfType(clazz).map { uncheckedCast<T>(it) }
 }
 
 fun <T> nullableCast(obj: Any?): T? {

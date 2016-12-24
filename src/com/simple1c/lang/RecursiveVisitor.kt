@@ -1,4 +1,4 @@
-package com.simple1c.boilerplate
+package com.simple1c.lang
 
 import com.intellij.psi.PsiElement
 import generated.Visitor

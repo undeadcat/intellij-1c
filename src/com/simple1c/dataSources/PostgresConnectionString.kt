@@ -28,7 +28,7 @@ class PostgresConnectionString constructor(val host: String,
             }.filterNotNull()
 
             fun tryGetPartValue(key: String) = parts
-                    .firstOrNull() { it.first.equalsIgnoreCase(key) }
+                    .firstOrNull { it.first.equalsIgnoreCase(key) }
                     ?.second
 
             val host = tryGetPartValue("host")

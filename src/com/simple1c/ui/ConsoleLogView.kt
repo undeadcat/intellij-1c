@@ -18,9 +18,9 @@ import com.simple1c.remote.QueryResult
 import com.simple1c.ui.Actions.MyActionIds
 
 class ConsoleLogView(private val project: Project) {
-    //need to get application, not project bus
-    private val cancelQueryAction = ActionManager.getInstance().getAction(MyActionIds.cancelQuery)!!
     private val application = ApplicationManager.getApplication()
+    private val cancelQueryAction = ActionManager.getInstance().getAction(MyActionIds.cancelQuery)!!
+    //need to get application, not project bus
     private val messageBus = application.messageBus
     private val actionManager = ActionManager.getInstance()
     private val editor: EditorEx = ConsoleViewUtil.setupConsoleEditor(project, false, false)

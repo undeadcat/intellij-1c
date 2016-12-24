@@ -5,9 +5,7 @@ import java.util.*
 
 data class TranslationRequest(var connectionString: String, var query: String)
 
-data class TranslationResult(var result: String?, var error: String?) {
-
-}
+data class TranslationResult(var result: String?, var error: String?)
 
 data class ExecuteQueryRequest(var connectionString: String, var query: String)
 
