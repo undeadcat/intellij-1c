@@ -15,7 +15,7 @@ class SchemaStore(private val analysisHost: AnalysisHostProcess,
         if (dataSource == null)
             return emptyList()
         val request = TableListRequest(dataSource.connectionString.format())
-        return analysisHost.getTransportOrNull()!!
+        return analysisHost.getTransport()
                 .invoke("listTables", request, TableListResult::class.java)
     }
 
@@ -26,7 +26,7 @@ class SchemaStore(private val analysisHost: AnalysisHostProcess,
         if (dataSource == null)
             return null
         val request = TableSchemaRequest(dataSource.connectionString.format(), tableName)
-        val props = analysisHost.getTransportOrNull()!!
+        val props = analysisHost.getTransport()
                 .invoke("tableMapping", request, TableMappingDto::class.java)
                 .properties.map { PropertyInfo(it.name, it.tables) }
         return TableSchema(tableName, props)

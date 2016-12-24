@@ -28,7 +28,7 @@ class QueryExecutor(val application: Application,
     fun executeQuery(project: Project, query: String, dataSource: DataSource) {
         if (!isAvailable())
             return
-        val transport = analysisHostProcess.getTransportOrNull()!!
+        val transport = analysisHostProcess.getTransport()
         val task = object : Task.Backgroundable(project, "Executing query", true, PerformInBackgroundOption.ALWAYS_BACKGROUND) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true

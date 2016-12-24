@@ -17,38 +17,36 @@ import java.io.File
 import java.io.IOException
 import java.net.ServerSocket
 
-//should this be a project component?
-//TODO. should not start in tests. make it lazy again?
-class AnalysisHostProcess(private val application: Application) : ApplicationComponent {
+class AnalysisHostProcess(private val application: Application) {
     private val logger = Logger.getInstance(javaClass)
     private val retryAction = RetryAction(this)
     private val exeDir = "/Users/jetbrains/sources/simple-1c/bin/"
     private val executableName = "Simple1c.AnalysisHost.exe"
     private val currentNotifications = arrayListOf<Notification>()
+    private val sync = Object()
 
     private val startingPort = 12345
     private var handle: Handle? = null
 
-    fun getTransportOrNull(): HttpTransport? {
-        if (handle == null)
-            return null
+    fun getTransport(): HttpTransport {
+        val myHandle = ensureInitialized()
+        if (myHandle == null)
+            throw RuntimeException("AnalysisHostProcess is not initialized")
 
-        return HttpTransport(handle!!.port)
-    }
-
-    override fun getComponentName(): String {
-        return AnalysisHostProcess::class.java.simpleName
-    }
-
-    override fun disposeComponent() {
-    }
-
-    override fun initComponent() {
-        handle = createProcess()
+        return HttpTransport(myHandle.port)
     }
 
     fun isAvailable(): Boolean {
-        return handle != null
+        return ensureInitialized() != null
+    }
+
+    private fun ensureInitialized(): Handle? {
+        if (handle != null)
+            return handle
+        val myHandle = synchronized(sync, {
+            createProcess()
+        })
+        return myHandle;
     }
 
     private fun createProcess(): Handle? {
@@ -125,7 +123,7 @@ StackTrace: $stacktrace"""
     private class RetryAction(private val analysisHostProcess: AnalysisHostProcess)
         : AnAction("Retry", "Some message", null) {
         override fun actionPerformed(e: AnActionEvent?) {
-            analysisHostProcess.initComponent()
+            analysisHostProcess.handle = analysisHostProcess.ensureInitialized()
         }
     }
 
