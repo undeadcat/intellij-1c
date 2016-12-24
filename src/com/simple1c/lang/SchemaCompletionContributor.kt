@@ -71,10 +71,18 @@ class SchemaCompletionContributor(private val schemaStore: ISchemaStore) : Compl
                 .map { Pair(it, context.resolve(it.joinToString("."))) }
                 .filter { it.second != null }
                 .firstOrNull()
-        if (rootTable == null)
+        if (rootTable != null) {
+            val localPath = tableSegments.subList(rootTable.first.size, tableSegments.size)
+            return evalChildPath(localPath, rootTable.second!!).map { it.name }
+        }
+        if (tableSegments.isEmpty())
             return emptyList()
-        val localPath = tableSegments.subList(rootTable.first.size, tableSegments.size)
-        return evalChildPath(localPath, rootTable.second!!).map { it.name }
+        return context.getUsedTables()
+                .map { context.resolve(it) }
+                .filterNotNull()
+                .flatMap { evalChildPath(tableSegments, it) }
+                .map { it.name }
+
     }
 
     private fun getPath(prefix: String): Path {

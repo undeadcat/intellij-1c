@@ -46,6 +46,7 @@ class AnalysisHostProcess(private val application: Application) {
         val myHandle = synchronized(sync, {
             createProcess()
         })
+        handle = myHandle
         return myHandle;
     }
 

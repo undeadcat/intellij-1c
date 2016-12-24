@@ -23,7 +23,7 @@ class HttpTransport(port: Int) {
 
     private val retry = RetryStrategy.Retry()
             .withTimeout(Duration.ofSeconds(1))
-            .byCount(20)
+            .byCount(4)
             .withDelay(Duration.ofMillis(30))
 
     private val gson = GsonBuilder()

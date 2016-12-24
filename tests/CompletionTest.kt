@@ -106,7 +106,7 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
                 PropertyInfo("Владелец", listOf("Справочник.Контрагенты")),
                 PropertyInfo("ИНН", emptyList()))
         testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет where <caret>", listOf("Контрагент"))
-        testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет d where Контрагент.<caret>", listOf("Владелец", "ИНН", "Фамилия", "Имя", "Отчество"))
+        testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет d where Контрагент.<caret>", listOf("Владелец", "ИНН"))
     }
 
     fun testNestedTablesWithAlias() {
@@ -206,7 +206,6 @@ WHERE table2Key in
 
     fun testTriggerDotCompletionOnPrimitiveColumn() {
         testEquivalentTo("select * from Справочник.Контрагенты c where c.ИНН.<caret>", emptyList())
-        Assert.fail()
     }
 
     private fun testEquivalentTo(input: String, expected: List<String>) {
