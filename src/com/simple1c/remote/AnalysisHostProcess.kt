@@ -16,7 +16,7 @@ import org.apache.commons.lang.SystemUtils
 import java.io.File
 import java.io.IOException
 import java.net.ServerSocket
-
+//TODO. need to add pinger (http/psql) and notify on failure
 class AnalysisHostProcess(private val application: Application) {
     private val logger = Logger.getInstance(javaClass)
     private val retryAction = RetryAction(this)

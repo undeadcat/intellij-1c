@@ -7,14 +7,22 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
+import com.simple1c.remote.RemoteException
 import coreUtils.equalsIgnoreCase
 import generated.*
 
+//TODO. don't complete where column is unexpected.
 class SchemaCompletionContributor(private val schemaStore: ISchemaStore) : CompletionContributor() {
     private val limit = 100
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
+        try {
+            doCompletion(parameters, result)
+        } catch (e: RemoteException) {
+        }
+    }
 
+    private fun doCompletion(parameters: CompletionParameters, result: CompletionResultSet) {
         val tableDeclarationPattern = PlatformPatterns.psiElement()
                 .inside(PlatformPatterns.psiElement(GeneratedTypes.TABLE_DECLARATION))
         val file = parameters.originalFile
