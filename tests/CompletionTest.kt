@@ -85,7 +85,7 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
     fun testHasDefinedAliases_IncludeInCompletion() {
         schemaStore.addColumns("Table", "Column1", "Column2")
         schemaStore.addColumns("Table2", "Column3")
-        testEquivalentTo("select * from Table t where <caret>", listOf("t", "Column1", "Column2"))
+        testEquivalentTo("select * from Table t where <caret>", listOf("t", "t.Column1", "t.Column2"))
         testEquivalentTo("select * from Table t where t.<caret>", listOf("Column1", "Column2"))
     }
 
@@ -146,7 +146,7 @@ WHERE table2Key in
                  (SELECT id
                   FROM table3 t3
                   WHERE id = t2.table3Key AND table1Key = t1.table3Key)
-        AND i<caret> )""", listOf("id1", "id2"))
+        AND i<caret> )""", listOf("t1.id1", "t2.id2"))
 
         testEquivalentTo("""SELECT *
 FROM table1 t1
@@ -156,7 +156,7 @@ WHERE table2Key in
        WHERE table3Key in
                  (SELECT id
                   FROM table3 t3
-                  WHERE id = t2.table3Key AND table1Key = i<caret> ))""", listOf("id3", "id2", "id1"))
+                  WHERE id = t2.table3Key AND table1Key = i<caret> ))""", listOf("t3.id3", "t2.id2", "t1.id1"))
     }
 
     fun testCannotReferToTableUsedInSubqueryOutsideScope() {
@@ -165,14 +165,13 @@ WHERE table2Key in
         testEquivalentTo("select * from " +
                 "table1 t1 " +
                 "where table1Column in (select id2 from table2 t2) " +
-                "and <caret>", listOf("t1", "id1", "table1Column"))
+                "and <caret>", listOf("t1", "t1.id1", "t1.table1Column"))
 
     }
 
-    fun testSelectFromSubquery_NamesMustBeQualifiedWithAlias() {
+    fun testSelectFromSubquery_SuggestNamesQualifiedWithAlias() {
         schemaStore.addColumns("table2", "a", "b", "c")
-        //TODO. should suggest qualified column names: t.alias1, t.alias2
-        testEquivalentTo("select * from (select a as alias1, b as alias2 from table2) t where <caret>", listOf("t"))
+        testEquivalentTo("select * from (select a as alias1, b as alias2 from table2) t where <caret>", listOf("t", "t.alias1", "t.alias2"))
         testEquivalentTo("select * from (select a as alias1, b as alias2 from table2) t where t.<caret>", listOf("alias1", "alias2"))
     }
 

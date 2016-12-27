@@ -4,39 +4,38 @@ import com.intellij.psi.util.PsiTreeUtil
 import generated.*
 import java.util.*
 
-data class QueryContext(
-        private val tables: ArrayList<TableSchema> = arrayListOf(),
-        private val subqueries: ArrayList<TableSchema> = arrayListOf(),
-        private val aliases: HashMap<String, String> = hashMapOf(),
+sealed class QuerySource(val schema: TableSchema) {
+    class Table(val alias: String?, schema: TableSchema) : QuerySource(schema)
+    class Subquery(schema: TableSchema) : QuerySource(schema)
+}
+
+data class QueryContext private constructor(
+        private val sources: ArrayList<QuerySource> = arrayListOf(),
         private val parent: QueryContext? = null) {
 
-    fun child(): QueryContext {
-        return QueryContext(parent = this)
+    private fun child(): QueryContext {
+        return QueryContext(sources = arrayListOf(), parent = this)
     }
 
-    fun resolve(tableName: String): TableSchema? {
-        return subqueries.firstOrNull { it.name == tableName }
-                ?: tables.firstOrNull { it.name == aliases[tableName] ?: tableName }
-                ?: parent?.resolve(tableName)
+    fun resolve(name: String): TableSchema? {
+        return sources.firstOrNull {
+            when (it) {
+                is QuerySource.Table -> it.alias == name || it.schema.name == name
+                is QuerySource.Subquery -> it.schema.name == name
+            }
+        }?.schema ?: parent?.resolve(name)
     }
 
-    fun getUsedTables(): Iterable<String> {
-        return tables.map { it.name }.plus(parent?.getUsedTables() ?: emptyList())
-    }
-
-    fun getIntroducedNames(): Iterable<String> {
-        return aliases.keys.plus(subqueries.map { it.name }).plus(parent?.getIntroducedNames() ?: emptyList())
+    fun getSources(): List<QuerySource> {
+        return sources.plus(parent?.getSources() ?: emptyList())
     }
 
     private fun registerSubquery(schema: TableSchema) {
-        subqueries.add(schema)
+        sources.add(QuerySource.Subquery(schema))
     }
 
     private fun registerTable(schema: TableSchema, alias: String?) {
-        tables.add(schema)
-        if (alias != null) {
-            aliases[alias] = schema.name
-        }
+        sources.add(QuerySource.Table(alias, schema))
     }
 
     companion object {
@@ -84,9 +83,8 @@ data class QueryContext(
                         .selectStatement
                         .selectionList!!
                 val columns = if (selectList.isSelectAll()) {
-                    subqueryContext.getUsedTables()
-                            .plus(subqueryContext.subqueries.map { it.name })
-                            .flatMap { subqueryContext.resolve(it)?.properties ?: emptyList() }
+                    subqueryContext.sources
+                            .flatMap { it.schema.properties }
                 } else {
                     selectList.selectionItemList
                             .map { it.alias?.text ?: extractColumnNameFromExpressionOrNull(it.expression) }
@@ -115,5 +113,4 @@ data class QueryContext(
 
         }
     }
-
 }

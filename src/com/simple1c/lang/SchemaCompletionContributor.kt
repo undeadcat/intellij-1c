@@ -23,21 +23,39 @@ class SchemaCompletionContributor(private val schemaStore: ISchemaStore) : Compl
             return
         }
 
-        val path = getPath(result.prefixMatcher.prefix)
+        val pathSegments = getPathSegments(result.prefixMatcher.prefix)
+        val localPath = pathSegments.lastOrNull().orEmpty()
         val sqlQuery = PsiTreeUtil.getParentOfType(parameters.position, SqlQuery::class.java)
         if (sqlQuery == null)
             return
         val context = QueryContext.createForQuery(sqlQuery, { schemaStore.getSchemaOrNull(file, it) })
 
-        if (!path.tableSegments.isEmpty()) {
-            addElements(evaluatePath(file, schemaStore, context, path.tableSegments).asSequence(), path.localPath, result)
-        } else if (context.getUsedTables().any() || context.getIntroducedNames().any()) {
-            val candidates = context.getIntroducedNames().asSequence().plus(getColumnNames(file, schemaStore, context.getUsedTables()))
-            addElements(candidates, path.localPath, result)
+        if (pathSegments.size > 1) {
+            addElements(evaluatePath(file, schemaStore, context, pathSegments).asSequence(), localPath, result)
+            return
+        }
+        if (context.getSources().any()) {
+            fun getQualifier(querySource: QuerySource): String? {
+                return when (querySource) {
+                    is QuerySource.Table -> querySource.alias
+                    is QuerySource.Subquery -> querySource.schema.name
+                }
+            }
+
+            val partitioned = context.getSources().partition { getQualifier(it) != null }
+            val qualifiedSuggestions = partitioned.first.flatMap { source ->
+                source.schema.properties.map { getQualifier(source) + "." + it.name }
+            }
+            val unqualifiedSuggestions = partitioned.second.flatMap { it.schema.properties }.map { it.name }
+            addElements(qualifiedSuggestions
+                    .plus(unqualifiedSuggestions)
+                    .plus(partitioned.first.map(::getQualifier).filterNotNull())
+                    .asSequence(), localPath, result)
+
         } else {
             val tables = schemaStore.getTables(file)
             val candidates = getColumnNames(file, schemaStore, schemaStore.getTables(file)).plus(tables)
-            addElements(candidates, path.localPath, result)
+            addElements(candidates, localPath, result)
         }
     }
 
@@ -49,55 +67,47 @@ class SchemaCompletionContributor(private val schemaStore: ISchemaStore) : Compl
         addStrings(columns.take(limit).toList(), result.withPrefixMatcher(prefix))
     }
 
-    private fun evaluatePath(file: PsiFile, schemaStore: ISchemaStore, context: QueryContext, tableSegments: List<String>): List<String> {
+    private fun evaluatePath(file: PsiFile, schemaStore: ISchemaStore, context: QueryContext, path: List<String>): List<String> {
         fun evalChildPath(segments: List<String>, schema: TableSchema): List<PropertyInfo> {
-            val first = segments.firstOrNull()
-            if (first == null)
-                return schema.properties
-            val remaining = segments.subList(1, segments.size)
+            val first = segments.firstOrNull().orEmpty()
+            val remainingPath = segments.subList(1, segments.size)
+            if (remainingPath.isEmpty())
+                return schema.properties.filter { it.name.startsWith(first, true) }
             return schema.properties.filter { it.name.equalsIgnoreCase(first) }
-                    .flatMap {
-                        it.referencedTables.flatMap {
-                            val childSchema = schemaStore.getSchemaOrNull(file, it)
-                            if (childSchema != null)
-                                evalChildPath(remaining, childSchema)
-                            else emptyList()
-                        }
-                    }
+                    .flatMap { it.referencedTables }
+                    .flatMap { childTable ->
+                        val childSchema = schemaStore.getSchemaOrNull(file, childTable)
+                        if (childSchema != null)
+                            evalChildPath(remainingPath, childSchema)
+                        else emptyList()
+                     }
         }
 
-        val candidateNames = tableSegments.withIndex().map { tableSegments.take(it.index + 1) }
+        if (path.isEmpty())
+            throw RuntimeException("Expected non-empty path")
+
+        val candidateNames = path.withIndex().map { path.take(it.index + 1) }
         val rootTable = candidateNames
                 .map { Pair(it, context.resolve(it.joinToString("."))) }
                 .filter { it.second != null }
                 .firstOrNull()
         if (rootTable != null) {
-            val localPath = tableSegments.subList(rootTable.first.size, tableSegments.size)
-            return evalChildPath(localPath, rootTable.second!!).map { it.name }
+            val rootSchema = rootTable.second!!
+            val tablePath = path.subList(rootTable.first.size, path.size)
+            return evalChildPath(tablePath, rootSchema).map { it.name }
         }
-        if (tableSegments.isEmpty())
-            return emptyList()
-        return context.getUsedTables()
-                .map { context.resolve(it) }
-                .filterNotNull()
-                .flatMap { evalChildPath(tableSegments, it) }
+        return context.getSources()
+                .flatMap { evalChildPath(path, it.schema) }
                 .map { it.name }
 
     }
 
-    private fun getPath(prefix: String): Path {
-        val lastDot = prefix.lastIndexOf('.')
-        if (lastDot < 0)
-            return Path(emptyList(), prefix)
-        val tableSegments = prefix.substring(0, lastDot)
-        val localPath = if (lastDot < prefix.length - 1) prefix.substring(lastDot + 1) else ""
-        return Path(tableSegments.split('.'), localPath)
+    private fun getPathSegments(prefix: String): List<String> {
+        return prefix.split('.').map(String::trim)
     }
 
     private fun addStrings(strings: Iterable<String>, result: CompletionResultSet) {
         result.addAllElements(strings.map { LookupElementBuilder.create(it) })
     }
-
-    private data class Path(val tableSegments: List<String>, val localPath: String)
 }
 
