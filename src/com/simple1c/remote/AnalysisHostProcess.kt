@@ -7,7 +7,6 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.Application
-import com.intellij.openapi.components.ApplicationComponent
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.Disposer
 import coreUtils.formatStacktrace
@@ -16,6 +15,7 @@ import org.apache.commons.lang.SystemUtils
 import java.io.File
 import java.io.IOException
 import java.net.ServerSocket
+
 //TODO. need to add pinger (http/psql) and notify on failure
 class AnalysisHostProcess(private val application: Application) {
     private val logger = Logger.getInstance(javaClass)
@@ -30,7 +30,7 @@ class AnalysisHostProcess(private val application: Application) {
 
     fun getTransport(): HttpTransport {
         val myHandle = ensureInitialized()
-        if (myHandle == null)
+        if (myHandle == null || myHandle.port == null)
             throw RuntimeException("AnalysisHostProcess is not initialized")
 
         return HttpTransport(myHandle.port)
@@ -47,7 +47,7 @@ class AnalysisHostProcess(private val application: Application) {
             createProcess()
         })
         handle = myHandle
-        return myHandle;
+        return myHandle
     }
 
     private fun createProcess(): Handle? {
@@ -95,7 +95,7 @@ StackTrace: $stacktrace"""
             notification.addAction(retryAction)
             Notifications.Bus.notify(notification)
             currentNotifications.add(notification)
-            return null
+            return Handle(null, null)
         }
     }
 
@@ -128,5 +128,5 @@ StackTrace: $stacktrace"""
         }
     }
 
-    private class Handle(val process: Process, val port: Int)
+    private class Handle(val process: Process?, val port: Int?)
 }

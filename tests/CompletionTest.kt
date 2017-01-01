@@ -2,32 +2,14 @@ import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.codeInsight.lookup.impl.LookupImpl
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.Result
 import com.intellij.openapi.command.WriteCommandAction
-import com.intellij.psi.PsiFile
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
-import com.simple1c.configuration.ProjectService
-import com.simple1c.lang.ISchemaStore
 import com.simple1c.lang.PropertyInfo
-import com.simple1c.lang.TableSchema
 import org.hamcrest.core.Is
 import org.junit.Assert
-import org.picocontainer.MutablePicoContainer
 
 //todo. TableSection. Do I need to do anything?
-class CompletionTest : LightCodeInsightFixtureTestCase() {
-
-    companion object {
-        private val schemaStore = FakeSchemaStore()
-    }
-
-    override fun setUp() {
-        super.setUp()
-        registerImplementation(schemaStore, ISchemaStore::class.java)
-        schemaStore.clear()
-    }
-
+class CompletionTest : ContainerTestBase() {
     fun testCompleteTableNames() {
         schemaStore.addColumns("Table1", "TColumn1")
         schemaStore.addColumns("Table2")
@@ -36,7 +18,7 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         testEquivalentTo("select * from Tab<caret>", listOf("Table1", "Table2"))
     }
 
-    fun testAcceptColumnCompletion_Bug(){
+    fun testAcceptColumnCompletion_Bug() {
         schemaStore.addColumns("Table", "Col1", "Col2")
         selectElement(getLookupElements("select <caret> from Table").first())
         myFixture.checkResult("select Col1 from Table")
@@ -67,7 +49,7 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         testEquivalentTo("select * from Table1 t where d.<caret>", emptyList())
     }
 
-    fun testCompleteAlias_InsertPeriod(){
+    fun testCompleteAlias_InsertPeriod() {
         schemaStore.addColumns("Table1", "Column1")
         selectElement(getLookupElements("select * from Table1 t where <caret>").first { it.lookupString.orEmpty() == "t" })
         myFixture.checkResult("select * from Table1 t where t.")
@@ -83,7 +65,7 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
     fun testHasDefinedAliases_IncludeAliasQualifiedNames() {
         schemaStore.addColumns("Table1", "Column1", "Column2")
         schemaStore.addColumns("Table2", "Column3")
-        testOrdered("select * from Table1 t left join Table2 t2 on t1.Column1 = t2.Column2 where <caret>", listOf("t.Column1", "t.Column2","t2.Column3", "t", "t2", "Table1", "Table2"))
+        testOrdered("select * from Table1 t left join Table2 t2 on t1.Column1 = t2.Column2 where <caret>", listOf("t.Column1", "t.Column2", "t2.Column3", "t", "t2", "Table1", "Table2"))
         testOrdered("select * from Table1 t left join Table2 t2 on t1.Column1 = t2.Column2 where t.<caret>", listOf("Column1", "Column2"))
     }
 
@@ -113,10 +95,9 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
                 PropertyInfo("Имя", emptyList()),
                 PropertyInfo("Отчество", emptyList()))
         testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет d where d.<caret>", listOf("Контрагент"))
-        testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет d where d.Контрагент.<caret>", listOf("Владелец", "ИНН", "Фамилия", "Имя", "Отчество"))
-        testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет d where d.Контрагент.Владелец.<caret>", listOf("Владелец", "ИНН"))
+        testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет d where D.КоНТрагент.<caret>", listOf("Владелец", "ИНН", "Фамилия", "Имя", "Отчество"))
+        testEquivalentTo("select * from ДокумеНТ.ПоступлениеНаРасчетныйСчет d where d.Контрагент.ВЛаделец.<caret>", listOf("Владелец", "ИНН"))
     }
-
 
     fun testNestedTableWithQualifiedName() {
         schemaStore.addColumns("Документ.ПоступлениеНаРасчетныйСчет",
@@ -126,7 +107,14 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет d where Документ.ПоступлениеНаРасчетныйСчет.Контрагент.<caret>", listOf("ИНН"))
     }
 
-    fun testFullyQualifiedName_Bug(){
+    fun testNestedTableWithSelfReference(){
+        schemaStore.addColumns("Справочник.Контрагенты",
+                PropertyInfo("Ссылка", listOf("Справочник.Контрагенты")),
+                PropertyInfo("ИНН", emptyList()))
+        testEquivalentTo("select * from Справочник.Контрагенты d where d.СсЫЛКА.Ссылка.<caret>", listOf("ИНН", "Ссылка"))
+    }
+
+    fun testFullyQualifiedName_Bug() {
         schemaStore.addColumns("Справочник.Контрагенты",
                 PropertyInfo("ИНН", emptyList()))
 
@@ -236,47 +224,4 @@ WHERE table2Key in
 
         }.execute()
     }
-
-    private fun <T> registerImplementation(implementation: T, interfaceClazz: Class<T>) {
-        val container = getContainer(interfaceClazz)
-        container.unregisterComponent(interfaceClazz)
-        container.registerComponentInstance(interfaceClazz, implementation)
-    }
-
-    private fun <T> getContainer(interfaceClazz: Class<T>): MutablePicoContainer {
-        val container = if (interfaceClazz.getAnnotationsByType(ProjectService::class.java).any())
-            myFixture.project.picoContainer
-        else ApplicationManager.getApplication().picoContainer
-        return container as MutablePicoContainer
-    }
-
-    class FakeSchemaStore : ISchemaStore {
-        private val tables = hashMapOf<String, List<PropertyInfo>>()
-
-        override fun getSchemaOrNull(file: PsiFile, tableName: String): TableSchema {
-            return TableSchema(tableName, tables.getOrElse(tableName, { emptyList<PropertyInfo>() }))
-        }
-
-        override fun getTables(file: PsiFile): List<String> {
-            return tables.keys.toList()
-        }
-
-        fun addColumns(tableName: String) {
-            tables.put(tableName, emptyList<PropertyInfo>())
-        }
-
-        fun addColumns(tableName: String, vararg columns: PropertyInfo) {
-            tables.put(tableName, columns.toList())
-        }
-
-        fun addColumns(tableName: String, vararg columns: String) {
-            tables.put(tableName, columns.map { PropertyInfo(it, emptyList()) })
-        }
-
-        fun clear() {
-            tables.clear()
-        }
-    }
-
 }
-

@@ -21,6 +21,8 @@ class SchemaStore(private val analysisHost: AnalysisHostProcess,
     }
 
     override fun getSchemaOrNull(file: PsiFile, tableName: String): TableSchema? {
+        if (tableName.isEmpty())
+            throw RuntimeException("Assertion failure. Should not query for empty table name")
         if (!analysisHost.isAvailable())
             return null
         val dataSource = dataSourceAssociations.getOrNull(file)
@@ -29,8 +31,9 @@ class SchemaStore(private val analysisHost: AnalysisHostProcess,
         val request = TableSchemaRequest(dataSource.connectionString.format(), tableName)
         val result: TableMappingDto? = analysisHost.getTransport()
                 .invoke("tableMapping", request, TableMappingDto::class.java)
-        val props = result?.properties?.map { PropertyInfo(it.name, it.tables) } ?: emptyList()
-        return TableSchema(tableName, props)
+        if (result == null)
+            return null
+        return TableSchema(tableName, result.properties.map { PropertyInfo(it.name, it.tables) })
     }
 }
 

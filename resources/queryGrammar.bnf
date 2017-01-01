@@ -114,7 +114,7 @@ private having_expression ::= havingKeyword expression {
 topOpt ::= [topKeyword numberLiteral]
 
 private distinctOpt ::= distinctKeyword?
-alias ::= asKeyword? identifier { //TODO. trash.make private
+alias ::= asKeyword? identifier {
     methods = [
         asKeyword=""
     ]

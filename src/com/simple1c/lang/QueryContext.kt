@@ -1,6 +1,7 @@
 package com.simple1c.lang
 
 import com.intellij.psi.util.PsiTreeUtil
+import coreUtils.equalsIgnoreCase
 import generated.*
 import java.util.*
 
@@ -20,8 +21,8 @@ data class QueryContext private constructor(
     fun resolve(name: String): TableSchema? {
         return sources.firstOrNull {
             when (it) {
-                is QuerySource.Table -> it.alias == name || it.schema.name == name
-                is QuerySource.Subquery -> it.schema.name == name
+                is QuerySource.Table -> it.alias.orEmpty().equalsIgnoreCase(name) || it.schema.name.equalsIgnoreCase(name)
+                is QuerySource.Subquery -> it.schema.name.equalsIgnoreCase(name)
             }
         }?.schema ?: parent?.resolve(name)
     }

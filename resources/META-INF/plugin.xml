@@ -50,8 +50,8 @@
         <lang.syntaxHighlighterFactory language="1c"
                                        implementationClass="com.simple1c.lang._1cHighlighterFactory"/>
         <lang.commenter language="1c" implementationClass="com.simple1c.lang._1cCommenter"/>
-
         <lang.braceMatcher language="1c" implementationClass="com.simple1c.lang._1cBraceMatcher"/>
+        <annotator language="1c" implementationClass="com.simple1c.lang._1cAnnotator"/>
         <completion.contributor language="1c" implementationClass="com.simple1c.lang.SchemaCompletionContributor"/>
 
 
