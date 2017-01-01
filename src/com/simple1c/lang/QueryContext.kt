@@ -63,9 +63,13 @@ data class QueryContext private constructor(
                 val parent = current
                 val subqueryContext = QueryContext()
                 current = subqueryContext
-                super.visitSqlQuery(o.subquery.sqlQuery!!)
+                val query = o.subquery.sqlQuery
+                if (query != null)
+                    super.visitSqlQuery(query)
                 current = parent
-                current!!.registerSubquery(createSubquerySchema(o, subqueryContext))
+                val schema = createSubquerySchema(o, subqueryContext)
+                if (schema != null)
+                    current!!.registerSubquery(schema)
             }
 
             override fun visitSqlQuery(o: SqlQuery) {
@@ -78,10 +82,13 @@ data class QueryContext private constructor(
                 current = previous
             }
 
-            private fun createSubquerySchema(subquery: SubqueryTable, subqueryContext: QueryContext): TableSchema {
-                val selectList = subquery.subquery.sqlQuery!!
-                        .selectStatement
-                        .selectionList!!
+            private fun createSubquerySchema(subquery: SubqueryTable, subqueryContext: QueryContext): TableSchema? {
+                val query = subquery.subquery.sqlQuery
+                if (query == null)
+                    return null
+                val selectList = query.selectStatement.selectionList
+                if (selectList == null)
+                    return null
                 val columns = if (selectList.isSelectAll()) {
                     subqueryContext.sources
                             .flatMap { it.schema.properties }

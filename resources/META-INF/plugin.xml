@@ -49,7 +49,9 @@
         <lang.parserDefinition language="1c" implementationClass="com.simple1c.lang._1cParserDefinition"/>
         <lang.syntaxHighlighterFactory language="1c"
                                        implementationClass="com.simple1c.lang._1cHighlighterFactory"/>
+        <lang.commenter language="1c" implementationClass="com.simple1c.lang._1cCommenter"/>
 
+        <lang.braceMatcher language="1c" implementationClass="com.simple1c.lang._1cBraceMatcher"/>
         <completion.contributor language="1c" implementationClass="com.simple1c.lang.SchemaCompletionContributor"/>
 
 

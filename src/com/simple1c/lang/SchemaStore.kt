@@ -15,8 +15,9 @@ class SchemaStore(private val analysisHost: AnalysisHostProcess,
         if (dataSource == null)
             return emptyList()
         val request = TableListRequest(dataSource.connectionString.format())
-        return analysisHost.getTransport()
+        val result: TableListResult? = analysisHost.getTransport()
                 .invoke("listTables", request, TableListResult::class.java)
+        return result ?: emptyList()
     }
 
     override fun getSchemaOrNull(file: PsiFile, tableName: String): TableSchema? {
@@ -26,9 +27,9 @@ class SchemaStore(private val analysisHost: AnalysisHostProcess,
         if (dataSource == null)
             return null
         val request = TableSchemaRequest(dataSource.connectionString.format(), tableName)
-        val props = analysisHost.getTransport()
+        val result: TableMappingDto? = analysisHost.getTransport()
                 .invoke("tableMapping", request, TableMappingDto::class.java)
-                .properties.map { PropertyInfo(it.name, it.tables) }
+        val props = result?.properties?.map { PropertyInfo(it.name, it.tables) } ?: emptyList()
         return TableSchema(tableName, props)
     }
 }
