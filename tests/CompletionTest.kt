@@ -11,17 +11,10 @@ import com.simple1c.configuration.ProjectService
 import com.simple1c.lang.ISchemaStore
 import com.simple1c.lang.PropertyInfo
 import com.simple1c.lang.TableSchema
-import junit.framework.TestCase
 import org.hamcrest.core.Is
 import org.junit.Assert
 import org.picocontainer.MutablePicoContainer
 
-//TODO. Ordering.
-//      Have aliases -> first aliases, then columns
-//      No aliases -> first columns, then tables
-//TODO. do we need fully qualified names?
-
-//TODO. trigger completion before bracket.
 //todo. TableSection. Do I need to do anything?
 class CompletionTest : LightCodeInsightFixtureTestCase() {
 
@@ -63,7 +56,7 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         testEquivalentTo("select * from Table1 join <caret>", listOf("Table1", "Table2"))
     }
 
-    fun _testIdentifierStartsWithFullyQualifiedTable_ResolveColumnsFromTable() {
+    fun testIdentifierStartsWithFullyQualifiedTable_ResolveColumnsFromTable() {
         schemaStore.addColumns("Справочник.Сотрудники", "Column1")
         schemaStore.addColumns("Справочник.Контрагенты", "Column2")
         testEquivalentTo("select Справочник.Контрагенты.<caret> from Справочник.Сотрудники join Справочник.Контрагенты", listOf("Column2"))
@@ -82,21 +75,16 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         testEquivalentTo("select * from Table1 t1 where t1.A<caret>", listOf("Another1", "Another2"))
     }
 
-    fun testHasDefinedAliases_IncludeInCompletion() {
-        schemaStore.addColumns("Table", "Column1", "Column2")
+    fun testHasDefinedAliases_IncludeAliasQualifiedNames() {
+        schemaStore.addColumns("Table1", "Column1", "Column2")
         schemaStore.addColumns("Table2", "Column3")
-        testEquivalentTo("select * from Table t where <caret>", listOf("t", "t.Column1", "t.Column2"))
-        testEquivalentTo("select * from Table t where t.<caret>", listOf("Column1", "Column2"))
+        testOrdered("select * from Table1 t left join Table2 t2 on t1.Column1 = t2.Column2 where <caret>", listOf("t.Column1", "t.Column2","t2.Column3", "t", "t2", "Table1", "Table2"))
+        testOrdered("select * from Table1 t left join Table2 t2 on t1.Column1 = t2.Column2 where t.<caret>", listOf("Column1", "Column2"))
     }
 
-    fun testUnqualifiedColumnName_ResolveFromDefinedTables() {
+    fun testNoAliases_SuggestSimpleAndFullyQualifiedNames() {
         schemaStore.addColumns("Table1", "Column1")
-        schemaStore.addColumns("Table2", "Column2")
-        schemaStore.addColumns("Table3", "Column3")
-        testEquivalentTo("select * from Table1 " +
-                "left join Table2 on " +
-                "t1.Id = t2.Id " +
-                "where <caret>", listOf("Column1", "Column2"))
+        testOrdered("select * from Table1 where <caret>", listOf("Column1", "Table1.Column1", "Table1"))
     }
 
     fun testNestedTables() {
@@ -105,7 +93,7 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         schemaStore.addColumns("Справочник.Контрагенты",
                 PropertyInfo("Владелец", listOf("Справочник.Контрагенты")),
                 PropertyInfo("ИНН", emptyList()))
-        testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет where <caret>", listOf("Контрагент"))
+        testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет where <caret>", listOf("Контрагент", "Документ.ПоступлениеНаРасчетныйСчет.Контрагент", "Документ.ПоступлениеНаРасчетныйСчет"))
         testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет d where Контрагент.<caret>", listOf("Владелец", "ИНН"))
     }
 
@@ -131,6 +119,14 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
         schemaStore.addColumns("Справочник.Контрагенты",
                 PropertyInfo("ИНН", emptyList()))
         testEquivalentTo("select * from Документ.ПоступлениеНаРасчетныйСчет d where Документ.ПоступлениеНаРасчетныйСчет.Контрагент.<caret>", listOf("ИНН"))
+    }
+
+    fun testFullyQualifiedName_Bug(){
+        schemaStore.addColumns("Справочник.Контрагенты",
+                PropertyInfo("ИНН", emptyList()))
+
+        testEquivalentTo("select * from Справочник.Контрагенты where Справочник.Контрагенты<caret>", emptyList())
+        testEquivalentTo("select * from Справочник.Контрагенты where Справочник.Контрагенты.<caret>", listOf("ИНН"))
     }
 
     fun testSubqueryCanReferToItemsFromOuterQuery() {
@@ -165,7 +161,7 @@ WHERE table2Key in
         testEquivalentTo("select * from " +
                 "table1 t1 " +
                 "where table1Column in (select id2 from table2 t2) " +
-                "and <caret>", listOf("t1", "t1.id1", "t1.table1Column"))
+                "and <caret>", listOf("t1", "t1.id1", "t1.table1Column", "table1"))
 
     }
 
@@ -211,7 +207,7 @@ WHERE table2Key in
         Assert.assertThat(getLookupStrings(input).toSet(), Is.`is`(expected.toSet()))
     }
 
-    private fun testEqualTo(query: String, expected: List<String>) {
+    private fun testOrdered(query: String, expected: List<String>) {
         Assert.assertThat(getLookupStrings(query), Is.`is`(expected))
     }
 
