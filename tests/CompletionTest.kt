@@ -64,8 +64,13 @@ class CompletionTest : LightCodeInsightFixtureTestCase() {
 
     fun testCannotResolveAlias() {
         schemaStore.addColumns("Table1", "Column1")
-        schemaStore.addColumns("Table2", "Column2")
         testEquivalentTo("select * from Table1 t where d.<caret>", emptyList())
+    }
+
+    fun testCompleteAlias_InsertPeriod(){
+        schemaStore.addColumns("Table1", "Column1")
+        selectElement(getLookupElements("select * from Table1 t where <caret>").first { it.lookupString.orEmpty() == "t" })
+        myFixture.checkResult("select * from Table1 t where t.")
     }
 
     fun testNameStartsWithAlias_ResolveColumnsFromAliasedTable() {

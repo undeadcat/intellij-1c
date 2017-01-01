@@ -1,9 +1,7 @@
 package com.simple1c.lang
 
-import com.intellij.codeInsight.completion.CompletionContributor
-import com.intellij.codeInsight.completion.CompletionParameters
-import com.intellij.codeInsight.completion.CompletionResultSet
-import com.intellij.codeInsight.completion.CompletionService
+import com.intellij.codeInsight.AutoPopupController
+import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementWeigher
@@ -23,6 +21,14 @@ class SchemaCompletionContributor(private val schemaStore: ISchemaStore,
             return -(element.getUserData(priorityKey) ?: 0)
         }
     })
+
+    private val tableInsertHandler: InsertHandler<LookupElement> =
+            InsertHandler { insertionContext, t ->
+                insertionContext.document.insertString(insertionContext.selectionEndOffset, ".")
+                insertionContext.editor.caretModel.moveCaretRelatively(1, 0, false, false, false)
+                AutoPopupController.getInstance(insertionContext.project).autoPopupMemberLookup(insertionContext.editor, null)
+            }
+
     private val priorityKey = Key<Int>("1c.completion.priority")
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
@@ -77,9 +83,10 @@ class SchemaCompletionContributor(private val schemaStore: ISchemaStore,
                 }
             }
             sortedResultSet.addAllElements(aliasedSuggestions.map { toLookupElement(it, Priority.ColumnWithAlias) })
-            sortedResultSet.addAllElements(unqualifiedSuggestions.map { toLookupElement(it.name, Priority.Column) } )
-            sortedResultSet.addAllElements(qNameSuggestions.map { toLookupElement(it, Priority.ColumnWithQName) } )
-            sortedResultSet.addAllElements(aliases.plus(tableNames).filterNotNull().map { toLookupElement(it, Priority.Table) })
+            sortedResultSet.addAllElements(unqualifiedSuggestions.map { toLookupElement(it.name, Priority.Column) })
+            sortedResultSet.addAllElements(qNameSuggestions.map { toLookupElement(it, Priority.ColumnWithQName) })
+            sortedResultSet.addAllElements(aliases.plus(tableNames).filterNotNull()
+                    .map { withPriority(LookupElementBuilder.create(it).withInsertHandler(tableInsertHandler), Priority.Table) })
 
         } else {
             val tables = schemaStore.getTables(file)
@@ -138,10 +145,14 @@ class SchemaCompletionContributor(private val schemaStore: ISchemaStore,
     private fun toLookupElement(name: String, priority: Priority? = null): LookupElementBuilder {
         val builder = LookupElementBuilder.create(name)
         if (priority != null)
-            builder.putUserData(priorityKey, priority.value)
+            return withPriority(builder, priority)
         return builder
     }
 
+    private fun withPriority(builder: LookupElementBuilder, priority: Priority): LookupElementBuilder {
+        builder.putUserData(priorityKey, priority.value)
+        return builder
+    }
 
     private enum class Priority(val value: Int) {
         ColumnWithAlias(10),
