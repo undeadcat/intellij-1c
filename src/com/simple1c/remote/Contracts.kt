@@ -1,5 +1,6 @@
 package com.simple1c.remote
 
+import com.simple1c.lang.TableType
 import java.util.*
 
 
@@ -20,6 +21,6 @@ class TableListResult : ArrayList<String>()
 
 data class TableSchemaRequest(var connectionString: String, var tableName: String)
 
-data class TableMappingDto(var name: String, var properties: List<PropertyDto>)
+data class TableMappingDto(var name: String, var properties: List<PropertyDto>, var type: TableType?)
 
 data class PropertyDto(var name: String, var tables: List<String>)

@@ -5,10 +5,11 @@ import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.openapi.application.Result
 import com.intellij.openapi.command.WriteCommandAction
 import com.simple1c.lang.PropertyInfo
+import com.simple1c.lang.TableSchema
+import com.simple1c.lang.TableType
 import org.hamcrest.core.Is
 import org.junit.Assert
 
-//todo. TableSection. Do I need to do anything?
 class CompletionTest : ContainerTestBase() {
     fun testCompleteTableNames() {
         schemaStore.addColumns("Table1", "TColumn1")
@@ -194,6 +195,16 @@ WHERE table2Key in
 
     fun testTriggerDotCompletionOnPrimitiveColumn() {
         testEquivalentTo("select * from Справочник.Контрагенты c where c.ИНН.<caret>", emptyList())
+    }
+
+    fun testTableSection() {
+        schemaStore.addTable(TableSchema("Documents.Section", listOf(PropertyInfo("TableSectionColumn")), TableType.TableSection))
+        schemaStore.addColumns("Documents",
+                PropertyInfo("Ссылка", listOf("Documents")),
+                PropertyInfo("MainColumn"))
+        testEquivalentTo("select * from Documents.Section where <caret>",
+                listOf("TableSectionColumn", "Documents.Section.TableSectionColumn", "Documents.Section"))
+        testEquivalentTo("select * from Documents.Section where Ссылка.<caret>", listOf("MainColumn", "Ссылка"))
     }
 
     private fun testEquivalentTo(input: String, expected: List<String>) {

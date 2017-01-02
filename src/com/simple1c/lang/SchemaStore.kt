@@ -33,9 +33,6 @@ class SchemaStore(private val analysisHost: AnalysisHostProcess,
                 .invoke("tableMapping", request, TableMappingDto::class.java)
         if (result == null)
             return null
-        return TableSchema(tableName, result.properties.map { PropertyInfo(it.name, it.tables) })
+        return TableSchema(tableName, result.properties.map { PropertyInfo(it.name, it.tables) }, result.type!!)
     }
 }
-
-class TableSchema(val name: String, val properties: List<PropertyInfo>)
-

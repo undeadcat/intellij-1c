@@ -99,7 +99,7 @@ data class QueryContext private constructor(
                             .filterNotNull()
                             .map { PropertyInfo(it, emptyList()) }
                 }
-                return TableSchema(subquery.alias!!.text, columns)
+                return TableSchema(subquery.alias!!.text, columns, TableType.Main)
             }
         }
 

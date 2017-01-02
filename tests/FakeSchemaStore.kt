@@ -2,6 +2,7 @@ import com.intellij.psi.PsiFile
 import com.simple1c.lang.ISchemaStore
 import com.simple1c.lang.PropertyInfo
 import com.simple1c.lang.TableSchema
+import com.simple1c.lang.TableType
 
 class FakeSchemaStore : ISchemaStore {
     private val tables = hashMapOf<String, TableSchema>()
@@ -14,6 +15,10 @@ class FakeSchemaStore : ISchemaStore {
 
     override fun getTables(file: PsiFile): List<String> {
         return tables.values.map { it.name }
+    }
+
+    fun addTable(tableSchema: TableSchema) {
+        tables[tableSchema.name.toLowerCase()] = tableSchema
     }
 
     fun addColumns(tableName: String) {
@@ -29,7 +34,7 @@ class FakeSchemaStore : ISchemaStore {
     }
 
     private fun doAddColumns(tableName: String, columns: List<PropertyInfo>) {
-        tables.put(tableName.toLowerCase(), TableSchema(tableName, columns))
+        addTable(TableSchema(tableName, columns, TableType.Main))
     }
 
     fun clear() {

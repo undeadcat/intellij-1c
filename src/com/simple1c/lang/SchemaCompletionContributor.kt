@@ -13,6 +13,7 @@ import generated.*
 
 //TODO. don't complete where column is unexpected.
 class SchemaCompletionContributor(private val schemaStore: ISchemaStore,
+                                  private val pathEvaluator: PathEvaluator,
                                   completionService: CompletionService) : CompletionContributor() {
     private val relevanceSorter = completionService.emptySorter().weigh(object : LookupElementWeigher("priority") {
         override fun weigh(element: LookupElement): Comparable<Int> {
@@ -54,7 +55,7 @@ class SchemaCompletionContributor(private val schemaStore: ISchemaStore,
         val context = QueryContext.createForQuery(sqlQuery, { schemaStore.getSchemaOrNull(file, it) })
 
         if (pathSegments.size > 1) {
-            sortedResultSet.addAllElements(evaluatePath(file, schemaStore, context, pathSegments).map { toLookupElement(it) })
+            sortedResultSet.addAllElements(pathEvaluator.eval(file, context, pathSegments).map { toLookupElement(it) })
             return
         }
         if (context.getSources().any()) {

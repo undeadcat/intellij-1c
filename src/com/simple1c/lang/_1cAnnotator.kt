@@ -7,16 +7,19 @@ import com.intellij.psi.util.*
 import com.simple1c.remote.RemoteException
 import generated.*
 
-class _1cAnnotator(val schemaStore: ISchemaStore) : Annotator {
+//todo. need to log exceptions to console.
+class _1cAnnotator(private val pathEvaluator: PathEvaluator,
+                   private val schemaStore: ISchemaStore) : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         try {
-            element.accept(AnnotatingVisitor(holder, schemaStore))
+            element.accept(AnnotatingVisitor(holder, pathEvaluator, schemaStore))
         } catch (e: RemoteException) {
 
         }
     }
 
     class AnnotatingVisitor(private val annotationHolder: AnnotationHolder,
+                            private val pathEvaluator: PathEvaluator,
                             private val schemaStore: ISchemaStore) : generated.Visitor() {
         override fun visitIdentifier(o: Identifier) {
             if (PsiTreeUtil.getParentOfType(o, Alias::class.java) != null)
@@ -30,10 +33,10 @@ class _1cAnnotator(val schemaStore: ISchemaStore) : Annotator {
             val text = o.text
             if (PsiTreeUtil.getParentOfType(o, TableDeclaration::class.java) != null) {
                 if (context.resolve(text) == null)
-                    annotationHolder.createWarningAnnotation(o, "Could not resolve table by name '${text}'")
+                    annotationHolder.createWarningAnnotation(o, "Could not resolve table by name '$text'")
             } else {
                 val pathSegments = text.split(".").map(String::trim)
-                if (evaluatePath(o.containingFile, schemaStore, context, pathSegments).isEmpty())
+                if (pathEvaluator.eval(o.containingFile, context, pathSegments).isEmpty())
                     annotationHolder.createWarningAnnotation(o, "Could not resolve identifier by name $text")
             }
         }
