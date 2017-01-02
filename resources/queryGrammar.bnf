@@ -69,7 +69,7 @@
     number = 'regexp:\d+'
     bool = 'regexp:true|false|истина|ложь'
     null = 'null'
-    ID_TOKEN = 'regexp:([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*)(\.([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*))*'
+    ID_TOKEN = 'regexp:([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789_]*)(\.([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*))*'
     string = "regexp:(\"([^\"\\]|\\\"|\\)*\")"
     line_comment = 'regexp://.*'
   ]
@@ -282,16 +282,18 @@ aggregateExpression ::= aggregationFunction LPAREN (ASTERISK | distinctOpt expre
     pin = 2
 }
 
-queryFunctionExpression ::= identifier LPAREN expressionList RPAREN {
-    pin = 2
+//query functions
+queryFunctionExpression ::= identifier LPAREN argumentList RPAREN {
+//    pin = 2 //TODO. doesn't work here
     methods = [
         FunctionName = "identifier"
         arguments = "expressionList"
     ]
 }
+argumentList ::= expressionList?
 
 inExpression ::= expression OP_IN (LPAREN expressionList RPAREN | subquery) {
-    pin = 2
+//    pin = 2 //TODO. doesn't work here
     methods = [
         OP_IN = ""
     ]

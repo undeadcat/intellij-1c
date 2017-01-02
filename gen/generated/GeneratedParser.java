@@ -26,6 +26,9 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     if (type == ALIAS) {
       result = alias(builder, 0);
     }
+    else if (type == ARGUMENT_LIST) {
+      result = argumentList(builder, 0);
+    }
     else if (type == CASE_ELEMENT) {
       result = caseElement(builder, 0);
     }
@@ -111,6 +114,16 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
   private static boolean alias_0(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "alias_0")) return false;
     consumeToken(builder, ASKEYWORD);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // expressionList?
+  public static boolean argumentList(PsiBuilder builder, int level) {
+    if (!recursion_guard_(builder, level, "argumentList")) return false;
+    Marker marker = enter_section_(builder, level, _NONE_, ARGUMENT_LIST, "<argument list>");
+    expressionList(builder, level + 1);
+    exit_section_(builder, level, marker, true, false, null);
     return true;
   }
 
@@ -954,13 +967,13 @@ public class GeneratedParser implements PsiParser, LightPsiParser {
     return result;
   }
 
-  // LPAREN expressionList RPAREN
+  // LPAREN argumentList RPAREN
   private static boolean queryFunctionExpression_0(PsiBuilder builder, int level) {
     if (!recursion_guard_(builder, level, "queryFunctionExpression_0")) return false;
     boolean result;
     Marker marker = enter_section_(builder);
     result = consumeTokenSmart(builder, LPAREN);
-    result = result && expressionList(builder, level + 1);
+    result = result && argumentList(builder, level + 1);
     result = result && consumeToken(builder, RPAREN);
     exit_section_(builder, marker, null, result);
     return result;

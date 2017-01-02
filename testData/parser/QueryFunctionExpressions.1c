@@ -1,0 +1,3 @@
+select * from Table where year(now()) = year(Column);
+
+select date_trunc(Column) from Table;

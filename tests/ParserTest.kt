@@ -28,7 +28,7 @@ class ParserTest : ParsingTestCase("parser", "1c", _1cParserDefinition()) {
         doTest(true)
     }
 
-    fun testCanSeparateQueriesWithNewLine(){
+    fun testCanSeparateQueriesWithNewLine() {
         doTest(true)
     }
 
@@ -81,6 +81,10 @@ class ParserTest : ParsingTestCase("parser", "1c", _1cParserDefinition()) {
     }
 
     fun testIncludeIncompleteOptionalClausesInParseTree() {
+        doTest(true)
+    }
+
+    fun testQueryFunctionExpressions() {
         doTest(true)
     }
 

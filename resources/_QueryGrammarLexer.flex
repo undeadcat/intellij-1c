@@ -2,6 +2,10 @@ package generated;
 
 import com.intellij.lexer.*;
 import com.intellij.psi.tree.IElementType;
+import org.intellij.grammar.psi.BnfTypes;
+
+import static com.intellij.psi.TokenType.BAD_CHARACTER;
+import static com.intellij.psi.TokenType.WHITE_SPACE;
 import static generated.GeneratedTypes.*;
 
 %%
@@ -55,13 +59,13 @@ ENDKEYWORD=end|конец
 WHITE_SPACE=[\s]+
 NUMBER=[0-9]+
 BOOL=true|false|истина|ложь
-ID_TOKEN=([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*)(\.([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*))*
+ID_TOKEN=([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789_]*)(\.([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0123456789]*))*
 STRING=(\"([^\"\\]|\\\"|\\)*\")
 LINE_COMMENT="//".*
 
 %%
 <YYINITIAL> {
-  {WHITE_SPACE}              { return com.intellij.psi.TokenType.WHITE_SPACE; }
+  {WHITE_SPACE}              { return WHITE_SPACE; }
 
   "*"                        { return ASTERISK; }
   "."                        { return DOT; }
@@ -122,4 +126,4 @@ LINE_COMMENT="//".*
 
 }
 
-[^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+[^] { return BAD_CHARACTER; }

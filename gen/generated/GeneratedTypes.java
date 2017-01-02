@@ -10,6 +10,7 @@ public interface GeneratedTypes {
 
   IElementType AGGREGATE_EXPRESSION = new _1cElementType("AGGREGATE_EXPRESSION");
   IElementType ALIAS = new _1cElementType("ALIAS");
+  IElementType ARGUMENT_LIST = new _1cElementType("ARGUMENT_LIST");
   IElementType BINARY_EXPRESSION = new _1cElementType("BINARY_EXPRESSION");
   IElementType BOOL_LITERAL = new _1cElementType("BOOL_LITERAL");
   IElementType CASE_ELEMENT = new _1cElementType("CASE_ELEMENT");
@@ -102,6 +103,9 @@ public interface GeneratedTypes {
       }
       else if (type == ALIAS) {
         return new AliasImpl(node);
+      }
+      else if (type == ARGUMENT_LIST) {
+        return new ArgumentListImpl(node);
       }
       else if (type == BINARY_EXPRESSION) {
         return new BinaryExpressionImpl(node);

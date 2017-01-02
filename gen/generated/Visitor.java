@@ -15,6 +15,10 @@ public class Visitor extends PsiElementVisitor {
     visit_1cElement(o);
   }
 
+  public void visitArgumentList(@NotNull ArgumentList o) {
+    visit_1cElement(o);
+  }
+
   public void visitBinaryExpression(@NotNull BinaryExpression o) {
     visitExpression(o);
   }

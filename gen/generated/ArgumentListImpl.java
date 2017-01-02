@@ -8,15 +8,16 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static generated.GeneratedTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 
-public class QueryFunctionExpressionImpl extends ExpressionImpl implements QueryFunctionExpression {
+public class ArgumentListImpl extends ASTWrapperPsiElement implements ArgumentList {
 
-  public QueryFunctionExpressionImpl(ASTNode node) {
+  public ArgumentListImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull Visitor visitor) {
-    visitor.visitQueryFunctionExpression(this);
+    visitor.visitArgumentList(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -25,15 +26,9 @@ public class QueryFunctionExpressionImpl extends ExpressionImpl implements Query
   }
 
   @Override
-  @NotNull
-  public ArgumentList getArgumentList() {
-    return findNotNullChildByClass(ArgumentList.class);
-  }
-
-  @Override
-  @NotNull
-  public Identifier getFunctionName() {
-    return findNotNullChildByClass(Identifier.class);
+  @Nullable
+  public ExpressionList getExpressionList() {
+    return findChildByClass(ExpressionList.class);
   }
 
 }
