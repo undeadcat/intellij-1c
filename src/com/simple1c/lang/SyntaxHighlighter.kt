@@ -5,8 +5,6 @@ import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
@@ -14,11 +12,6 @@ import generated.GeneratedTypes
 import generated._QueryGrammarLexer
 
 internal class SyntaxHighlighter : com.intellij.openapi.fileTypes.SyntaxHighlighter {
-
-    private val Error = arrayOf(HighlighterColors.BAD_CHARACTER)
-    private val Comment = arrayOf(DefaultLanguageHighlighterColors.LINE_COMMENT)
-
-    private val KeywordHighlight = arrayOf(DefaultLanguageHighlighterColors.KEYWORD)
     private val KeywordsSet = TokenSet.create(GeneratedTypes.ALLKEYWORD,
             GeneratedTypes.ASCKEYWORD,
             GeneratedTypes.ASKEYWORD,
@@ -41,24 +34,38 @@ internal class SyntaxHighlighter : com.intellij.openapi.fileTypes.SyntaxHighligh
             GeneratedTypes.UNIONKEYWORD,
             GeneratedTypes.WHEREKEYWORD,
             GeneratedTypes.ПОKEYWORD)
+    private val wordOperatorsTokenSet = TokenSet.create(GeneratedTypes.OP_AND, GeneratedTypes.OP_IN, GeneratedTypes.OP_IS,
+            GeneratedTypes.OP_LIKE, GeneratedTypes.OP_NOT, GeneratedTypes.OP_OR)
 
-    private val Identifier = arrayOf(DefaultLanguageHighlighterColors.IDENTIFIER)
+    private val errorAttributes = arrayOf(HighlighterColors.BAD_CHARACTER)
+    private val commentAttributes = arrayOf(DefaultLanguageHighlighterColors.LINE_COMMENT)
+    private val keywordAttributes = arrayOf(DefaultLanguageHighlighterColors.KEYWORD)
+    private val identifierAttributes = arrayOf(DefaultLanguageHighlighterColors.IDENTIFIER)
+    private val stringAttributes = arrayOf(DefaultLanguageHighlighterColors.STRING)
+    private val numberAttributes = arrayOf(DefaultLanguageHighlighterColors.NUMBER)
+    private val defaultAttributes = emptyArray<TextAttributesKey>()
 
-    private val Default = emptyArray<TextAttributesKey>()
     override fun getHighlightingLexer(): Lexer {
+        println(true)
         return FlexAdapter(_QueryGrammarLexer())
     }
 
     override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
         if (tokenType == TokenType.BAD_CHARACTER)
-            return Error
+            return errorAttributes
         if (tokenType == GeneratedTypes.LINE_COMMENT)
-            return Comment
-        if (tokenType == GeneratedTypes.IDENTIFIER)
-            return Identifier
-        if (KeywordsSet.contains(tokenType))
-            return KeywordHighlight
-        return Default
+            return commentAttributes
+        if (tokenType == GeneratedTypes.ID_TOKEN)
+            return identifierAttributes
+        if (tokenType == GeneratedTypes.STRING)
+            return stringAttributes
+        if (tokenType == GeneratedTypes.NUMBER)
+            return numberAttributes
+        if (KeywordsSet.contains(tokenType)
+                || tokenType == GeneratedTypes.BOOL
+                || wordOperatorsTokenSet.contains(tokenType))
+            return keywordAttributes
+        return defaultAttributes
     }
 }
 

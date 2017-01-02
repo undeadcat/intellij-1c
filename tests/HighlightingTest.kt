@@ -20,6 +20,7 @@ class HighlightingTest : ContainerTestBase() {
         schemaStore.addColumns("Справочник.Контрагенты",
                 PropertyInfo("Владелец", listOf("Справочник.Контрагенты")),
                 PropertyInfo("ИНН", emptyList()))
+        //TODO. highlight only last segment
         doTestHighlighting("select * from Документ.ПоступлениеНаРасчетныйСчет where " +
                 "Контрагент.ИНН = 123" +
                 "and Контрагент.Владелец.Инн = 456" +

@@ -88,6 +88,15 @@ class ParserTest : ParsingTestCase("parser", "1c", _1cParserDefinition()) {
         doTest(true)
     }
 
+    fun todo_NeedBetterRecovery() {
+        //TODO. highlights somethingValid as unknown identifier - need to end selection list at from keyword
+        /*
+        select
+	somethingValid,
+	someTrash someTrash someTrash
+from ValidTable */
+    }
+
     override fun skipSpaces(): Boolean {
         return true
     }

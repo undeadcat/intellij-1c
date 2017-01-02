@@ -7,14 +7,13 @@ import com.intellij.psi.util.*
 import com.simple1c.remote.RemoteException
 import generated.*
 
-//todo. need to log exceptions to console.
 class _1cAnnotator(private val pathEvaluator: PathEvaluator,
                    private val schemaStore: ISchemaStore) : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         try {
             element.accept(AnnotatingVisitor(holder, pathEvaluator, schemaStore))
         } catch (e: RemoteException) {
-
+            //todo. need to log exceptions to console.
         }
     }
 
