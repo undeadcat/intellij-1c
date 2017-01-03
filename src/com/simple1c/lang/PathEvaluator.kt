@@ -12,6 +12,7 @@ class PathEvaluator(private val schemaStore: ISchemaStore) {
 
         val candidateNames = path.withIndex().map { path.take(it.index + 1) }
         val rootTable = candidateNames
+                .asSequence()
                 .map { Pair(it, context.resolve(it.joinToString("."))) }
                 .filter { it.second != null }
                 .firstOrNull()
@@ -33,7 +34,7 @@ class PathEvaluator(private val schemaStore: ISchemaStore) {
             else return emptyList()
         }
         if (segments.isEmpty())
-            return emptyList()
+            return schema.properties
         val first = segments[0]
         val remainingPath = segments.subList(1, segments.size)
         if (remainingPath.isEmpty())

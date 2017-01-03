@@ -20,11 +20,11 @@ class HighlightingTest : ContainerTestBase() {
         schemaStore.addColumns("Справочник.Контрагенты",
                 PropertyInfo("Владелец", listOf("Справочник.Контрагенты")),
                 PropertyInfo("ИНН", emptyList()))
-        //TODO. highlight only last segment
-        doTestHighlighting("select * from Документ.ПоступлениеНаРасчетныйСчет where " +
-                "Контрагент.ИНН = 123" +
-                "and Контрагент.Владелец.Инн = 456" +
-                "and <warning>Контрагент.Владелец.Nonexistent</warning> = 123")
+        doTestHighlighting("select * from Документ.ПоступлениеНаРасчетныйСчет docs where\n" +
+                "docs.Контрагент.ИНН = 123\n" +
+                "and docs.Контрагент.Владелец.Инн = 456\n" +
+                "and docs.<warning descr=\"Could not resolve identifier Nonexistent.Владелец.ИНН\">Nonexistent.Владелец.ИНН</warning> = 123\n" +
+                "and docs.Контрагент.Владелец.<warning descr=\"Could not resolve identifier Nonexistent\">Nonexistent</warning> = 123")
     }
 
     fun testDoNotHighlightFunctionNames() {

@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 
 class CreateQueryAction() : AnAction("1C: Create query", "Create a new scratch file with this data source", null) {
     override fun actionPerformed(e: AnActionEvent?) {
-        print(e!!.dataContext)
     }
 
 }

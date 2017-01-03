@@ -46,7 +46,6 @@ internal class SyntaxHighlighter : com.intellij.openapi.fileTypes.SyntaxHighligh
     private val defaultAttributes = emptyArray<TextAttributesKey>()
 
     override fun getHighlightingLexer(): Lexer {
-        println(true)
         return FlexAdapter(_QueryGrammarLexer())
     }
 

@@ -28,9 +28,14 @@
 
     <application-components>
         <component>
-            <implementation-class>com.simple1c.configuration.ApplicationComponent</implementation-class>
+            <implementation-class>com.simple1c.configuration.MyApplicationComponent</implementation-class>
         </component>
     </application-components>
+    <project-components>
+        <component>
+            <implementation-class>com.simple1c.configuration.MyProjectComponent</implementation-class>
+        </component>
+    </project-components>
 
     <actions>
 

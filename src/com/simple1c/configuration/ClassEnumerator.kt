@@ -1,34 +1,25 @@
 package com.simple1c.configuration
 
-import com.intellij.openapi.components.ApplicationComponent
-import com.intellij.openapi.components.impl.ComponentManagerImpl
+import com.intellij.openapi.components.BaseComponent
+import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.diagnostic.Logger
 import java.io.File
 import java.lang.reflect.Modifier
 import java.nio.file.Paths
 
-//TODO. kill excludeTypes?
-class ComponentAutoRegistrator(val root: File, val excludeType: Class<*>) {
-    private var classes: Iterable<Class<*>>? = null
+class ClassEnumerator(val root: File) {
     val logger = Logger.getInstance(javaClass)
-    fun autoRegister(description: String,
-                     componentManager: ComponentManagerImpl, classFilter: (Class<*>) -> Boolean = { true }) {
-        for (clazz in getClasses()
+    fun enumerate(): List<Class<*>> {
+        return getClasses()
                 .distinct()
-                .filter(classFilter)
                 .filter {
-                    it != excludeType
-                            && !Modifier.isAbstract(it.modifiers)
+                    !Modifier.isAbstract(it.modifiers)
                             && !it.isInterface
-                            && !ApplicationComponent::class.java.isAssignableFrom(it)
-                            && it.getAnnotationsByType(ProjectService::class.java).isEmpty()
-                }) {
-            val interfaces = clazz.interfaces + clazz
-            val logMessage = "$description: Registering class ${clazz.simpleName} as " +
-                    interfaces.map { it.simpleName }.joinToString(",")
-            logger.info(logMessage)
-            componentManager.picoContainer.registerComponentImplementation(clazz)
-        }
+                            && it != ClassEnumerator::class.java
+                            && !PersistentStateComponent::class.java.isAssignableFrom(it)
+                            && !BaseComponent::class.java.isAssignableFrom(it)
+
+                }
     }
 
     private fun getClasses(): Iterable<Class<*>> {
@@ -56,5 +47,10 @@ class ComponentAutoRegistrator(val root: File, val excludeType: Class<*>) {
         return files
                 .flatMap { getFilesOfType(it, extension) + it }
                 .filter { it.name.endsWith(extension) }
+    }
+
+    companion object {
+        private var classes: Iterable<Class<*>>? = null
+
     }
 }
