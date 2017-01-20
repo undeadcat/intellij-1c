@@ -15,13 +15,13 @@ import org.apache.commons.lang.SystemUtils
 import java.io.File
 import java.io.IOException
 import java.net.ServerSocket
+import java.nio.file.Files
 
 //TODO. need to add pinger (http/psql) and notify on failure
 class AnalysisHostProcess(private val application: Application) {
     private val logger = Logger.getInstance(javaClass)
     private val retryAction = RetryAction(this)
-    private val exeDir = "/Users/jetbrains/sources/simple-1c/bin/"
-    private val executableName = "Simple1c.AnalysisHost.exe"
+    private val executableName = "Simple1C.AnalysisHost.exe"
     private val currentNotifications = arrayListOf<Notification>()
     private val sync = Object()
 
@@ -43,21 +43,34 @@ class AnalysisHostProcess(private val application: Application) {
     private fun ensureInitialized(): Handle? {
         if (handle != null)
             return handle
-        val myHandle = synchronized(sync, {
-            createProcess()
+        return synchronized(sync, {
+            val handle = createProcess()
+            this.handle = handle
+            return handle
         })
-        handle = myHandle
-        return myHandle
     }
 
     private fun createProcess(): Handle? {
         currentNotifications.forEach { it.expire() }
         currentNotifications.clear()
+
+        val classLoader = AnalysisHostProcess::class.java.classLoader
+        val resources = File(classLoader.getResource("Simple1C").path).list()
+        val tempDir = Files.createTempDirectory("simple1c-tempdir")
+        tempDir.toFile().deleteOnExit()
+        val tempFiles = resources.map { resource ->
+            val sourceFile = File(classLoader.getResource("Simple1C/" + resource).path)
+            val tempFile = sourceFile.copyTo(File(tempDir.toAbsolutePath().toString(), sourceFile.name))
+            tempFile.deleteOnExit()
+            tempFile
+        }
+
         var commandLine = emptyList<String>()
         try {
             val openPort = findPort()
             logger.info("Found open port $openPort")
-            commandLine = getCommandLine(openPort)
+            val executablePath = tempFiles.first { it.path.contains(executableName) }
+            commandLine = getCommandLine(openPort, executablePath.absolutePath)
 
             val process = ProcessBuilder()
                     .command(commandLine)
@@ -99,9 +112,8 @@ StackTrace: $stacktrace"""
         }
     }
 
-    private fun getCommandLine(port: Int): List<String> {
-        val executablePath = File(exeDir, executableName).absolutePath
-        val commandLine = listOf(executablePath, "-port", port.toString())
+    private fun getCommandLine(port: Int, path: String): List<String> {
+        val commandLine = listOf(path, "-port", port.toString())
         if (SystemUtils.IS_OS_WINDOWS)
             return commandLine
         return listOf("mono") + commandLine
