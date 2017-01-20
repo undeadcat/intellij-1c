@@ -3,7 +3,7 @@ package com.simple1c.lang
 import com.intellij.psi.PsiFile
 import coreUtils.equalsIgnoreCase
 
-class PathEvaluator(private val schemaStore: ISchemaStore) {
+class PathEvaluator private constructor(private val schemaStore: ISchemaStore, private val condition: (String, String) -> Boolean) {
     private val idPropertyName = "Ссылка"
 
     fun eval(file: PsiFile, context: QueryContext, path: List<String>): List<String> {
@@ -38,7 +38,7 @@ class PathEvaluator(private val schemaStore: ISchemaStore) {
         val first = segments[0]
         val remainingPath = segments.subList(1, segments.size)
         if (remainingPath.isEmpty())
-            return schema.properties.filter { it.name.startsWith(first, true) }
+            return schema.properties.filter { condition(it.name, first) }
         if (first.equalsIgnoreCase(idPropertyName)) {
             if (schema.type == TableType.TableSection) {
                 return evalWithSchemaName(getMainTableName(schema.name), remainingPath)
@@ -56,6 +56,16 @@ class PathEvaluator(private val schemaStore: ISchemaStore) {
         if (lastDot <= 0)
             throw RuntimeException("Assertion failed. Expected TableSection name to contain a '.': $name")
         return name.substring(0, lastDot)
+    }
+
+    companion object {
+        fun prefix(schemaStore: ISchemaStore): PathEvaluator {
+            return PathEvaluator(schemaStore, { x, y -> x.startsWith(y, true)})
+        }
+
+        fun exact(schemaStore: ISchemaStore): PathEvaluator {
+            return PathEvaluator(schemaStore, String::equalsIgnoreCase)
+        }
     }
 }
 

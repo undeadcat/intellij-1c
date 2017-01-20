@@ -13,8 +13,8 @@ import generated.*
 
 //TODO. don't complete where column is unexpected.
 class SchemaCompletionContributor(private val schemaStore: ISchemaStore,
-                                  private val pathEvaluator: PathEvaluator,
                                   completionService: CompletionService) : CompletionContributor() {
+    private val pathEvaluator = PathEvaluator.prefix(schemaStore)
     private val relevanceSorter = completionService.emptySorter().weigh(object : LookupElementWeigher("priority") {
         override fun weigh(element: LookupElement): Comparable<Int> {
             return -(element.getUserData(priorityKey) ?: 0)

@@ -8,8 +8,8 @@ import com.intellij.psi.util.*
 import com.simple1c.remote.RemoteException
 import generated.*
 
-class _1cAnnotator(private val pathEvaluator: PathEvaluator,
-                   private val schemaStore: ISchemaStore) : Annotator {
+class _1cAnnotator(private val schemaStore: ISchemaStore) : Annotator {
+    private val pathEvaluator = PathEvaluator.exact(schemaStore)
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         try {
             element.accept(AnnotatingVisitor(holder, pathEvaluator, schemaStore))
@@ -60,7 +60,5 @@ class _1cAnnotator(private val pathEvaluator: PathEvaluator,
                 CachedValueProvider.Result(context, PsiModificationTracker.MODIFICATION_COUNT)
             })
         }
-
     }
-
 }

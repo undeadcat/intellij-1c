@@ -23,13 +23,18 @@ class HighlightingTest : ContainerTestBase() {
         doTestHighlighting("select * from Документ.ПоступлениеНаРасчетныйСчет docs where\n" +
                 "docs.Контрагент.ИНН = 123\n" +
                 "and docs.Контрагент.Владелец.Инн = 456\n" +
-                "and docs.<warning descr=\"Could not resolve identifier Nonexistent.Владелец.ИНН\">Nonexistent.Владелец.ИНН</warning> = 123\n" +
-                "and docs.Контрагент.Владелец.<warning descr=\"Could not resolve identifier Nonexistent\">Nonexistent</warning> = 123")
+                "and docs.<warning descr=\"Could not resolve identifier 'Nonexistent.Владелец.ИНН'\">Nonexistent.Владелец.ИНН</warning> = 123\n" +
+                "and docs.Контрагент.Владелец.<warning descr=\"Could not resolve identifier 'Nonexistent'\">Nonexistent</warning> = 123")
     }
 
     fun testDoNotHighlightFunctionNames() {
         schemaStore.addColumns("Table")
         doTestHighlighting("select count(<warning>NonExistent</warning>) from Table where length(<warning>Inn</warning>) > 0")
+    }
+
+    fun testHighlightPrefixOfValidColumn() {
+        schemaStore.addColumns("Table", "Column")
+        doTestHighlighting("select <warning>Col</warning> from Table")
     }
 
     private fun doTestHighlighting(text: String) {
