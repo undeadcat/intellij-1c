@@ -7,8 +7,7 @@ import coreUtils.getComponentsOfType
 import org.picocontainer.MutablePicoContainer
 
 class MyApplicationComponent(val application: Application) : ApplicationComponent {
-    private val selfClass = javaClass
-    private val logger = Logger.getInstance(selfClass)
+    private val logger = Logger.getInstance(javaClass)
     override fun initComponent() {
         val container = application.picoContainer as MutablePicoContainer
         ClassEnumerator(PluginId.get().path)

@@ -14,14 +14,27 @@ import coreUtils.readString
 import org.apache.commons.lang.SystemUtils
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
 import java.net.ServerSocket
 import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+
 
 //TODO. need to add pinger (http/psql) and notify on failure
 class AnalysisHostProcess(private val application: Application) {
+    private val macOsMonoPath = "/Library/Frameworks/Mono.framework/Versions/Current/bin/mono"
+    private val requiredFiles = arrayListOf(
+            "Simple1C.AnalysisHost",
+            "Simple1C",
+            "Irony",
+            "Npgsql",
+            "Newtonsoft.Json")
+    private val extensions = arrayListOf("dll", "exe", "dll.mdb", "exe.mdb", "pdb", "dll")
+    private val executableName = "Simple1C.AnalysisHost.exe"
+    private val resourceDir = "Simple1C"
     private val logger = Logger.getInstance(javaClass)
     private val retryAction = RetryAction(this)
-    private val executableName = "Simple1C.AnalysisHost.exe"
     private val currentNotifications = arrayListOf<Notification>()
     private val sync = Object()
 
@@ -46,7 +59,7 @@ class AnalysisHostProcess(private val application: Application) {
         return synchronized(sync, {
             val handle = createProcess()
             this.handle = handle
-            return handle
+            handle
         })
     }
 
@@ -54,22 +67,13 @@ class AnalysisHostProcess(private val application: Application) {
         currentNotifications.forEach { it.expire() }
         currentNotifications.clear()
 
-        val classLoader = AnalysisHostProcess::class.java.classLoader
-        val resources = File(classLoader.getResource("Simple1C").path).list()
-        val tempDir = Files.createTempDirectory("simple1c-tempdir")
-        tempDir.toFile().deleteOnExit()
-        val tempFiles = resources.map { resource ->
-            val sourceFile = File(classLoader.getResource("Simple1C/" + resource).path)
-            val tempFile = sourceFile.copyTo(File(tempDir.toAbsolutePath().toString(), sourceFile.name))
-            tempFile.deleteOnExit()
-            tempFile
-        }
+        val tempFiles = copyResources()
+        val executablePath = tempFiles.first { it.path.contains(executableName) }
 
         var commandLine = emptyList<String>()
         try {
             val openPort = findPort()
             logger.info("Found open port $openPort")
-            val executablePath = tempFiles.first { it.path.contains(executableName) }
             commandLine = getCommandLine(openPort, executablePath.absolutePath)
 
             val process = ProcessBuilder()
@@ -95,12 +99,16 @@ class AnalysisHostProcess(private val application: Application) {
 
             return Handle(process, openPort)
         } catch (e: Exception) {
+            val isMacOS = SystemUtils.IS_OS_MAC_OSX
+            val macOSItem = "3) On Mac OS X, mono is not installed in path, and path value differs for GUI and non-GUI applications." +
+                    "Make sure mono executable is in $macOsMonoPath"
             val stacktrace = e.formatStacktrace()
             val msg = """Error starting analysis host process.
 Command line: ${commandLine.joinToString(" ")}
 Ensure that
 1) you have .NET or Mono installed
-2) path to $executableName is correct
+2) $executableName and dependencies exist in path $executablePath
+${if (isMacOS) macOSItem else ""}
 
 StackTrace: $stacktrace"""
             val notification = Notification("1C Plugin", "1C Plugin", msg, NotificationType.ERROR)
@@ -112,10 +120,38 @@ StackTrace: $stacktrace"""
         }
     }
 
+    private fun copyResources(): List<File> {
+        val tempDir = Files.createTempDirectory("simple1c-tempdir")
+        tempDir.toFile().deleteOnExit()
+        val candidates = requiredFiles.flatMap { fileName -> extensions.map { extension -> fileName + "." + extension } }
+        return candidates.map {
+            val stream = getResourceStreamOrNull(File(resourceDir, it).toString())
+            if (stream == null) null
+            else {
+                val targetPath = Paths.get(tempDir.toString(), File(it).name)
+                Files.copy(stream, targetPath, StandardCopyOption.REPLACE_EXISTING)
+                stream.close()
+                targetPath.toFile().deleteOnExit()
+                targetPath.toFile()
+            }
+        }.filterNotNull()
+    }
+
+    private fun getResourceStreamOrNull(path: String): InputStream? {
+        try {
+            return AnalysisHostProcess::class.java.classLoader.getResourceAsStream(path)
+        } catch (e: Exception) {
+            logger.info("Could not load resource {$path}", e)
+            return null
+        }
+    }
+
     private fun getCommandLine(port: Int, path: String): List<String> {
         val commandLine = listOf(path, "-port", port.toString())
         if (SystemUtils.IS_OS_WINDOWS)
             return commandLine
+        if (SystemUtils.IS_OS_MAC_OSX)
+            return listOf(macOsMonoPath) + commandLine
         return listOf("mono") + commandLine
     }
 
