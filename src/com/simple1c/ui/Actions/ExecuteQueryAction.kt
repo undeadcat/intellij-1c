@@ -43,8 +43,8 @@ class ExecuteQueryAction(private val queryExecutor: QueryExecutor,
         val editor = e.getData(CommonDataKeys.EDITOR)
         val _1cFile = psiFile as? _1cFile
         e.presentation.isVisible = _1cFile != null
-        val isEnabled = if (_1cFile != null) {
-            val startQuery = findQueryAfter(_1cFile, editor!!.selectionModel.selectionStart)
+        val isEnabled = if (editor != null && _1cFile != null) {
+            val startQuery = findQueryAfter(_1cFile, editor.selectionModel.selectionStart)
             val endQuery = findQueryBefore(_1cFile, editor.selectionModel.selectionEnd)
             startQuery != null
                     && endQuery != null

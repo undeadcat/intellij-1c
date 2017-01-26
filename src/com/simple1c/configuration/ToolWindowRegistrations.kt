@@ -3,6 +3,7 @@ package com.simple1c.configuration
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
@@ -51,8 +52,7 @@ class DataSourcesWindowRegistration(val analysisHostProcess: AnalysisHostProcess
 
 class ConsoleWindowRegistration : ToolWindowFactory, DumbAware {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        val consoleLogView = ConsoleLogView(project)
-        consoleLogView.initContent(toolWindow)
+        //oh fuck me with an xml config
+        ServiceManager.getService(project, ConsoleLogView::class.java).initContent(toolWindow)
     }
-
 }

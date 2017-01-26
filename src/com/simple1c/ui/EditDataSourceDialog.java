@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.DarculaColors;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.util.containers.ContainerUtil;
 import com.simple1c.dataSources.DataSource;
@@ -101,6 +102,7 @@ public class EditDataSourceDialog extends DialogWrapper {
             public void mouseClicked(MouseEvent e) {
                 toggleEnabled(false, partInputs);
                 toggleEnabled(true, connectionStringInput);
+                connectionStringInput.requestFocus();
             }
         });
 
@@ -109,6 +111,7 @@ public class EditDataSourceDialog extends DialogWrapper {
             public void mouseClicked(MouseEvent e) {
                 toggleEnabled(true, partInputs);
                 toggleEnabled(false, connectionStringInput);
+                field.requestFocus();
             }
         }));
 
@@ -163,30 +166,19 @@ public class EditDataSourceDialog extends DialogWrapper {
     }
 
     private void toggleEnabled(boolean enabled, Collection<JTextField> inputs) {
-        inputs.forEach(field -> field.setEnabled(enabled));
+        inputs.forEach(field -> {
+            field.setEnabled(enabled);
+            field.setEditable(enabled);
+        });
     }
 
     private void addChangeListener(JTextField textField, Consumer<String> listener) {
         Document document = textField.getDocument();
-        document.addDocumentListener(new DocumentListener() {
+        document.addDocumentListener(new DocumentAdapter() {
             String lastValue = getText();
 
             @Override
-            public void insertUpdate(DocumentEvent e) {
-                fireListener();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                fireListener();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                fireListener();
-            }
-
-            private void fireListener() {
+            protected void textChanged(DocumentEvent e) {
                 String newText = getText();
                 if (Objects.equals(newText, lastValue))
                     return;

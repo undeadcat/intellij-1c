@@ -50,7 +50,8 @@ class AnalysisHostProcess(private val application: Application) {
     }
 
     fun isAvailable(): Boolean {
-        return ensureInitialized() != null
+        val handle = ensureInitialized()
+        return handle != null && handle.port != null
     }
 
     private fun ensureInitialized(): Handle? {
@@ -172,7 +173,10 @@ StackTrace: $stacktrace"""
     private class RetryAction(private val analysisHostProcess: AnalysisHostProcess)
         : AnAction("Retry", "Some message", null) {
         override fun actionPerformed(e: AnActionEvent?) {
-            analysisHostProcess.handle = analysisHostProcess.ensureInitialized()
+            synchronized(analysisHostProcess.sync) {
+                analysisHostProcess.handle = null
+                analysisHostProcess.handle = analysisHostProcess.ensureInitialized()
+            }
         }
     }
 

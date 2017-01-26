@@ -29,6 +29,9 @@
         <component>
             <implementation-class>com.simple1c.configuration.MyProjectComponent</implementation-class>
         </component>
+        <component>
+            <implementation-class>com.simple1c.ui.ConsoleLogView$_1cQueryListener</implementation-class>
+        </component>
     </project-components>
 
     <actions>
